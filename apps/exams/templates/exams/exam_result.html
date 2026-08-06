@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Exam Result — {{ attempt.exam.title }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="text-center mb-5">
+    <h2 class="fw-bold">{{ attempt.exam.title }}</h2>
+    <p class="text-muted">{{ attempt.exam.course.title }}</p>
+  </div>
+  <div class="row justify-content-center mb-4">
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0 {% if attempt.passed %}border-success{% else %}border-danger{% endif %}">
+        <div class="card-header text-center py-3 {% if attempt.passed %}bg-success text-white{% else %}bg-danger text-white{% endif %}">
+          <h3 class="mb-0">
+            {% if attempt.passed %}<i class="fas fa-trophy"></i> PASSED!
+            {% else %}<i class="fas fa-times-circle"></i> NOT PASSED{% endif %}
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-4">
+              <div class="p-3 bg-light rounded">
+                <h2 class="fw-bold text-primary mb-0">{{ attempt.score }}<small class="fs-6 text-muted">/{{ attempt.exam.total_marks }}</small></h2>
+                <small class="text-muted">Score</small>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="p-3 bg-light rounded">
+                <h2 class="fw-bold mb-0 {% if attempt.percentage >= attempt.exam.passing_score %}text-success{% else %}text-danger{% endif %}">
+                  {{ attempt.percentage|floatformat:1 }}%
+                </h2>
+                <small class="text-muted">Percentage</small>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="p-3 bg-light rounded">
+                <h2 class="fw-bold text-muted mb-0">{{ attempt.exam.passing_score }}%</h2>
+                <small class="text-muted">Pass Mark</small>
+              </div>
+            </div>
+          </div>
+          <hr>
+          <div class="row text-muted small">
+            <div class="col-6"><i class="fas fa-play-circle"></i> Started: {{ attempt.started_at|date:"M d, Y H:i" }}</div>
+            <div class="col-6 text-end"><i class="fas fa-flag-checkered"></i> Submitted: {{ attempt.submitted_at|date:"M d, Y H:i" }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <h4 class="fw-bold mb-3">Answer Review</h4>
+      {% for answer in answers %}
+      <div class="card shadow-sm border-0 mb-3 {% if answer.is_correct %}border-start border-success border-3{% else %}border-start border-danger border-3{% endif %}">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h6 class="fw-bold mb-0">{{ forloop.counter }}. {{ answer.question.question_text }}</h6>
+            <div class="d-flex gap-2 flex-shrink-0">
+              <span class="badge bg-secondary">{{ answer.question.marks }} mk</span>
+              {% if answer.is_correct %}
+                <span class="badge bg-success"><i class="fas fa-check"></i> Correct</span>
+              {% else %}
+                <span class="badge bg-danger"><i class="fas fa-times"></i> Wrong</span>
+              {% endif %}
+            </div>
+          </div>
+          <div class="mt-2">
+            {% for choice in answer.question.choices.all %}
+            <div class="p-2 rounded mb-1 d-flex align-items-center gap-2
+              {% if choice.is_correct %}bg-success bg-opacity-10 border border-success
+              {% elif choice == answer.selected_choice and not choice.is_correct %}bg-danger bg-opacity-10 border border-danger
+              {% else %}bg-light{% endif %}">
+              {% if choice.is_correct %}
+                <i class="fas fa-check-circle text-success flex-shrink-0"></i>
+              {% elif choice == answer.selected_choice and not choice.is_correct %}
+                <i class="fas fa-times-circle text-danger flex-shrink-0"></i>
+              {% else %}
+                <i class="fas fa-circle text-muted flex-shrink-0" style="font-size:0.5rem;"></i>
+              {% endif %}
+              <span>{{ choice.choice_text }}</span>
+              {% if choice == answer.selected_choice %}<span class="ms-auto badge bg-secondary">Your answer</span>{% endif %}
+              {% if choice.is_correct %}<span class="ms-auto badge bg-success">Correct</span>{% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          {% if answer.question.explanation %}
+          <div class="alert alert-info mt-2 mb-0 py-2">
+            <small><i class="fas fa-lightbulb"></i> <strong>Explanation:</strong> {{ answer.question.explanation }}</small>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <div class="alert alert-info">No answers recorded.</div>
+      {% endfor %}
+      <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'courses:course_detail' attempt.exam.course.pk %}" class="btn btn-secondary">
+          <i class="fas fa-arrow-left"></i> Back to Course
+        </a>
+        <a href="{% url 'exams:my_exams' %}" class="btn btn-primary">
+          <i class="fas fa-list"></i> My Exams
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

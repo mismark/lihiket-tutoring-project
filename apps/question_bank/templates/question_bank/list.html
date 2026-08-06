@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Question Bank{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold"><i class="fas fa-database text-primary"></i> Question Bank</h2>
+      <p class="text-muted mb-0">Manage reusable questions for exams, quizzes and assignments.</p>
+    </div>
+    <a href="{% url 'question_bank:create' %}" class="btn btn-primary">
+      <i class="fas fa-plus-circle"></i> Add Question
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+      <form method="GET" class="row g-2 align-items-end">
+
+        <div class="col-md-4">
+          <label class="form-label small fw-semibold">Search</label>
+          <input type="text" name="search" class="form-control"
+                 placeholder="Search questions..." value="{{ search }}">
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label small fw-semibold">Type</label>
+          <select name="type" class="form-select">
+            <option value="">All Types</option>
+            {% for val, label in question_types %}
+              <option value="{{ val }}" {% if q_type == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label small fw-semibold">Difficulty</label>
+          <select name="difficulty" class="form-select">
+            <option value="">All Levels</option>
+            {% for val, label in difficulty_levels %}
+              <option value="{{ val }}" {% if difficulty == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label small fw-semibold">Subject</label>
+          <select name="subject" class="form-select">
+            <option value="">All Subjects</option>
+            {% for s in subjects %}
+              <option value="{{ s.pk }}" {% if subject_id == s.pk|stringformat:"s" %}selected{% endif %}>
+                {{ s.name }} ({{ s.get_grade_level_display }})
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-2 d-flex gap-2">
+          <button class="btn btn-primary flex-grow-1">
+            <i class="fas fa-search"></i> Filter
+          </button>
+          <a href="{% url 'question_bank:list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-times"></i>
+          </a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="alert alert-light border mb-3">
+    <strong>{{ total }}</strong> question{{ total|pluralize }} found
+  </div>
+
+  <!-- Question Table -->
+  {% if questions %}
+  <div class="card shadow-sm border-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead class="table-light">
+          <tr>
+            <th width="40%">Question</th>
+            <th>Subject</th>
+            <th>Type</th>
+            <th>Difficulty</th>
+            <th>Marks</th>
+            <th>Status</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for q in questions %}
+          <tr>
+            <td>
+              <p class="mb-1 fw-semibold">{{ q.question_text|truncatewords:15 }}</p>
+              {% if q.tags %}
+                {% for tag in q.tags.split|slice:":3" %}
+                  <span class="badge bg-light text-dark border small">{{ tag|cut:"," }}</span>
+                {% endfor %}
+              {% endif %}
+            </td>
+            <td>
+              {% if q.subject %}
+                <span class="badge bg-info text-dark">{{ q.subject.name }}</span>
+                <br><small class="text-muted">{{ q.subject.get_grade_level_display }}</small>
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td>
+              <span class="badge bg-{{ q.get_type_badge_color }}">
+                {{ q.get_question_type_display }}
+              </span>
+            </td>
+            <td>
+              <span class="badge bg-{{ q.get_difficulty_badge_color }}">
+                {{ q.get_difficulty_display }}
+              </span>
+            </td>
+            <td><span class="fw-bold">{{ q.marks }}</span></td>
+            <td>
+              {% if q.is_active %}
+                <span class="badge bg-success">Active</span>
+              {% else %}
+                <span class="badge bg-secondary">Inactive</span>
+              {% endif %}
+            </td>
+            <td class="text-center">
+              <div class="btn-group btn-group-sm">
+                <a href="{% url 'question_bank:detail' q.pk %}"
+                   class="btn btn-outline-primary" title="View">
+                  <i class="fas fa-eye"></i>
+                </a>
+                <a href="{% url 'question_bank:edit' q.pk %}"
+                   class="btn btn-outline-warning" title="Edit">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'question_bank:delete' q.pk %}"
+                   class="btn btn-outline-danger" title="Delete">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  {% if page_obj.has_other_pages %}
+  <nav class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.previous_page_number }}&search={{ search }}&type={{ q_type }}&difficulty={{ difficulty }}&subject={{ subject_id }}">Previous</a>
+        </li>
+      {% endif %}
+      {% for num in page_obj.paginator.page_range %}
+        <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+          <a class="page-link" href="?page={{ num }}&search={{ search }}&type={{ q_type }}&difficulty={{ difficulty }}&subject={{ subject_id }}">{{ num }}</a>
+        </li>
+      {% endfor %}
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.next_page_number }}&search={{ search }}&type={{ q_type }}&difficulty={{ difficulty }}&subject={{ subject_id }}">Next</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+
+  {% else %}
+  <div class="alert alert-info text-center py-5">
+    <i class="fas fa-question-circle fa-3x mb-3 text-primary d-block"></i>
+    <h5>No questions yet.</h5>
+    <a href="{% url 'question_bank:create' %}" class="btn btn-primary mt-2">
+      <i class="fas fa-plus-circle"></i> Create Your First Question
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

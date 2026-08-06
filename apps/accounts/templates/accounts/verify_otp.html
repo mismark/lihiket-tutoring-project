@@ -1,0 +1,52 @@
+{% extends "base_auth.html" %}
+{% load static %}
+
+{% block title %}Enter Reset Code{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'accounts/css/accounts.css' %}">
+
+<div class="container py-5">
+  <div class="card mx-auto shadow p-4" style="max-width:420px;">
+
+    <div class="text-center mb-4">
+      <h3>Enter Reset Code</h3>
+      <p class="text-muted">Enter the 4-digit code we sent to your email. The code expires in 10 minutes.</p>
+    </div>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <div class="mb-4">
+        <label class="form-label">4-Digit Code</label>
+        {{ form.code }}
+        {% if form.code.errors %}
+          <div class="text-danger small mt-1">{{ form.code.errors.0 }}</div>
+        {% endif %}
+        {% if form.non_field_errors %}
+          <div class="text-danger small mt-1">{{ form.non_field_errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="d-grid">
+        <button class="btn btn-primary">Verify Code</button>
+      </div>
+
+    </form>
+
+    <p class="text-center mt-3">
+      Didn't receive a code?
+      <a href="{% url 'accounts:forgot_password' %}">Try again</a>
+    </p>
+
+  </div>
+</div>
+
+{% endblock %}

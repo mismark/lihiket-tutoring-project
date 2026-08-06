@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ document.title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'documents/css/documents.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="row">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body">
+
+                    <div class="text-center mb-4">
+
+                        {% if document.file_extension == "pdf" %}
+
+                            <i class="fas fa-file-pdf fa-5x text-danger"></i>
+
+                        {% elif document.file_extension == "doc" or document.file_extension == "docx" %}
+
+                            <i class="fas fa-file-word fa-5x text-primary"></i>
+
+                        {% elif document.file_extension == "ppt" or document.file_extension == "pptx" %}
+
+                            <i class="fas fa-file-powerpoint fa-5x text-warning"></i>
+
+                        {% elif document.file_extension == "xls" or document.file_extension == "xlsx" %}
+
+                            <i class="fas fa-file-excel fa-5x text-success"></i>
+
+                        {% elif document.file_extension == "zip" or document.file_extension == "rar" %}
+
+                            <i class="fas fa-file-archive fa-5x text-secondary"></i>
+
+                        {% else %}
+
+                            <i class="fas fa-file fa-5x text-info"></i>
+
+                        {% endif %}
+
+                    </div>
+
+                    <h2 class="fw-bold">
+
+                        {{ document.title }}
+
+                    </h2>
+
+                    <hr>
+
+                    <p>
+
+                        {{ document.description }}
+
+                    </p>
+
+                    <div class="d-grid gap-2 mt-4">
+
+                        <a href="{% url 'documents:download_document' document.pk %}"
+                           class="btn btn-success">
+
+                            <i class="fas fa-download"></i>
+
+                            Download Document
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-4">
+
+            <div class="card shadow border-0">
+
+                <div class="card-header bg-primary text-white">
+
+                    <h5 class="mb-0">
+
+                        Document Information
+
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <table class="table table-borderless">
+
+                        <tr>
+
+                            <th>Subject</th>
+
+                            <td>{{ document.subject.name }}</td>
+
+                        </tr>
+
+                        <tr>
+
+                            <th>Course</th>
+
+                            <td>{{ document.course.title }}</td>
+
+                        </tr>
+
+                        {% if document.lesson %}
+
+                        <tr>
+
+                            <th>Lesson</th>
+
+                            <td>{{ document.lesson.title }}</td>
+
+                        </tr>
+
+                        {% endif %}
+
+                        <tr>
+
+                            <th>Teacher</th>
+
+                            <td>
+
+                                {{ document.teacher.get_full_name|default:document.teacher.username }}
+
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <th>Visibility</th>
+
+                            <td>
+
+                                {{ document.get_visibility_display }}
+
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <th>File Name</th>
+
+                            <td>
+
+                                {{ document.file_name }}
+
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <th>Extension</th>
+
+                            <td>
+
+                                {{ document.file_extension|upper }}
+
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <th>Size</th>
+
+                            <td>
+
+                                {{ document.file_size }}
+
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <th>Downloads</th>
+
+                            <td>
+
+                                {{ document.download_count }}
+
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <th>Uploaded</th>
+
+                            <td>
+
+                                {{ document.created_at|date:"M d, Y H:i" }}
+
+                            </td>
+
+                        </tr>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+            {% if can_manage %}
+
+            <div class="card shadow border-0 mt-4">
+
+                <div class="card-body">
+
+                    <div class="d-grid gap-2">
+
+                        <a href="{% url 'documents:document_update' document.pk %}"
+                           class="btn btn-warning">
+
+                            <i class="fas fa-edit"></i>
+
+                            Edit Document
+
+                        </a>
+
+                        <a href="{% url 'documents:document_delete' document.pk %}"
+                           class="btn btn-danger">
+
+                            <i class="fas fa-trash"></i>
+
+                            Delete Document
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'documents/js/documents.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold">{{ quiz.title }}</h2>
+      <p class="text-muted mb-0">
+        <i class="fas fa-book"></i> {{ quiz.course.title }}
+      </p>
+    </div>
+    <a href="{% url 'quizzes:quiz_list' %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+  </div>
+
+  <div class="row">
+
+    <!-- Main -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-3">About This Quiz</h5>
+          <p>{{ quiz.description|linebreaks|default:"No description provided." }}</p>
+
+          <hr>
+
+          <!-- Student attempt status -->
+          {% if request.user.role == "student" %}
+            {% if my_attempt and my_attempt.completed_at %}
+              <div class="alert {% if my_attempt.passed %}alert-success{% else %}alert-danger{% endif %}">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <strong>
+                      {% if my_attempt.passed %}
+                        <i class="fas fa-trophy"></i> You passed this quiz!
+                      {% else %}
+                        <i class="fas fa-times-circle"></i> You did not pass.
+                      {% endif %}
+                    </strong>
+                    <p class="mb-0 mt-1">
+                      Score: <strong>{{ my_attempt.score }}/{{ my_attempt.total_marks }}</strong>
+                      &nbsp;·&nbsp; {{ my_attempt.percentage|floatformat:1 }}%
+                    </p>
+                  </div>
+                  <a href="{% url 'quizzes:quiz_result' my_attempt.pk %}"
+                     class="btn btn-primary btn-sm">
+                    <i class="fas fa-chart-bar"></i> View Result
+                  </a>
+                </div>
+              </div>
+            {% else %}
+              <a href="{% url 'quizzes:start_quiz' quiz.pk %}" class="btn btn-success btn-lg">
+                <i class="fas fa-play"></i> Start Quiz
+              </a>
+            {% endif %}
+          {% endif %}
+
+          <!-- Teacher actions -->
+          {% if can_manage %}
+          <div class="d-flex flex-wrap gap-2 mt-3">
+            <a href="{% url 'quizzes:question_list' quiz.pk %}" class="btn btn-info">
+              <i class="fas fa-list"></i> Manage Questions
+            </a>
+            <a href="{% url 'quizzes:import_questions' quiz.pk %}" class="btn btn-outline-info">
+              <i class="fas fa-file-import"></i> Import from Question Bank
+            </a>
+            <a href="{% url 'quizzes:quiz_update' quiz.pk %}" class="btn btn-warning">
+              <i class="fas fa-edit"></i> Edit Quiz
+            </a>
+            <a href="{% url 'quizzes:quiz_results' quiz.pk %}" class="btn btn-primary">
+              <i class="fas fa-chart-bar"></i> View All Results
+            </a>
+            <a href="{% url 'quizzes:quiz_delete' quiz.pk %}" class="btn btn-outline-danger">
+              <i class="fas fa-trash"></i> Delete
+            </a>
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+
+      <!-- Questions preview (teacher only) -->
+      {% if can_manage %}
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white">
+          <h6 class="mb-0 fw-bold">
+            <i class="fas fa-question-circle text-primary"></i>
+            Questions ({{ quiz.questions.count }})
+            &nbsp;·&nbsp; Total Marks: {{ total_marks }}
+          </h6>
+        </div>
+        <ul class="list-group list-group-flush">
+          {% for question in quiz.questions.all %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <span class="fw-semibold">{{ forloop.counter }}.</span>
+              {{ question.question_text|truncatewords:15 }}
+            </div>
+            <div class="d-flex gap-2 align-items-center">
+              <span class="badge bg-secondary">{{ question.get_question_type_display }}</span>
+              <span class="badge bg-primary">{{ question.marks }} mk</span>
+              <a href="{% url 'quizzes:question_update' question.pk %}"
+                 class="btn btn-outline-warning btn-sm">
+                <i class="fas fa-edit"></i>
+              </a>
+            </div>
+          </li>
+          {% empty %}
+          <li class="list-group-item text-muted text-center py-4">
+            No questions yet.
+            <a href="{% url 'quizzes:question_create' quiz.pk %}">Add the first question</a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <!-- Sidebar info -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white">
+          <h6 class="mb-0 fw-bold">Quiz Info</h6>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Course</span>
+            <span class="fw-semibold">{{ quiz.course.title }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Teacher</span>
+            <span>{{ quiz.created_by.get_full_name|default:quiz.created_by.username }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Duration</span>
+            <strong>{{ quiz.duration }} min</strong>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Pass Score</span>
+            <strong>{{ quiz.passing_score }}%</strong>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Questions</span>
+            <strong>{{ quiz.questions.count }}</strong>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Total Marks</span>
+            <strong>{{ total_marks }}</strong>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Max Attempts</span>
+            <strong>{{ quiz.max_attempts }}</strong>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Status</span>
+            {% if quiz.is_active %}
+              <span class="badge bg-success">Active</span>
+            {% else %}
+              <span class="badge bg-secondary">Inactive</span>
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

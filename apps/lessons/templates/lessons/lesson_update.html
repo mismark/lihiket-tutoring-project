@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'lessons/css/lessons.css' %}">
+
+
+{% block title %}Update Lesson{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- Page Header -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold">
+
+                <i class="fas fa-edit text-warning"></i>
+
+                Update Lesson
+
+            </h2>
+
+            <p class="text-muted">
+
+                Edit lesson information.
+
+            </p>
+
+        </div>
+
+        <a href="{% url 'lessons:lesson_detail' lesson.slug %}"
+           class="btn btn-outline-secondary">
+
+            <i class="fas fa-arrow-left"></i>
+
+            Back
+
+        </a>
+
+    </div>
+
+    <div class="card shadow-lg border-0">
+
+        <div class="card-body p-4">
+
+            <form method="POST"
+                  enctype="multipart/form-data"
+                  novalidate>
+
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="row">
+
+                    <!-- Course -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+
+                            Course
+
+                        </label>
+
+                        {{ form.course }}
+
+                        <div class="text-danger small">
+
+                            {{ form.course.errors }}
+
+                        </div>
+
+                    </div>
+
+                    <!-- Title -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+
+                            Lesson Title
+
+                        </label>
+
+                        {{ form.title }}
+
+                        <div class="text-danger small">
+
+                            {{ form.title.errors }}
+
+                        </div>
+
+                    </div>
+
+                    <!-- Description -->
+
+                    <div class="col-12 mb-3">
+
+                        <label class="form-label">
+
+                            Description
+
+                        </label>
+
+                        {{ form.description }}
+
+                        <div class="text-danger small">
+
+                            {{ form.description.errors }}
+
+                        </div>
+
+                    </div>
+
+                    <!-- Thumbnail -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+
+                            Thumbnail
+
+                        </label>
+
+                        {{ form.thumbnail }}
+
+                        <div class="text-danger small">
+
+                            {{ form.thumbnail.errors }}
+
+                        </div>
+
+                        {% if lesson.thumbnail %}
+
+                            <img
+                                id="thumbnailPreview"
+                                src="{{ lesson.thumbnail.url }}"
+                                class="img-fluid rounded shadow mt-3"
+                                style="max-height:220px;">
+
+                        {% else %}
+
+                            <img
+                                id="thumbnailPreview"
+                                src=""
+                                class="img-fluid rounded shadow mt-3"
+                                style="display:none;max-height:220px;">
+
+                        {% endif %}
+
+                    </div>
+
+                    <!-- Video -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+
+                            Upload Video
+
+                        </label>
+
+                        {{ form.video }}
+
+                        <div class="text-danger small">
+
+                            {{ form.video.errors }}
+
+                        </div>
+
+                    </div>
+
+                    <!-- Video URL -->
+
+                    <div class="col-12 mb-3">
+
+                        <label class="form-label">
+
+                            YouTube / Vimeo URL
+
+                        </label>
+
+                        {{ form.video_url }}
+
+                        <div class="text-danger small">
+
+                            {{ form.video_url.errors }}
+
+                        </div>
+
+                    </div>
+
+                    <!-- Duration -->
+
+                    <div class="col-md-4 mb-3">
+
+                        <label class="form-label">
+
+                            Duration
+
+                        </label>
+
+                        {{ form.duration }}
+
+                    </div>
+
+                    <!-- Lesson Order -->
+
+                    <div class="col-md-4 mb-3">
+
+                        <label class="form-label">
+
+                            Lesson Order
+
+                        </label>
+
+                        {{ form.lesson_order }}
+
+                    </div>
+
+                    <!-- Status -->
+
+                    <div class="col-md-4 mb-3">
+
+                        <label class="form-label">
+
+                            Status
+
+                        </label>
+
+                        {{ form.status }}
+
+                    </div>
+
+                    <!-- Preview -->
+
+                    <div class="col-12 mb-4">
+
+                        <div class="form-check">
+
+                            {{ form.is_preview }}
+
+                            <label class="form-check-label">
+
+                                Allow Free Preview
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-end gap-2">
+
+                    <a href="{% url 'lessons:lesson_detail' lesson.slug %}"
+                       class="btn btn-secondary">
+
+                        Cancel
+
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-warning">
+
+                        <i class="fas fa-save"></i>
+
+                        Update Lesson
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const thumbnailInput = document.getElementById("id_thumbnail");
+
+const preview = document.getElementById("thumbnailPreview");
+
+if (thumbnailInput){
+
+    thumbnailInput.addEventListener("change", function(){
+
+        const file = this.files[0];
+
+        if(file){
+
+            preview.src = URL.createObjectURL(file);
+
+            preview.style.display = "block";
+
+        }
+
+    });
+
+}
+
+</script>
+
+<script src="{% static 'lessons/js/lessons.js' %}" defer></script>
+
+
+{% endblock %}

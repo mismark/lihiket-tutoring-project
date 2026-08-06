@@ -1,0 +1,72 @@
+{% load static %}
+<footer style="background:linear-gradient(135deg,#1a1a2e,#16213e);color:rgba(255,255,255,.7);margin-top:3rem;">
+
+  <!-- Main footer content -->
+  <div class="container py-4">
+    <div class="row align-items-center gy-3">
+
+      <!-- Brand -->
+      <div class="col-md-4">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.9rem;">
+            <i class="fas fa-graduation-cap"></i>
+          </div>
+          <span style="font-size:1.1rem;font-weight:800;background:linear-gradient(135deg,#667eea,#f093fb);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+            Lihiket Tutor
+          </span>
+        </div>
+        <p style="font-size:.8rem;color:rgba(255,255,255,.45);margin:0;line-height:1.6;">
+          A complete online tutoring platform for students, teachers and parents.
+        </p>
+      </div>
+
+      <!-- Quick links -->
+      <div class="col-md-4 text-md-center">
+        <div class="d-flex justify-content-md-center flex-wrap gap-3">
+          <a href="{% url 'courses:course_list' %}" style="color:rgba(255,255,255,.5);text-decoration:none;font-size:.82rem;transition:color .2s;" onmouseenter="this.style.color='#667eea'" onmouseleave="this.style.color='rgba(255,255,255,.5)'">Courses</a>
+          <a href="{% url 'subjects:subject_list' %}" style="color:rgba(255,255,255,.5);text-decoration:none;font-size:.82rem;transition:color .2s;" onmouseenter="this.style.color='#667eea'" onmouseleave="this.style.color='rgba(255,255,255,.5)'">Subjects</a>
+          <a href="{% url 'live_classes:live_class_list' %}" style="color:rgba(255,255,255,.5);text-decoration:none;font-size:.82rem;transition:color .2s;" onmouseenter="this.style.color='#667eea'" onmouseleave="this.style.color='rgba(255,255,255,.5)'">Live Classes</a>
+          <a href="{% url 'accounts:profile' %}" style="color:rgba(255,255,255,.5);text-decoration:none;font-size:.82rem;transition:color .2s;" onmouseenter="this.style.color='#667eea'" onmouseleave="this.style.color='rgba(255,255,255,.5)'">Profile</a>
+        </div>
+      </div>
+
+      <!-- Social links -->
+      <div class="col-md-4 text-md-end">
+        <div class="d-flex justify-content-md-end gap-2">
+          <a href="https://github.com/mismark" target="_blank"
+             style="width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.08);display:inline-flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);text-decoration:none;transition:all .2s;border:1px solid rgba(255,255,255,.1);"
+             onmouseenter="this.style.background='#667eea';this.style.color='#fff'"
+             onmouseleave="this.style.background='rgba(255,255,255,.08)';this.style.color='rgba(255,255,255,.6)'">
+            <i class="fab fa-github" style="font-size:.85rem;"></i>
+          </a>
+          <a href="https://t.me/mismarkol" target="_blank"
+             style="width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.08);display:inline-flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);text-decoration:none;transition:all .2s;border:1px solid rgba(255,255,255,.1);"
+             onmouseenter="this.style.background='#0088cc';this.style.color='#fff'"
+             onmouseleave="this.style.background='rgba(255,255,255,.08)';this.style.color='rgba(255,255,255,.6)'">
+            <i class="fab fa-telegram" style="font-size:.85rem;"></i>
+          </a>
+          <a href="http://www.youtube.com/@Mismarkol-f2w" target="_blank"
+             style="width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.08);display:inline-flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);text-decoration:none;transition:all .2s;border:1px solid rgba(255,255,255,.1);"
+             onmouseenter="this.style.background='#ff0000';this.style.color='#fff'"
+             onmouseleave="this.style.background='rgba(255,255,255,.08)';this.style.color='rgba(255,255,255,.6)'">
+            <i class="fab fa-youtube" style="font-size:.85rem;"></i>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bottom bar -->
+  <div style="border-top:1px solid rgba(255,255,255,.07);padding:.75rem 0;">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <span style="font-size:.75rem;color:rgba(255,255,255,.3);">
+        © 2026 EduLearn · Built by <strong style="color:rgba(255,255,255,.5);">MISMARKOL</strong>
+      </span>
+      <span style="font-size:.75rem;color:rgba(255,255,255,.25);">
+        <i class="fas fa-code me-1"></i> Online Tutoring Platform
+      </span>
+    </div>
+  </div>
+
+</footer>

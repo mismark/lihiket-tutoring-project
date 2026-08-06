@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{% if form.instance.pk %}
+Edit Exam Question
+{% else %}
+Add Exam Question
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet"
+      href="{% static 'exams/css/exams.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow">
+
+                <div class="card-header bg-primary text-white">
+
+                    <h3 class="mb-0">
+
+                        {% if form.instance.pk %}
+
+                            Edit Exam Question
+
+                        {% else %}
+
+                            Add Question to Exam
+
+                        {% endif %}
+
+                    </h3>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="alert alert-info">
+
+                        <strong>Exam:</strong>
+
+                        {{ exam.title }}
+
+                        <br>
+
+                        <strong>Course:</strong>
+
+                        {{ exam.course.title }}
+
+                    </div>
+
+                    <form method="post">
+
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Question
+
+                            </label>
+
+                            {{ form.question }}
+
+                            {{ form.question.errors }}
+
+                        </div>
+
+                        {% if form.order %}
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Display Order
+
+                            </label>
+
+                            {{ form.order }}
+
+                            {{ form.order.errors }}
+
+                        </div>
+
+                        {% endif %}
+
+                        {% if form.marks %}
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Marks
+
+                            </label>
+
+                            {{ form.marks }}
+
+                            {{ form.marks.errors }}
+
+                        </div>
+
+                        {% endif %}
+
+                        <div class="d-flex justify-content-between">
+
+                            <a href="{% url 'exams:exam_question_list' exam.pk %}"
+                               class="btn btn-secondary">
+
+                                Cancel
+
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+
+                                {% if form.instance.pk %}
+
+                                    Update Question
+
+                                {% else %}
+
+                                    Add Question
+
+                                {% endif %}
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'exams/js/exams.js' %}"></script>
+{% endblock %}

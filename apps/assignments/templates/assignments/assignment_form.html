@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{% if form.instance.pk %}
+Update Assignment
+{% else %}
+Create Assignment
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet"
+      href="{% static 'assignments/css/assignments.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow">
+
+                <div class="card-header bg-primary text-white">
+
+                    <h3 class="mb-0">
+
+                        {% if form.instance.pk %}
+                            Update Assignment
+                        {% else %}
+                            Create Assignment
+                        {% endif %}
+
+                    </h3>
+
+                </div>
+
+                <div class="card-body">
+
+                    <form method="POST"
+                          enctype="multipart/form-data">
+
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Course
+                            </label>
+
+                            {{ form.course }}
+
+                            {% if form.course.errors %}
+                                <div class="text-danger">
+                                    {{ form.course.errors }}
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Title
+                            </label>
+
+                            {{ form.title }}
+
+                            {% if form.title.errors %}
+                                <div class="text-danger">
+                                    {{ form.title.errors }}
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Description
+                            </label>
+
+                            {{ form.description }}
+
+                            {% if form.description.errors %}
+                                <div class="text-danger">
+                                    {{ form.description.errors }}
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Assignment File
+                            </label>
+
+                            {{ form.file }}
+
+                            {% if form.file.errors %}
+                                <div class="text-danger">
+                                    {{ form.file.errors }}
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Due Date
+                                </label>
+
+                                {{ form.due_date }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Maximum Marks
+                                </label>
+
+                                {{ form.max_marks }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-check mb-4">
+
+                            {{ form.is_active }}
+
+                            <label class="form-check-label">
+
+                                Active Assignment
+
+                            </label>
+
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+
+                            <a href="{% url 'assignments:assignment_list' %}"
+                               class="btn btn-secondary">
+
+                                <i class="fas fa-arrow-left"></i>
+
+                                Back
+
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+
+                                <i class="fas fa-save"></i>
+
+                                {% if form.instance.pk %}
+                                    Update Assignment
+                                {% else %}
+                                    Create Assignment
+                                {% endif %}
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'assignments/js/assignments.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ live_class.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'live_classes:live_class_list' %}">Live Classes</a></li>
+      <li class="breadcrumb-item active">{{ live_class.title }}</li>
+    </ol>
+  </nav>
+
+  <!-- ── COUNTDOWN / LIVE BANNER ──────────────────────────────────────── -->
+  {% if live_class.computed_status == "upcoming" %}
+  <div class="card shadow-sm border-0 mb-4 border-start border-primary border-4">
+    <div class="card-body text-center py-4">
+      <p class="text-muted fw-semibold mb-2">
+        <i class="fas fa-clock text-primary"></i> Class starts in
+      </p>
+      <div class="d-flex justify-content-center gap-3 mb-2">
+        <div class="text-center">
+          <div class="display-5 fw-bold text-primary" id="cd-hours">--</div>
+          <small class="text-muted">Hours</small>
+        </div>
+        <div class="display-5 fw-bold text-muted mt-1">:</div>
+        <div class="text-center">
+          <div class="display-5 fw-bold text-primary" id="cd-minutes">--</div>
+          <small class="text-muted">Minutes</small>
+        </div>
+        <div class="display-5 fw-bold text-muted mt-1">:</div>
+        <div class="text-center">
+          <div class="display-5 fw-bold text-primary" id="cd-seconds">--</div>
+          <small class="text-muted">Seconds</small>
+        </div>
+      </div>
+      <p class="small text-muted mb-0">
+        Scheduled for <strong>{{ live_class.start_datetime|date:"F d, Y at H:i" }}</strong>
+      </p>
+    </div>
+  </div>
+  {% elif live_class.computed_status == "live" %}
+  <div class="alert alert-success text-center py-3 mb-4">
+    <h4 class="mb-1">
+      <i class="fas fa-circle fa-sm"></i>
+      This class is LIVE right now!
+    </h4>
+    <p class="mb-2 text-muted">Join immediately to attend.</p>
+    <a href="{% url 'live_classes:join_live_class' live_class.pk %}"
+       class="btn btn-success btn-lg">
+      <i class="fas fa-video"></i> Join Live Class
+    </a>
+  </div>
+  {% elif live_class.computed_status == "completed" %}
+  <div class="alert alert-secondary text-center py-3 mb-4">
+    <i class="fas fa-check-circle fa-lg me-2"></i>
+    This class has ended.
+    {% if live_class.is_recorded and live_class.recording_url %}
+      <a href="{{ live_class.recording_url }}" target="_blank" class="btn btn-info btn-sm ms-2">
+        <i class="fas fa-play-circle"></i> Watch Recording
+      </a>
+    {% endif %}
+  </div>
+  {% elif live_class.computed_status == "cancelled" %}
+  <div class="alert alert-danger text-center py-3 mb-4">
+    <i class="fas fa-ban fa-lg me-2"></i>
+    This live class has been cancelled.
+  </div>
+  {% endif %}
+
+  <div class="row">
+
+    <!-- Left: thumbnail + description -->
+    <div class="col-lg-8">
+      <div class="card shadow border-0 mb-4">
+        {% if live_class.thumbnail %}
+          <img src="{{ live_class.thumbnail.url }}"
+               class="card-img-top" style="height:350px;object-fit:cover;">
+        {% else %}
+          <div class="d-flex align-items-center justify-content-center bg-light"
+               style="height:250px;">
+            <i class="fas fa-video fa-6x text-primary"></i>
+          </div>
+        {% endif %}
+        <div class="card-body">
+          <h2 class="fw-bold">{{ live_class.title }}</h2>
+          <hr>
+          {% if live_class.description %}
+            <p>{{ live_class.description|linebreaks }}</p>
+          {% else %}
+            <p class="text-muted">No description provided.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: info + actions -->
+    <div class="col-lg-4">
+
+      <!-- Info card -->
+      <div class="card shadow border-0 mb-4">
+        <div class="card-header bg-primary text-white fw-semibold">
+          <i class="fas fa-info-circle"></i> Class Information
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Course</span>
+            <span class="fw-semibold">{{ live_class.course.title }}</span>
+          </li>
+          {% if live_class.lesson %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Lesson</span>
+            <span>{{ live_class.lesson.title }}</span>
+          </li>
+          {% endif %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Teacher</span>
+            <span>{{ live_class.teacher.get_full_name|default:live_class.teacher.username }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Platform</span>
+            <span>{{ live_class.get_platform_display }}</span>
+          </li>
+          {% if live_class.meeting_id %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Meeting ID</span>
+            <span class="fw-semibold">{{ live_class.meeting_id }}</span>
+          </li>
+          {% endif %}
+          {% if live_class.passcode %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Passcode</span>
+            <span class="fw-semibold">{{ live_class.passcode }}</span>
+          </li>
+          {% endif %}
+          <li class="list-group-item">
+            <span class="text-muted d-block mb-1">Start Time</span>
+            <strong>{{ live_class.start_datetime|date:"F d, Y at H:i" }}</strong>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Duration</span>
+            <strong>{{ live_class.duration }} min</strong>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Max Students</span>
+            <span>{{ live_class.maximum_students }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Status</span>
+            {% if live_class.computed_status == "upcoming" %}
+              <span class="badge bg-primary">Upcoming</span>
+            {% elif live_class.computed_status == "live" %}
+              <span class="badge bg-success"><i class="fas fa-circle fa-xs"></i> Live</span>
+            {% elif live_class.computed_status == "completed" %}
+              <span class="badge bg-secondary">Completed</span>
+            {% else %}
+              <span class="badge bg-danger">Cancelled</span>
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+
+      <!-- Actions -->
+      <div class="card shadow border-0">
+        <div class="card-header bg-dark text-white">Actions</div>
+        <div class="card-body d-grid gap-2">
+
+          {% if live_class.computed_status != "cancelled" and live_class.computed_status != "completed" %}
+          <a href="{% url 'live_classes:join_live_class' live_class.pk %}"
+             class="btn btn-success {% if live_class.status == 'live' %}btn-lg{% endif %}">
+            <i class="fas fa-video"></i>
+            {% if live_class.status == "live" %}Join Now{% else %}Join Class{% endif %}
+          </a>
+          {% endif %}
+
+          {% if live_class.is_recorded and live_class.recording_url %}
+          <a href="{{ live_class.recording_url }}" target="_blank" class="btn btn-info">
+            <i class="fas fa-play-circle"></i> Watch Recording
+          </a>
+          {% endif %}
+
+          {% if request.user.role == "teacher" or request.user.role == "admin" %}
+          <a href="{% url 'live_classes:live_class_update' live_class.pk %}"
+             class="btn btn-warning">
+            <i class="fas fa-edit"></i> Edit
+          </a>
+          <a href="{% url 'live_classes:live_class_delete' live_class.pk %}"
+             class="btn btn-outline-danger">
+            <i class="fas fa-trash"></i> Delete
+          </a>
+          {% endif %}
+
+          <a href="{% url 'live_classes:live_class_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+          </a>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% if live_class.status == "upcoming" %}
+<script>
+(function () {
+  var startMs    = {{ live_class.start_datetime|date:"U" }} * 1000;
+  var hoursEl    = document.getElementById('cd-hours');
+  var minutesEl  = document.getElementById('cd-minutes');
+  var secondsEl  = document.getElementById('cd-seconds');
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function tick() {
+    var diff = Math.floor((startMs - Date.now()) / 1000);
+
+    if (diff <= 0) {
+      hoursEl.textContent   = '00';
+      minutesEl.textContent = '00';
+      secondsEl.textContent = '00';
+      // Reload page to show Live banner
+      window.location.reload();
+      return;
+    }
+
+    var h = Math.floor(diff / 3600);
+    var m = Math.floor((diff % 3600) / 60);
+    var s = diff % 60;
+
+    hoursEl.textContent   = pad(h);
+    minutesEl.textContent = pad(m);
+    secondsEl.textContent = pad(s);
+
+    // Color: danger < 5 min, warning < 30 min, primary otherwise
+    var color = diff <= 300 ? 'text-danger' : (diff <= 1800 ? 'text-warning' : 'text-primary');
+    [hoursEl, minutesEl, secondsEl].forEach(function (el) {
+      el.className = 'display-5 fw-bold ' + color;
+    });
+
+    setTimeout(tick, 1000);
+  }
+
+  tick();
+})();
+</script>
+{% endif %}
+
+{% endblock %}

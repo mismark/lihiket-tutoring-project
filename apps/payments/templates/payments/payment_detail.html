@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Payment Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Payment Details</h1>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ payment.course.title }}</h5>
+            <p class="card-text"><strong>Amount:</strong> ${{ payment.amount }}</p>
+            <p class="card-text"><strong>Status:</strong> {{ payment.status }}</p>
+            <p class="card-text"><strong>Payment Method:</strong> {{ payment.get_payment_method_display }}</p>
+            <p class="card-text"><strong>Transaction ID:</strong> {{ payment.transaction_id|default:"N/A" }}</p>
+            <p class="card-text"><strong>Payment Date:</strong> {{ payment.payment_date }}</p>
+            <a href="{% url 'payments:payment_list' %}" class="btn btn-secondary">Back to Payments</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

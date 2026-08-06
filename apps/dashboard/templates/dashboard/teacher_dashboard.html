@@ -1,0 +1,384 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Teacher Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4" id="dashRoot">
+
+<!-- Welcome Banner -->
+<div class="card border-0 shadow-lg mb-4" style="border-radius:24px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);overflow:hidden;position:relative;">
+  <div style="position:absolute;right:-80px;top:-80px;width:320px;height:320px;border-radius:50%;background:rgba(255,255,255,.06);"></div>
+  <div style="position:absolute;right:80px;bottom:-100px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.04);"></div>
+  <div class="card-body p-4 p-lg-5" style="position:relative;z-index:2;">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <span class="badge rounded-pill mb-3 px-3 py-2" style="background:rgba(255,255,255,.15);color:#fff;font-size:.8rem;">
+          <i class="fas fa-chalkboard-teacher me-1"></i> Teacher Portal
+        </span>
+        <h1 class="fw-800 text-white mb-2" style="font-size:2rem;">
+          Welcome back, {{ request.user.first_name|default:request.user.username }}! 
+        </h1>
+        <p style="color:rgba(255,255,255,.8);font-size:1rem;margin-bottom:1.75rem;">
+          Manage your courses, students, assignments and live classes — all in one place.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="{% url 'courses:course_create' %}" class="btn px-4 py-2 fw-semibold" style="background:#fff;color:#667eea;border-radius:50px;border:none;">
+            <i class="fas fa-plus-circle me-2"></i>New Course
+          </a>
+          <a href="{% url 'live_classes:live_class_create' %}" class="btn px-4 py-2 fw-semibold" style="background:rgba(255,255,255,.15);color:#fff;border:2px solid rgba(255,255,255,.4);border-radius:50px;">
+            <i class="fas fa-video me-2"></i>Schedule Class
+          </a>
+          <a href="{% url 'lessons:lesson_create' %}" class="btn px-4 py-2 fw-semibold" style="background:rgba(255,255,255,.15);color:#fff;border:2px solid rgba(255,255,255,.4);border-radius:50px;">
+            <i class="fas fa-play me-2"></i>Add Lesson
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-4 text-center d-none d-lg-block">
+        {% if request.user.profile_picture %}
+          <img src="{{ request.user.profile_picture.url }}"
+               style="width:130px;height:130px;border-radius:50%;object-fit:cover;border:4px solid rgba(255,255,255,.4);box-shadow:0 10px 40px rgba(0,0,0,.2);">
+        {% else %}
+          <div style="width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.2);display:inline-flex;align-items:center;justify-content:center;font-size:3rem;color:#fff;border:4px solid rgba(255,255,255,.4);">
+            {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-4 mb-4">
+  <div class="col-xl-3 col-md-6">
+    <div class="card border-0 shadow stat-card" style="border-radius:20px;overflow:hidden;cursor:default;">
+      <div class="card-body p-4" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;position:relative;">
+        <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.12;"><i class="fas fa-book-open"></i></div>
+        <p class="mb-1" style="opacity:.85;font-size:.82rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">My Courses</p>
+        <h2 class="fw-bold mb-0 counter" data-target="{{ total_courses }}">0</h2>
+        <small style="opacity:.7;">Active teaching courses</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card border-0 shadow stat-card" style="border-radius:20px;overflow:hidden;">
+      <div class="card-body p-4" style="background:linear-gradient(135deg,#43e97b,#38f9d7);color:#fff;position:relative;">
+        <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.12;"><i class="fas fa-user-graduate"></i></div>
+        <p class="mb-1" style="opacity:.85;font-size:.82rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Students</p>
+        <h2 class="fw-bold mb-0 counter" data-target="{{ enrolled_count }}">0</h2>
+        <small style="opacity:.7;">Enrolled in your courses</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card border-0 shadow stat-card" style="border-radius:20px;overflow:hidden;">
+      <div class="card-body p-4" style="background:linear-gradient(135deg,#f7971e,#ffd200);color:#fff;position:relative;">
+        <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.12;"><i class="fas fa-tasks"></i></div>
+        <p class="mb-1" style="opacity:.85;font-size:.82rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Pending Grades</p>
+        <h2 class="fw-bold mb-0 counter" data-target="{{ pending_count }}">0</h2>
+        <small style="opacity:.7;">Submissions to review</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card border-0 shadow stat-card" style="border-radius:20px;overflow:hidden;">
+      <div class="card-body p-4" style="background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff;position:relative;">
+        <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.12;"><i class="fas fa-video"></i></div>
+        <p class="mb-1" style="opacity:.85;font-size:.82rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Live Classes</p>
+        <h2 class="fw-bold mb-0 counter" data-target="{{ upcoming|length }}">0</h2>
+        <small style="opacity:.7;">Upcoming sessions</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main content row -->
+<div class="row g-4 mb-4">
+
+  <!-- My courses list -->
+  <div class="col-lg-8">
+    <div class="card border-0 shadow h-100" style="border-radius:20px;">
+      <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+        <h6 class="fw-bold mb-0"><i class="fas fa-book-open text-primary me-2"></i>My Courses</h6>
+        <a href="{% url 'courses:course_create' %}" class="btn btn-primary btn-sm rounded-pill px-3">
+          <i class="fas fa-plus me-1"></i>New
+        </a>
+      </div>
+      <div class="card-body px-4 pb-4">
+        {% if my_courses %}
+        <div class="row g-3">
+          {% for course in my_courses|slice:":4" %}
+          <div class="col-md-6">
+            <div class="course-mini-card p-3 rounded" style="background:#f8f9ff;border:1px solid #e8eaf6;transition:all .3s;cursor:pointer;"
+                 onmouseenter="this.style.background='#f0f2ff';this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 25px rgba(102,126,234,.15)'"
+                 onmouseleave="this.style.background='#f8f9ff';this.style.transform='';this.style.boxShadow=''">
+              <div class="d-flex align-items-start gap-3">
+                <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem;flex-shrink:0;">
+                  <i class="fas fa-book"></i>
+                </div>
+                <div style="min-width:0;">
+                  <div class="fw-semibold text-truncate" style="font-size:.875rem;">{{ course.title }}</div>
+                  <small class="text-muted">{{ course.subject.name|default:"No subject" }}</small>
+                  <div class="d-flex gap-2 mt-1">
+                    <span class="badge {% if course.status == 'published' %}bg-success{% else %}bg-secondary{% endif %}" style="font-size:.7rem;">
+                      {{ course.get_status_display }}
+                    </span>
+                    <span class="badge" style="background:#f0f2ff;color:#667eea;font-size:.7rem;">
+                      {{ course.enrollments.count }} students
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-sm w-100 mt-2 rounded-pill" style="background:#f0f2ff;color:#667eea;border:none;font-size:.78rem;font-weight:600;">
+                Manage <i class="fas fa-arrow-right ms-1"></i>
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% if my_courses.count > 4 %}
+        <div class="text-center mt-3">
+          <a href="{% url 'courses:course_list' %}" class="btn btn-outline-primary rounded-pill px-4">
+            View All {{ my_courses.count }} Courses
+          </a>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="text-center py-5 text-muted">
+          <i class="fas fa-book-open fa-3x mb-3 d-block" style="opacity:.2;"></i>
+          <p>No courses yet.</p>
+          <a href="{% url 'courses:course_create' %}" class="btn btn-primary rounded-pill px-4">
+            <i class="fas fa-plus me-2"></i>Create First Course
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right column: live + upcoming -->
+  <div class="col-lg-4">
+
+    <!-- Live now -->
+    {% if live_now %}
+    <div class="card border-0 shadow mb-4" style="border-radius:20px;background:linear-gradient(135deg,#f5576c,#f093fb);color:#fff;">
+      <div class="card-body p-4">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <div style="width:10px;height:10px;border-radius:50%;background:#fff;animation:livePulse 1.5s infinite;"></div>
+          <h6 class="fw-bold mb-0 text-white">LIVE NOW</h6>
+        </div>
+        {% for lc in live_now %}
+        <div class="mb-3 p-3 rounded" style="background:rgba(255,255,255,.15);">
+          <div class="fw-semibold">{{ lc.title }}</div>
+          <small style="opacity:.8;">{{ lc.course.title }}</small>
+          <a href="{% url 'live_classes:join_live_class' lc.pk %}" class="btn btn-sm w-100 mt-2 fw-semibold" style="background:#fff;color:#f5576c;border-radius:50px;border:none;">
+            <i class="fas fa-video me-1"></i>Join Now
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Upcoming classes -->
+    <div class="card border-0 shadow" style="border-radius:20px;">
+      <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+        <h6 class="fw-bold mb-0"><i class="fas fa-calendar-alt text-danger me-2"></i>Upcoming Classes</h6>
+        <a href="{% url 'live_classes:live_class_create' %}" class="btn btn-danger btn-sm rounded-pill px-3">
+          <i class="fas fa-plus me-1"></i>Schedule
+        </a>
+      </div>
+      <div class="card-body px-4 pb-4">
+        {% if upcoming %}
+          {% for lc in upcoming %}
+          <div class="d-flex align-items-center gap-3 mb-3 p-2 rounded" style="background:#f8f9ff;border:1px solid #e8eaf6;">
+            <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#f5576c,#f093fb);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;flex-shrink:0;">
+              <i class="fas fa-video"></i>
+            </div>
+            <div style="min-width:0;flex:1;">
+              <div class="fw-semibold text-truncate" style="font-size:.85rem;">{{ lc.title }}</div>
+              <small class="text-muted">
+                <i class="fas fa-clock me-1"></i>{{ lc.start_datetime|date:"M d, H:i" }}
+              </small>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-center py-3 text-muted">
+            <i class="fas fa-calendar-times fa-2x mb-2 d-block" style="opacity:.2;"></i>
+            <small>No upcoming classes</small>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Pending submissions + recent lessons -->
+<div class="row g-4">
+
+  <!-- Pending submissions to grade -->
+  <div class="col-lg-7">
+    <div class="card border-0 shadow" style="border-radius:20px;">
+      <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+        <h6 class="fw-bold mb-0">
+          <i class="fas fa-tasks text-warning me-2"></i>Submissions to Grade
+          {% if pending_count %}
+          <span class="badge rounded-pill ms-1" style="background:#f7971e;color:#fff;">{{ pending_count }}</span>
+          {% endif %}
+        </h6>
+        <a href="{% url 'assignments:assignment_list' %}" class="btn btn-sm btn-outline-warning rounded-pill px-3">View All</a>
+      </div>
+      <div class="card-body p-0">
+        {% if pending_subs %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0 align-middle" style="border-radius:0 0 20px 20px;overflow:hidden;">
+            <thead class="table-light">
+              <tr>
+                <th class="px-4">Student</th>
+                <th>Assignment</th>
+                <th>Submitted</th>
+                <th class="text-center">Grade</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for sub in pending_subs %}
+              <tr>
+                <td class="px-4">
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#43e97b,#38f9d7);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.75rem;font-weight:700;flex-shrink:0;">
+                      {{ sub.student.first_name|first|upper }}{{ sub.student.last_name|first|upper }}
+                    </div>
+                    <span style="font-size:.85rem;font-weight:600;">{{ sub.student.get_full_name|default:sub.student.username }}</span>
+                  </div>
+                </td>
+                <td style="font-size:.82rem;">{{ sub.assignment.title|truncatewords:6 }}</td>
+                <td><small class="text-muted">{{ sub.submitted_at|date:"M d" }}</small></td>
+                <td class="text-center">
+                  <a href="{% url 'assignments:grade_submission' sub.pk %}" class="btn btn-warning btn-sm rounded-pill px-3">
+                    <i class="fas fa-check-circle me-1"></i>Grade
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+          <i class="fas fa-check-double fa-3x mb-2 d-block" style="color:#43e97b;opacity:.5;"></i>
+          <p class="mb-0">All caught up! No pending submissions.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent lessons + quick actions -->
+  <div class="col-lg-5">
+
+    <!-- Quick actions -->
+    <div class="card border-0 shadow mb-4" style="border-radius:20px;">
+      <div class="card-header bg-white border-0 pt-4 px-4">
+        <h6 class="fw-bold mb-0"><i class="fas fa-bolt text-warning me-2"></i>Quick Actions</h6>
+      </div>
+      <div class="card-body px-4 pb-4">
+        <div class="row g-2">
+          {% for action in actions %}
+          <div class="col-6">
+            <a href="{{ action.url }}" class="d-block text-center p-3 rounded text-decoration-none" style="background:{{ action.bg }};transition:all .3s;"
+               onmouseenter="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 20px rgba(0,0,0,.1)'"
+               onmouseleave="this.style.transform='';this.style.boxShadow=''">
+              <i class="{{ action.icon }} fa-lg mb-1 d-block" style="color:{{ action.color }};"></i>
+              <small class="fw-semibold" style="color:{{ action.color }};font-size:.75rem;">{{ action.label }}</small>
+            </a>
+          </div>
+          {% empty %}
+          <div class="col-6">
+            <a href="{% url 'courses:course_create' %}" class="d-block text-center p-3 rounded text-decoration-none" style="background:#f0f2ff;transition:all .3s;"
+               onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform=''">
+              <i class="fas fa-book fa-lg mb-1 d-block" style="color:#667eea;"></i>
+              <small class="fw-semibold" style="color:#667eea;font-size:.75rem;">Course</small>
+            </a>
+          </div>
+          <div class="col-6">
+            <a href="{% url 'assignments:assignment_create' %}" class="d-block text-center p-3 rounded text-decoration-none" style="background:#fff8f0;transition:all .3s;"
+               onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform=''">
+              <i class="fas fa-tasks fa-lg mb-1 d-block" style="color:#f7971e;"></i>
+              <small class="fw-semibold" style="color:#f7971e;font-size:.75rem;">Assignment</small>
+            </a>
+          </div>
+          <div class="col-6">
+            <a href="{% url 'quizzes:quiz_create' %}" class="d-block text-center p-3 rounded text-decoration-none" style="background:#f0fff4;transition:all .3s;"
+               onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform=''">
+              <i class="fas fa-question-circle fa-lg mb-1 d-block" style="color:#43e97b;"></i>
+              <small class="fw-semibold" style="color:#43e97b;font-size:.75rem;">Quiz</small>
+            </a>
+          </div>
+          <div class="col-6">
+            <a href="{% url 'exams:exam_create' %}" class="d-block text-center p-3 rounded text-decoration-none" style="background:#fff1f2;transition:all .3s;"
+               onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform=''">
+              <i class="fas fa-file-alt fa-lg mb-1 d-block" style="color:#f5576c;"></i>
+              <small class="fw-semibold" style="color:#f5576c;font-size:.75rem;">Exam</small>
+            </a>
+          </div>
+          <div class="col-6">
+            <a href="{% url 'documents:document_create' %}" class="d-block text-center p-3 rounded text-decoration-none" style="background:#f8f0ff;transition:all .3s;"
+               onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform=''">
+              <i class="fas fa-upload fa-lg mb-1 d-block" style="color:#a78bfa;"></i>
+              <small class="fw-semibold" style="color:#a78bfa;font-size:.75rem;">Document</small>
+            </a>
+          </div>
+          <div class="col-6">
+            <a href="{% url 'question_bank:create' %}" class="d-block text-center p-3 rounded text-decoration-none" style="background:#f0f9ff;transition:all .3s;"
+               onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform=''">
+              <i class="fas fa-database fa-lg mb-1 d-block" style="color:#4facfe;"></i>
+              <small class="fw-semibold" style="color:#4facfe;font-size:.75rem;">Question Bank</small>
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent lessons -->
+    <div class="card border-0 shadow" style="border-radius:20px;">
+      <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between">
+        <h6 class="fw-bold mb-0"><i class="fas fa-play-circle text-primary me-2"></i>Recent Lessons</h6>
+        <a href="{% url 'lessons:lesson_create' %}" class="btn btn-primary btn-sm rounded-pill px-3">
+          <i class="fas fa-plus me-1"></i>Add
+        </a>
+      </div>
+      <div class="card-body px-4 pb-4">
+        {% if recent_lessons %}
+          {% for lesson in recent_lessons %}
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div style="width:38px;height:38px;border-radius:10px;background:{% if lesson.status == 'published' %}linear-gradient(135deg,#667eea,#764ba2){% else %}#e8eaf6{% endif %};display:flex;align-items:center;justify-content:center;color:{% if lesson.status == 'published' %}#fff{% else %}#9ca3af{% endif %};font-size:.9rem;flex-shrink:0;">
+              <i class="fas fa-{% if lesson.status == 'published' %}play{% else %}pause{% endif %}"></i>
+            </div>
+            <div style="min-width:0;flex:1;">
+              <a href="{% url 'lessons:lesson_detail' lesson.slug %}" class="fw-semibold text-decoration-none text-truncate d-block" style="font-size:.85rem;color:#1a1a2e;">
+                {{ lesson.title }}
+              </a>
+              <small class="text-muted">{{ lesson.course.title|truncatewords:4 }}</small>
+            </div>
+            <span class="badge rounded-pill {% if lesson.status == 'published' %}bg-success{% else %}bg-secondary{% endif %}" style="font-size:.7rem;flex-shrink:0;">
+              {{ lesson.status|title }}
+            </span>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-center py-3 text-muted">
+            <i class="fas fa-play-circle fa-2x mb-2 d-block" style="opacity:.2;"></i>
+            <small>No lessons yet</small>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div>
+
+{% endblock %}

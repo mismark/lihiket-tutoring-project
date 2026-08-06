@@ -1,0 +1,333 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Update Live Class{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-10">
+
+            <div class="card shadow border-0">
+
+                <div class="card-header bg-warning text-dark">
+
+                    <h4 class="mb-0">
+
+                        <i class="fas fa-edit"></i>
+
+                        Update Live Class
+
+                    </h4>
+
+                </div>
+
+                <div class="card-body">
+
+                    <form method="POST"
+                          enctype="multipart/form-data">
+
+                        {% csrf_token %}
+
+                        {% if form.errors %}
+
+                            <div class="alert alert-danger">
+
+                                {{ form.errors }}
+
+                            </div>
+
+                        {% endif %}
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Course
+                                </label>
+
+                                {{ form.course }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Lesson
+                                </label>
+
+                                {{ form.lesson }}
+
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+
+                                <label class="form-label">
+                                    Title
+                                </label>
+
+                                {{ form.title }}
+
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+
+                                <label class="form-label">
+                                    Description
+                                </label>
+
+                                {{ form.description }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Platform
+                                </label>
+
+                                {{ form.platform }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Meeting Link
+                                </label>
+
+                                {{ form.meeting_link }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Meeting ID
+                                </label>
+
+                                {{ form.meeting_id }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Passcode
+                                </label>
+
+                                {{ form.passcode }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Start Date & Time
+                                </label>
+
+                                {{ form.start_datetime }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    End Date & Time
+                                </label>
+
+                                {{ form.end_datetime }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Duration (Minutes)
+                                </label>
+
+                                {{ form.duration }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Maximum Students
+                                </label>
+
+                                {{ form.maximum_students }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Status
+                                </label>
+
+                                {{ form.status }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Thumbnail
+                                </label>
+
+                                {{ form.thumbnail }}
+                            </div>
+
+                            {% if live_class.thumbnail %}
+
+                            <div class="col-md-12 mb-3 text-center">
+
+                                <img src="{{ live_class.thumbnail.url }}"
+                                     id="thumbnailPreview"
+                                     class="img-fluid rounded shadow"
+                                     style="max-height:250px;">
+
+                            </div>
+
+                            {% else %}
+
+                            <div class="col-md-12 mb-3 text-center">
+
+                                <img id="thumbnailPreview"
+                                     src="#"
+                                     class="img-fluid rounded shadow"
+                                     style="display:none;max-height:250px;">
+
+                            </div>
+
+                            {% endif %}
+
+                            <div class="col-md-6 mb-3">
+
+                                <div class="form-check mt-4">
+
+                                    {{ form.is_recorded }}
+
+                                    <label class="form-check-label">
+
+                                        Record this live class
+
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Recording URL
+                                </label>
+
+                                {{ form.recording_url }}
+
+                            </div>
+
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between">
+
+                            <a href="{% url 'live_classes:live_class_detail' live_class.pk %}"
+                               class="btn btn-secondary">
+
+                                Cancel
+
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-warning">
+
+                                <i class="fas fa-save"></i>
+
+                                Update Live Class
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+(function () {
+  var courseSelect    = document.getElementById('id_course');
+  var lessonSelect    = document.getElementById('id_lesson');
+  var ajaxUrl         = "{% url 'live_classes:ajax_load_lessons' %}";
+  var currentLesson   = "{{ live_class.lesson_id|default:'' }}";
+
+  function loadLessons(courseId, selectedId) {
+    lessonSelect.innerHTML = '<option value="">— Loading... —</option>';
+    lessonSelect.disabled  = true;
+
+    if (!courseId) {
+      lessonSelect.innerHTML = '<option value="">— Select a course first —</option>';
+      lessonSelect.disabled  = false;
+      return;
+    }
+
+    fetch(ajaxUrl + '?course_id=' + courseId)
+      .then(function (r) { return r.json(); })
+      .then(function (lessons) {
+        lessonSelect.innerHTML = '<option value="">— No specific lesson —</option>';
+        lessonSelect.disabled  = false;
+
+        lessons.forEach(function (l) {
+          var opt         = document.createElement('option');
+          opt.value       = l.id;
+          opt.textContent = l.title;
+          if (selectedId && String(l.id) === String(selectedId)) {
+            opt.selected = true;
+          }
+          lessonSelect.appendChild(opt);
+        });
+
+        if (!lessons.length) {
+          lessonSelect.innerHTML = '<option value="">— No published lessons —</option>';
+        }
+      })
+      .catch(function () {
+        lessonSelect.innerHTML = '<option value="">— Error loading lessons —</option>';
+        lessonSelect.disabled  = false;
+      });
+  }
+
+  // On course change — reload without pre-selecting
+  courseSelect.addEventListener('change', function () {
+    loadLessons(this.value, null);
+  });
+
+  // On page load — load lessons for current course, keeping existing lesson selected
+  if (courseSelect.value) {
+    loadLessons(courseSelect.value, currentLesson);
+  } else {
+    lessonSelect.innerHTML = '<option value="">— Select a course first —</option>';
+  }
+})();
+</script>
+
+{% endblock %}

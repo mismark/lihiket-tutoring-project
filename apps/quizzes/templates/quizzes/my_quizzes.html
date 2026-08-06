@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+My Quizzes
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet"
+      href="{% static 'quizzes/css/quizzes.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold">
+
+                My Quizzes
+
+            </h2>
+
+            <p class="text-muted">
+
+                View your quizzes, attempts and results.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    {% if quizzes %}
+
+    <div class="row">
+
+        {% for quiz in quizzes %}
+
+        <div class="col-lg-6 mb-4">
+
+            <div class="card shadow h-100">
+
+                <div class="card-body">
+
+                    <h4>
+
+                        {{ quiz.title }}
+
+                    </h4>
+
+                    <p class="text-muted">
+
+                        {{ quiz.course.title }}
+
+                    </p>
+
+                    <p>
+
+                        {{ quiz.description|truncatewords:20 }}
+
+                    </p>
+
+                    <hr>
+
+                    <p>
+
+                        <strong>Duration:</strong>
+
+                        {{ quiz.duration }} Minutes
+
+                    </p>
+
+                    <p>
+
+                        <strong>Passing Score:</strong>
+
+                        {{ quiz.passing_score }}%
+
+                    </p>
+
+                    <p>
+
+                        <strong>Total Questions:</strong>
+
+                        {{ quiz.questions.count }}
+
+                    </p>
+
+                    {% comment %} {% with attempt=quiz.attempts.all|first %}
+
+                        {% if attempt %}
+
+                            <div class="alert alert-success">
+
+                                <strong>Status:</strong>
+
+                                Completed
+
+                                <br>
+
+                                <strong>Score:</strong>
+
+                                {{ attempt.score }}/{{ attempt.total_marks }}
+
+                                <br>
+
+                                <strong>Result:</strong>
+
+                                {% if attempt.passed %}
+
+                                    <span class="text-success">
+
+                                        Passed
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="text-danger">
+
+                                        Failed
+
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+                        {% else %}
+
+                            <div class="alert alert-warning">
+
+                                Not Attempted
+
+                            </div>
+
+                        {% endif %}
+
+                    {% endwith %} {% endcomment %}
+
+
+
+                    {% if quiz.my_attempt %}
+
+<div class="alert alert-success">
+
+    <strong>Status:</strong>
+    Completed
+
+    <br>
+
+    <strong>Score:</strong>
+
+    {{ quiz.my_attempt.score }}/{{ quiz.my_attempt.total_marks }}
+
+    <br>
+
+    <strong>Result:</strong>
+
+    {% if quiz.my_attempt.passed %}
+        <span class="text-success">Passed</span>
+    {% else %}
+        <span class="text-danger">Failed</span>
+    {% endif %}
+
+</div>
+
+<a href="{% url 'quizzes:quiz_result' quiz.my_attempt.pk %}"
+   class="btn btn-success btn-sm">
+
+    View Result
+
+</a>
+
+{% else %}
+
+<div class="alert alert-warning">
+
+    Not Attempted
+
+</div>
+
+<a href="{% url 'quizzes:start_quiz' quiz.pk %}"
+   class="btn btn-primary btn-sm">
+
+    Start Quiz
+
+</a>
+
+{% endif %}
+
+
+
+                </div>
+
+                <div class="card-footer bg-white">
+
+                    <div class="d-flex gap-2">
+
+                        <a href="{% url 'quizzes:quiz_detail' quiz.pk %}"
+                           class="btn btn-outline-primary btn-sm">
+
+                            View
+
+                        </a>
+
+                        {% with attempt=quiz.attempts.all|first %}
+
+                            {% if attempt %}
+
+                                <a href="{% url 'quizzes:quiz_result' attempt.pk %}"
+                                   class="btn btn-success btn-sm">
+
+                                    View Result
+
+                                </a>
+
+                            {% else %}
+
+                                <a href="{% url 'quizzes:start_quiz' quiz.pk %}"
+                                   class="btn btn-primary btn-sm">
+
+                                    Start Quiz
+
+                                </a>
+
+                            {% endif %}
+
+                        {% endwith %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="alert alert-info">
+
+        No quizzes available.
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'quizzes/js/quizzes.js' %}"></script>
+{% endblock %}

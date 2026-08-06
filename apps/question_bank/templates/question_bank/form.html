@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold">
+        <i class="fas fa-{% if action == 'Create' %}plus-circle text-primary{% else %}edit text-warning{% endif %}"></i>
+        {{ title }}
+      </h2>
+      <p class="text-muted mb-0">
+        {% if action == "Create" %}
+          Create a reusable question for use in exams, quizzes and assignments.
+        {% else %}
+          Update the question details and choices below.
+        {% endif %}
+      </p>
+    </div>
+    <a href="{% url 'question_bank:list' %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+  </div>
+
+  <form method="POST" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <div class="row">
+
+      <!-- Left column — main question fields -->
+      <div class="col-lg-8">
+
+        <div class="card shadow-sm border-0 mb-4">
+          <div class="card-header bg-white">
+            <h6 class="mb-0 fw-bold"><i class="fas fa-question-circle text-primary"></i> Question Details</h6>
+          </div>
+          <div class="card-body p-4">
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Question Text <span class="text-danger">*</span></label>
+              {{ form.question_text }}
+              <div class="text-danger small">{{ form.question_text.errors }}</div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">Question Type <span class="text-danger">*</span></label>
+                {{ form.question_type }}
+                <div class="text-danger small">{{ form.question_type.errors }}</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">Subject</label>
+                {{ form.subject }}
+                <div class="text-danger small">{{ form.subject.errors }}</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">Difficulty</label>
+                {{ form.difficulty }}
+                <div class="text-danger small">{{ form.difficulty.errors }}</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">Marks</label>
+                {{ form.marks }}
+                <div class="text-danger small">{{ form.marks.errors }}</div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Tags</label>
+              {{ form.tags }}
+              <small class="text-muted">Separate with commas</small>
+              <div class="text-danger small">{{ form.tags.errors }}</div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Explanation</label>
+              {{ form.explanation }}
+              <small class="text-muted">Shown after answering (optional)</small>
+              <div class="text-danger small">{{ form.explanation.errors }}</div>
+            </div>
+
+            <div class="form-check mb-2">
+              {{ form.is_active }}
+              <label class="form-check-label">Active (available for use in exams/quizzes)</label>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Answer Choices (shown for MCQ / True-False) -->
+        <div class="card shadow-sm border-0 mb-4" id="choices_section">
+          <div class="card-header bg-white d-flex justify-content-between">
+            <h6 class="mb-0 fw-bold">
+              <i class="fas fa-list-ul text-success"></i> Answer Choices
+            </h6>
+            <small class="text-muted">Check the box next to the correct answer(s)</small>
+          </div>
+          <div class="card-body p-4">
+
+            {{ formset.management_form }}
+
+            {% for choice_form in formset %}
+            <div class="row align-items-center mb-3 choice-row border rounded p-2">
+              {{ choice_form.id }}
+              <div class="col-1 text-center">
+                <span class="fw-bold text-muted">{{ forloop.counter }}</span>
+              </div>
+              <div class="col-7">
+                {{ choice_form.choice_text }}
+                <div class="text-danger small">{{ choice_form.choice_text.errors }}</div>
+              </div>
+              <div class="col-2 text-center">
+                <label class="form-check-label small me-1">Correct</label>
+                {{ choice_form.is_correct }}
+              </div>
+              <div class="col-1">
+                {{ choice_form.order }}
+              </div>
+              {% if formset.can_delete %}
+              <div class="col-1 text-center">
+                <label class="form-check-label small text-danger">Del</label>
+                {{ choice_form.DELETE }}
+              </div>
+              {% endif %}
+            </div>
+            {% endfor %}
+
+            <small class="text-muted">
+              Choices are only used for Multiple Choice and True/False questions.
+            </small>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right column — tips -->
+      <div class="col-lg-4">
+        <div class="card border-0 bg-light">
+          <div class="card-body">
+            <h6 class="fw-bold mb-3"><i class="fas fa-info-circle text-info"></i> Tips</h6>
+            <ul class="small text-muted ps-3">
+              <li class="mb-2"><strong>Multiple Choice</strong> — Add 2–5 choices, mark the correct one(s).</li>
+              <li class="mb-2"><strong>True / False</strong> — Add "True" and "False" as choices.</li>
+              <li class="mb-2"><strong>Short Answer / Essay</strong> — No choices needed.</li>
+              <li class="mb-2">Use <strong>Tags</strong> to organise questions by topic.</li>
+              <li class="mb-2">An <strong>Explanation</strong> helps students understand the correct answer.</li>
+              <li><strong>Inactive</strong> questions won't appear when adding to quizzes/exams.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <hr>
+    <div class="d-flex justify-content-end gap-2">
+      <a href="{% url 'question_bank:list' %}" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-{% if action == 'Create' %}primary{% else %}warning{% endif %}">
+        <i class="fas fa-save"></i>
+        {% if action == "Create" %}Save Question{% else %}Update Question{% endif %}
+      </button>
+    </div>
+
+  </form>
+
+</div>
+
+<script>
+// Show/hide choices section based on question type
+(function () {
+  const typeSelect     = document.getElementById('id_question_type');
+  const choicesSection = document.getElementById('choices_section');
+
+  function toggleChoices() {
+    const val = typeSelect.value;
+    choicesSection.style.display = (val === 'mcq' || val === 'tf') ? 'block' : 'none';
+  }
+
+  toggleChoices();
+  typeSelect.addEventListener('change', toggleChoices);
+})();
+</script>
+
+{% endblock %}

@@ -1,0 +1,350 @@
+{% extends "base.html" %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'lessons/css/lessons.css' %}">
+
+
+{% block title %}My Lessons{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- Header -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold">
+
+                <i class="fas fa-book-open text-primary"></i>
+
+                My Lessons
+
+            </h2>
+
+            <p class="text-muted">
+
+                Manage your course lessons.
+
+            </p>
+
+        </div>
+
+        <a href="{% url 'lessons:lesson_create' %}"
+           class="btn btn-primary">
+
+            <i class="fas fa-plus-circle"></i>
+
+            Create Lesson
+
+        </a>
+
+    </div>
+
+    <!-- Statistics -->
+
+    <div class="row mb-4">
+
+        <div class="col-lg-3 col-md-6 mb-3">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+
+                        Total Lessons
+
+                    </h6>
+
+                    <h2>
+
+                        {{ lessons.count }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+
+                        Published
+
+                    </h6>
+
+                    <h2>
+
+                        {{ lessons|length }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+
+                        Preview Lessons
+
+                    </h6>
+
+                    <h2>
+
+                        {{ lessons|length }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+
+                        Draft Lessons
+
+                    </h6>
+
+                    <h2>
+
+                        {{ lessons|length }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Lesson Table -->
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-white">
+
+            <h5 class="mb-0">
+
+                Lesson List
+
+            </h5>
+
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-light">
+
+                    <tr>
+
+                        <th>Thumbnail</th>
+
+                        <th>Lesson</th>
+
+                        <th>Course</th>
+
+                        <th>Duration</th>
+
+                        <th>Order</th>
+
+                        <th>Status</th>
+
+                        <th>Preview</th>
+
+                        <th>Actions</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for lesson in lessons %}
+
+                    <tr>
+
+                        <td width="90">
+
+                            {% if lesson.thumbnail %}
+
+                                <img src="{{ lesson.thumbnail.url }}"
+                                     class="rounded"
+                                     width="70">
+
+                            {% else %}
+
+                                <img src="{% static 'images/default-course.jpg' %}"
+                                     class="rounded"
+                                     width="70">
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            <strong>
+
+                                {{ lesson.title }}
+
+                            </strong>
+
+                        </td>
+
+                        <td>
+
+                            {{ lesson.course.title }}
+
+                        </td>
+
+                        <td>
+
+                            {{ lesson.duration }}
+
+                        </td>
+
+                        <td>
+
+                            {{ lesson.lesson_order }}
+
+                        </td>
+
+                        <td>
+
+                            {% if lesson.status == "published" %}
+
+                                <span class="badge bg-success">
+
+                                    Published
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-secondary">
+
+                                    Draft
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            {% if lesson.is_preview %}
+
+                                <span class="badge bg-info">
+
+                                    Yes
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-dark">
+
+                                    No
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            <a href="{% url 'lessons:lesson_detail' lesson.slug %}"
+                               class="btn btn-sm btn-outline-primary">
+
+                                <i class="fas fa-eye"></i>
+
+                            </a>
+
+                            <a href="{% url 'lessons:lesson_update' lesson.slug %}"
+                               class="btn btn-sm btn-warning">
+
+                                <i class="fas fa-edit"></i>
+
+                            </a>
+
+                            <a href="{% url 'lessons:lesson_delete' lesson.slug %}"
+                               class="btn btn-sm btn-danger">
+
+                                <i class="fas fa-trash"></i>
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+
+                        <td colspan="8" class="text-center py-5">
+
+                            <h5>
+
+                                No lessons available.
+
+                            </h5>
+
+                            <a href="{% url 'lessons:lesson_create' %}"
+                               class="btn btn-primary mt-3">
+
+                                Create Your First Lesson
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="{% static 'lessons/js/lessons.js' %}" defer></script>
+
+{% endblock %}

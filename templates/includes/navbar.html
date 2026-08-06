@@ -1,0 +1,484 @@
+{% load static %}
+
+<header class="top-navbar">
+
+  <!-- Left: mobile toggle + page title -->
+  <div style="display:flex;align-items:center;gap:.75rem;">
+
+    {% comment %} <!-- Mobile sidebar toggle (shown via CSS on small screens) -->
+    <button onclick="toggleSidebar()" class="sidebar-toggle-btn"
+            style="display:none;width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#667eea,#764ba2);border:none;color:#fff;font-size:1rem;cursor:pointer;align-items:center;justify-content:center;">
+      <i class="fas fa-bars"></i>
+    </button> {% endcomment %}
+
+    <!-- Page title (auto-set by JS) -->
+    <div>
+      <div style="font-size:.72rem;color:#9ca3af;font-weight:500;text-transform:uppercase;letter-spacing:.08em;">Lihiket Tutor</div>
+      <div id="navPageTitle" style="font-size:.95rem;font-weight:700;color:#1a1a2e;line-height:1.2;">Dashboard</div>
+    </div>
+  </div>
+
+  <!-- Right: search + notifications + user -->
+  <div style="display:flex;align-items:center;gap:.75rem;">
+
+    <!-- Search bar -->
+    <div style="position:relative;" id="navSearchWrap" class="nav-search-wrap">
+      <form id="navSearchForm" action="{% url 'dashboard:search' %}" method="GET" autocomplete="off">
+        <input id="navSearch" name="q" type="text" placeholder="Search courses, lessons..."
+               style="padding:.45rem 1rem .45rem 2.5rem;border-radius:50px;border:1.5px solid #e8eaf6;font-size:.82rem;font-family:Poppins,sans-serif;background:#f8f9ff;width:240px;transition:all .3s;outline:none;"
+               onfocus="this.style.borderColor='#667eea';this.style.boxShadow='0 0 0 3px rgba(102,126,234,.12)';this.style.width='280px'"
+               onblur="this.style.borderColor='#e8eaf6';this.style.boxShadow='';this.style.width='240px'"
+               oninput="liveSearch(this.value)">
+        <i class="fas fa-search" style="position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:.8rem;pointer-events:none;"></i>
+      </form>
+
+      <!-- Live results dropdown -->
+      <div id="searchDrop" style="display:none;position:absolute;top:46px;left:0;width:360px;background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.14);border:1px solid #e8eaf6;z-index:700;overflow:hidden;max-height:400px;overflow-y:auto;">
+        <div id="searchResults" style="padding:.5rem 0;"></div>
+        <div id="searchFooter" style="display:none;padding:.6rem 1rem;border-top:1px solid #f0f2ff;text-align:center;">
+          <a id="searchViewAll" href="#" style="font-size:.78rem;color:#667eea;font-weight:600;text-decoration:none;">View all results <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search icon button — desktop toggles bar, mobile opens overlay -->
+    <button onclick="handleSearchBtn()" class="mob-search-btn"
+            style="width:38px;height:38px;border-radius:10px;background:#f0f2ff;border:1px solid #e8eaf6;color:#667eea;font-size:.85rem;cursor:pointer;align-items:center;justify-content:center;transition:all .2s;"
+            onmouseenter="this.style.background='#667eea';this.style.color='#fff'"
+            onmouseleave="this.style.background='#f0f2ff';this.style.color='#667eea'">
+      <i class="fas fa-search"></i>
+    </button>
+
+    <!-- Notification bell -->
+    <div style="position:relative;" id="notifWrap">
+      <button onclick="toggleNotif()" id="notifBtn" style="width:38px;height:38px;border-radius:10px;background:#f0f2ff;border:1px solid #e8eaf6;color:#667eea;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;"
+              onmouseenter="this.style.background='#667eea';this.style.color='#fff'"
+              onmouseleave="this.style.background='#f0f2ff';this.style.color='#667eea'">
+        <i class="fas fa-bell"></i>
+      </button>
+      <span id="notifBadge" style="display:none;position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;background:linear-gradient(135deg,#f5576c,#f093fb);border-radius:50%;font-size:.6rem;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;border:2px solid #fff;padding:0 3px;"></span>
+
+      <!-- Notification dropdown -->
+      <div id="notifDrop" style="display:none;position:absolute;top:46px;right:0;width:300px;background:#fff;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.12);border:1px solid #e8eaf6;z-index:600;overflow:hidden;">
+        <div style="padding:.85rem 1rem;font-weight:700;font-size:.85rem;border-bottom:1px solid #f0f2ff;display:flex;justify-content:space-between;align-items:center;">
+          <span>Notifications</span>
+          <a href="{% url 'notifications:notification_list' %}" style="font-size:.75rem;color:#667eea;font-weight:600;text-decoration:none;">View all</a>
+        </div>
+        <div id="notifItems" style="max-height:320px;overflow-y:auto;">
+          <div style="padding:1.5rem;text-align:center;color:#9ca3af;font-size:.82rem;">
+            <i class="fas fa-spinner fa-spin me-2"></i>Loading...
+          </div>
+        </div>
+        <div style="padding:.65rem 1rem;border-top:1px solid #f0f2ff;display:flex;justify-content:space-between;">
+          <a href="{% url 'notifications:notification_list' %}" style="font-size:.78rem;color:#667eea;font-weight:600;text-decoration:none;">
+            <i class="fas fa-list me-1"></i>All notifications
+          </a>
+          <form method="POST" action="{% url 'notifications:mark_all_as_read' %}" style="margin:0;">
+            {% csrf_token %}
+            <button type="submit" style="background:none;border:none;font-size:.75rem;color:#43e97b;font-weight:600;cursor:pointer;padding:0;">
+              <i class="fas fa-check-double me-1"></i>Mark all read
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- User menu -->
+    {% if user.is_authenticated %}
+    <div style="position:relative;" id="userMenuWrap">
+      <button onclick="toggleUserMenu()"
+              style="display:flex;align-items:center;gap:.6rem;padding:.35rem .75rem .35rem .35rem;border-radius:50px;background:#f0f2ff;border:1.5px solid #e8eaf6;cursor:pointer;transition:all .2s;"
+              onmouseenter="this.style.background='#e8eaf6'"
+              onmouseleave="this.style.background='#f0f2ff'">
+        {% if user.profile_picture %}
+          <img src="{{ user.profile_picture.url }}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid #667eea;">
+        {% else %}
+          <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.75rem;flex-shrink:0;">
+            {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+          </div>
+        {% endif %}
+        <span class="nav-user-name" style="font-size:.82rem;font-weight:600;color:#1a1a2e;max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+          {{ user.get_full_name|default:user.username }}
+        </span>
+        <i class="fas fa-chevron-down" style="font-size:.6rem;color:#9ca3af;"></i>
+      </button>
+
+      <!-- User dropdown -->
+      <div id="userDrop" style="display:none;position:absolute;top:48px;right:0;width:210px;background:#fff;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.12);border:1px solid #e8eaf6;z-index:600;overflow:hidden;">
+        <div style="padding:.85rem 1rem;border-bottom:1px solid #f0f2ff;">
+          <div style="font-weight:700;font-size:.85rem;color:#1a1a2e;">{{ user.get_full_name|default:user.username }}</div>
+          <div style="font-size:.72rem;color:#9ca3af;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ user.email }}</div>
+          <span style="font-size:.7rem;padding:.15rem .5rem;border-radius:20px;margin-top:.3rem;display:inline-block;font-weight:600;
+            {% if user.role == 'admin' %}background:#fff1f2;color:#f5576c;
+            {% elif user.role == 'teacher' %}background:#f0f2ff;color:#667eea;
+            {% elif user.role == 'student' %}background:#f0fff4;color:#43e97b;
+            {% else %}background:#fff8f0;color:#f7971e;{% endif %}">
+            {{ user.role|title }}
+          </span>
+        </div>
+        <div style="padding:.4rem 0;">
+          <a href="{% url 'accounts:profile' %}" style="display:flex;align-items:center;gap:.6rem;padding:.55rem 1rem;font-size:.82rem;color:#374151;text-decoration:none;transition:background .15s;" onmouseenter="this.style.background='#f0f2ff'" onmouseleave="this.style.background=''">
+            <i class="fas fa-user" style="width:16px;color:#667eea;"></i> My Profile
+          </a>
+          <a href="{% url 'accounts:edit_profile' %}" style="display:flex;align-items:center;gap:.6rem;padding:.55rem 1rem;font-size:.82rem;color:#374151;text-decoration:none;transition:background .15s;" onmouseenter="this.style.background='#f0f2ff'" onmouseleave="this.style.background=''">
+            <i class="fas fa-edit" style="width:16px;color:#43e97b;"></i> Edit Profile
+          </a>
+          <a href="{% url 'dashboard:home' %}" style="display:flex;align-items:center;gap:.6rem;padding:.55rem 1rem;font-size:.82rem;color:#374151;text-decoration:none;transition:background .15s;" onmouseenter="this.style.background='#f0f2ff'" onmouseleave="this.style.background=''">
+            <i class="fas fa-th-large" style="width:16px;color:#f7971e;"></i> Dashboard
+          </a>
+          <div style="height:1px;background:#f0f2ff;margin:.25rem 0;"></div>
+          <a href="{% url 'accounts:logout' %}" style="display:flex;align-items:center;gap:.6rem;padding:.55rem 1rem;font-size:.82rem;color:#f5576c;text-decoration:none;transition:background .15s;" onmouseenter="this.style.background='#fff1f2'" onmouseleave="this.style.background=''">
+            <i class="fas fa-sign-out-alt" style="width:16px;"></i> Logout
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+</header>
+
+<style>
+/* Desktop: inline search bar visible */
+.nav-search-wrap { display: block; }
+.mob-search-btn  { display: none; }
+
+/* Mobile: hide inline bar, show icon button */
+@media (max-width: 768px) {
+  .sidebar-toggle-btn { display: flex !important; }
+  .nav-search-wrap    { display: none !important; }
+  .mob-search-btn     { display: flex !important; }
+  /* Shrink user name on small screens */
+  .nav-user-name      { display: none !important; }
+  /* Search overlay full screen */
+  #mobileSearchOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26,26,46,.7);
+    z-index: 2000;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 4rem 1rem 1rem;
+    backdrop-filter: blur(4px);
+  }
+  #mobileSearchOverlay.open { display: flex; }
+  #mobileSearchBox {
+    background: #fff;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    overflow: hidden;
+    animation: mobSearchIn .25s ease;
+  }
+  @keyframes mobSearchIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to   { transform: translateY(0);     opacity: 1; }
+  }
+}
+@media (min-width: 769px) {
+  #mobileSearchOverlay { display: none !important; }
+}
+</style>
+
+<!-- ── MOBILE SEARCH FULL-SCREEN OVERLAY ──────────────────────── -->
+<div id="mobileSearchOverlay" onclick="closeMobSearch(event)">
+  <div id="mobileSearchBox">
+    <!-- Input row -->
+    <div style="display:flex;align-items:center;gap:.5rem;padding:.75rem 1rem;border-bottom:1px solid #f0f2ff;">
+      <i class="fas fa-search" style="color:#667eea;font-size:1rem;flex-shrink:0;"></i>
+      <form id="mobSearchForm" action="{% url 'dashboard:search' %}" method="GET" autocomplete="off" style="flex:1;">
+        <input id="mobSearchInp" name="q" type="text"
+               placeholder="Search courses, lessons, subjects..."
+               style="width:100%;border:none;outline:none;font-size:.95rem;font-family:Poppins,sans-serif;color:#1a1a2e;"
+               oninput="liveSearchMob(this.value)">
+      </form>
+      <button onclick="closeMobSearchBtn()" style="background:none;border:none;color:#9ca3af;font-size:1rem;cursor:pointer;padding:.25rem;">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <!-- Live results -->
+    <div id="mobSearchResults" style="max-height:340px;overflow-y:auto;">
+      <div style="padding:2rem;text-align:center;color:#9ca3af;font-size:.85rem;">
+        <i class="fas fa-search fa-2x mb-2 d-block" style="opacity:.2;"></i>
+        Type to search courses, subjects, lessons and more
+      </div>
+    </div>
+    <!-- View all -->
+    <div id="mobSearchFooter" style="display:none;padding:.65rem 1rem;border-top:1px solid #f0f2ff;text-align:center;">
+      <a id="mobViewAll" href="#" style="font-size:.82rem;color:#667eea;font-weight:600;text-decoration:none;">
+        View all results <i class="fas fa-arrow-right ms-1"></i>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleNotif() {
+  var d = document.getElementById('notifDrop');
+  document.getElementById('userDrop').style.display = 'none';
+  var isOpen = d.style.display === 'block';
+  d.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) { notifLoaded = false; loadNotifications(); }
+}
+
+function toggleUserMenu() {
+  var d = document.getElementById('userDrop');
+  document.getElementById('notifDrop').style.display = 'none';
+  d.style.display = d.style.display === 'block' ? 'none' : 'block';
+}
+
+function toggleSearch() {
+  var w = document.getElementById('navSearchWrap');
+  var inp = document.getElementById('navSearch');
+  if (w.style.display === 'block') {
+    w.style.display = 'none';
+    document.getElementById('searchDrop').style.display = 'none';
+  } else {
+    w.style.display = 'block';
+    inp.focus();
+  }
+}
+
+function handleSearchBtn() {
+  if (window.innerWidth <= 768) {
+    openMobSearch();
+  } else {
+    toggleSearch();
+  }
+}
+
+function openMobSearch() {
+  document.getElementById('mobileSearchOverlay').classList.add('open');
+  setTimeout(function() { document.getElementById('mobSearchInp').focus(); }, 100);
+}
+
+function closeMobSearchBtn() {
+  document.getElementById('mobileSearchOverlay').classList.remove('open');
+  document.getElementById('mobSearchInp').value = '';
+  document.getElementById('mobSearchResults').innerHTML = '<div style="padding:2rem;text-align:center;color:#9ca3af;font-size:.85rem;"><i class="fas fa-search fa-2x mb-2 d-block" style="opacity:.2;"></i>Type to search</div>';
+  document.getElementById('mobSearchFooter').style.display = 'none';
+}
+
+function closeMobSearch(e) {
+  if (e.target === document.getElementById('mobileSearchOverlay')) {
+    closeMobSearchBtn();
+  }
+}
+
+var mobSearchTimer = null;
+function liveSearchMob(q) {
+  clearTimeout(mobSearchTimer);
+  var results = document.getElementById('mobSearchResults');
+  var footer  = document.getElementById('mobSearchFooter');
+  var viewAll = document.getElementById('mobViewAll');
+
+  if (!q || q.length < 2) {
+    results.innerHTML = '<div style="padding:2rem;text-align:center;color:#9ca3af;font-size:.85rem;"><i class="fas fa-search fa-2x mb-2 d-block" style="opacity:.2;"></i>Type to search</div>';
+    footer.style.display = 'none';
+    return;
+  }
+
+  results.innerHTML = '<div style="padding:1.5rem;text-align:center;color:#9ca3af;font-size:.85rem;"><i class="fas fa-spinner fa-spin me-2"></i>Searching...</div>';
+
+  mobSearchTimer = setTimeout(function() {
+    fetch(ajaxUrl + '?q=' + encodeURIComponent(q))
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (!data.results || !data.results.length) {
+          results.innerHTML = '<div style="padding:2rem;text-align:center;color:#9ca3af;font-size:.85rem;"><i class="fas fa-search-minus fa-2x mb-2 d-block" style="opacity:.2;"></i>No results for "' + q + '"</div>';
+          footer.style.display = 'none';
+          return;
+        }
+        var html = '';
+        data.results.forEach(function(item) {
+          html += '<a href="' + item.url + '" style="display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;text-decoration:none;transition:background .15s;border-bottom:1px solid #f9f9f9;" onclick="closeMobSearchBtn()">' +
+            '<div style="width:38px;height:38px;border-radius:10px;background:#f0f2ff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem;">' +
+              '<i class="' + item.icon + '" style="color:' + item.color + ';"></i>' +
+            '</div>' +
+            '<div style="min-width:0;flex:1;">' +
+              '<div style="font-size:.875rem;font-weight:600;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + item.title + '</div>' +
+              '<div style="font-size:.75rem;color:#9ca3af;">' + item.type + ' · ' + item.sub + '</div>' +
+            '</div>' +
+            '<i class="fas fa-chevron-right" style="color:#d1d5db;font-size:.7rem;flex-shrink:0;"></i>' +
+          '</a>';
+        });
+        results.innerHTML = html;
+        viewAll.href = searchUrl + '?q=' + encodeURIComponent(q);
+        footer.style.display = 'block';
+      });
+  }, 300);
+}
+
+// Mobile Enter key
+document.addEventListener('DOMContentLoaded', function() {
+  var mobInp = document.getElementById('mobSearchInp');
+  if (mobInp) {
+    mobInp.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        closeMobSearchBtn();
+        document.getElementById('mobSearchForm').submit();
+      }
+      if (e.key === 'Escape') closeMobSearchBtn();
+    });
+  }
+});
+
+var searchTimer = null;
+var ajaxUrl = "{% url 'dashboard:ajax_search' %}";
+var searchUrl = "{% url 'dashboard:search' %}";
+
+function liveSearch(q) {
+  clearTimeout(searchTimer);
+  var drop = document.getElementById('searchDrop');
+  var results = document.getElementById('searchResults');
+  var footer = document.getElementById('searchFooter');
+  var viewAll = document.getElementById('searchViewAll');
+
+  if (!q || q.length < 2) {
+    drop.style.display = 'none';
+    return;
+  }
+
+  searchTimer = setTimeout(function () {
+    results.innerHTML = '<div style="padding:1rem;text-align:center;color:#9ca3af;font-size:.82rem;"><i class="fas fa-spinner fa-spin me-2"></i>Searching...</div>';
+    drop.style.display = 'block';
+
+    fetch(ajaxUrl + '?q=' + encodeURIComponent(q))
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if (!data.results || !data.results.length) {
+          results.innerHTML = '<div style="padding:1.25rem 1rem;text-align:center;color:#9ca3af;font-size:.82rem;"><i class="fas fa-search-minus fa-lg mb-2 d-block" style="opacity:.3;"></i>No results for "' + q + '"</div>';
+          footer.style.display = 'none';
+          return;
+        }
+
+        var html = '';
+        data.results.forEach(function(item) {
+          html += '<a href="' + item.url + '" style="display:flex;align-items:center;gap:.75rem;padding:.65rem 1rem;text-decoration:none;transition:background .15s;border-bottom:1px solid #f9f9f9;" onmouseenter="this.style.background=\'#f8f9ff\'" onmouseleave="this.style.background=\'\'">' +
+            '<div style="width:34px;height:34px;border-radius:9px;background:#f0f2ff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.85rem;">' +
+              '<i class="' + item.icon + '" style="color:' + item.color + ';"></i>' +
+            '</div>' +
+            '<div style="min-width:0;flex:1;">' +
+              '<div style="font-size:.84rem;font-weight:600;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + item.title + '</div>' +
+              '<div style="font-size:.72rem;color:#9ca3af;">' + item.type + ' · ' + item.sub + '</div>' +
+            '</div>' +
+          '</a>';
+        });
+        results.innerHTML = html;
+
+        viewAll.href = searchUrl + '?q=' + encodeURIComponent(q);
+        footer.style.display = 'block';
+      })
+      .catch(function(){
+        results.innerHTML = '<div style="padding:1rem;text-align:center;color:#f5576c;font-size:.82rem;">Search failed. Try again.</div>';
+      });
+  }, 320);
+}
+
+// Submit form on Enter
+document.addEventListener('DOMContentLoaded', function() {
+  var inp = document.getElementById('navSearch');
+  if (inp) {
+    inp.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('searchDrop').style.display = 'none';
+        document.getElementById('navSearchForm').submit();
+      }
+      if (e.key === 'Escape') {
+        document.getElementById('searchDrop').style.display = 'none';
+        inp.blur();
+      }
+    });
+  }
+  // Close search dropdown on outside click
+  document.addEventListener('click', function(e) {
+    var wrap = document.getElementById('navSearchWrap');
+    if (wrap && !wrap.contains(e.target)) {
+      document.getElementById('searchDrop').style.display = 'none';
+    }
+  });
+});
+
+// ── NOTIFICATION AJAX ──────────────────────────────────────────
+var notifLoaded = false;
+
+function loadNotifications() {
+  fetch('/notifications/ajax/recent/')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      notifLoaded = true;
+      updateBadge(data.unread);
+      var container = document.getElementById('notifItems');
+      if (!data.notifications || !data.notifications.length) {
+        container.innerHTML = '<div style="padding:1.5rem;text-align:center;color:#9ca3af;font-size:.82rem;"><i class="fas fa-bell-slash fa-2x mb-2 d-block" style="opacity:.2;"></i>No notifications</div>';
+        return;
+      }
+      var typeConfig = {
+        course_enrollment: { icon: 'fas fa-user-plus',    bg: '#f0f2ff',  color: '#667eea' },
+        assignment:        { icon: 'fas fa-tasks',         bg: '#fff8f0',  color: '#f7971e' },
+        quiz:              { icon: 'fas fa-question-circle',bg:'#f0f2ff',  color: '#667eea' },
+        exam:              { icon: 'fas fa-file-alt',      bg: '#fff1f2',  color: '#f5576c' },
+        live_class:        { icon: 'fas fa-video',         bg: '#f0fff4',  color: '#43e97b' },
+        certificate:       { icon: 'fas fa-certificate',  bg: '#fff8f0',  color: '#f7971e' },
+        message:           { icon: 'fas fa-comment',       bg: '#f0f2ff',  color: '#667eea' },
+        system:            { icon: 'fas fa-bell',          bg: '#f0f2ff',  color: '#667eea' },
+      };
+      var html = '';
+      data.notifications.forEach(function(n) {
+        var cfg = typeConfig[n.type] || typeConfig.system;
+        var url = n.link || '/notifications/';
+        html += '<a href="' + url + '" style="display:flex;gap:.75rem;align-items:flex-start;padding:.75rem 1rem;text-decoration:none;border-bottom:1px solid #f9f9f9;transition:background .15s;' + (n.is_read ? '' : 'background:#f8f9ff;') + '" onmouseenter="this.style.background=\'#f0f2ff\'" onmouseleave="this.style.background=\'' + (n.is_read ? '#fff' : '#f8f9ff') + '\'">' +
+          '<div style="width:34px;height:34px;border-radius:9px;background:' + cfg.bg + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.82rem;">' +
+            '<i class="' + cfg.icon + '" style="color:' + cfg.color + ';"></i>' +
+          '</div>' +
+          '<div style="min-width:0;">' +
+            '<div style="font-size:.82rem;font-weight:' + (n.is_read ? '500' : '700') + ';color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + n.title + '</div>' +
+            '<div style="font-size:.73rem;color:#6b7280;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + n.message + '</div>' +
+            '<div style="font-size:.68rem;color:#9ca3af;margin-top:.2rem;">' + n.time + (n.is_read ? '' : ' · <span style="color:#667eea;font-weight:600;">New</span>') + '</div>' +
+          '</div>' +
+        '</a>';
+      });
+      container.innerHTML = html;
+    })
+    .catch(function() {
+      document.getElementById('notifItems').innerHTML = '<div style="padding:1rem;text-align:center;color:#9ca3af;font-size:.82rem;">Could not load notifications.</div>';
+    });
+}
+
+function updateBadge(count) {
+  var badge = document.getElementById('notifBadge');
+  if (!badge) return;
+  if (count > 0) {
+    badge.textContent = count > 99 ? '99+' : count;
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// Poll unread count every 30 seconds
+function pollUnread() {
+  fetch('/notifications/ajax/unread-count/')
+    .then(function(r) { return r.json(); })
+    .then(function(data) { updateBadge(data.count); notifLoaded = false; })
+    .catch(function() {});
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  pollUnread();
+  setInterval(pollUnread, 30000);
+});
+
+// Auto-set page title
+document.addEventListener('DOMContentLoaded', function () {
+  var h = document.querySelector('.page-content h2, .page-content h1');
+  var el = document.getElementById('navPageTitle');
+  if (h && el) {
+    var txt = h.textContent.replace(/[^\w\s]/g, '').trim();
+    if (txt) el.textContent = txt.length > 35 ? txt.slice(0, 35) + '…' : txt;
+  }
+});
+</script>

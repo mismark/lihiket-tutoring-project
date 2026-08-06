@@ -1,0 +1,144 @@
+/* ==========================================
+   Quiz Cards
+========================================== */
+
+.quiz-card{
+    border: none;
+    border-radius: 12px;
+    transition: all .3s ease;
+}
+
+.quiz-card:hover{
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(0,0,0,.15);
+}
+
+.quiz-card .card-body h4{
+    font-weight: 700;
+}
+
+/* ==========================================
+   Quiz Information
+========================================== */
+
+.quiz-info p{
+    margin-bottom: 15px;
+}
+
+.quiz-info strong{
+    color:#0d6efd;
+}
+
+/* ==========================================
+   Question Card
+========================================== */
+
+.card-header{
+    font-weight:600;
+}
+
+.form-check{
+    padding:12px;
+    border:1px solid #dee2e6;
+    border-radius:8px;
+    margin-bottom:10px;
+    transition:.3s;
+}
+
+.form-check:hover{
+    background:#f8f9fa;
+}
+
+.form-check-input{
+    cursor:pointer;
+}
+
+.form-check-label{
+    cursor:pointer;
+    width:100%;
+}
+
+/* ==========================================
+   Timer
+========================================== */
+
+#timer{
+    font-size:2rem;
+    font-weight:bold;
+}
+
+.time-warning{
+    color:#dc3545;
+    animation:blink .8s infinite;
+}
+
+@keyframes blink{
+
+    0%{
+        opacity:1;
+    }
+
+    50%{
+        opacity:.4;
+    }
+
+    100%{
+        opacity:1;
+    }
+
+}
+
+/* ==========================================
+   Result Cards
+========================================== */
+
+.result-card{
+    border:none;
+    border-radius:12px;
+}
+
+.result-card h2{
+    font-weight:bold;
+}
+
+.badge{
+    font-size:.9rem;
+}
+
+/* ==========================================
+   Buttons
+========================================== */
+
+.btn{
+    border-radius:8px;
+}
+
+/* ==========================================
+   Responsive
+========================================== */
+
+@media(max-width:768px){
+
+    #timer{
+        font-size:1.5rem;
+    }
+
+}
+
+table thead {
+    background: white;
+}
+
+thead th {
+    background: white;
+}
+
+.table th {
+    background: white;
+}
+
+
+.table-dark th {
+    background-color: #212529 !important;
+    color: #fff !important;
+}

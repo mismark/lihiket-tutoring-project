@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Edit Question{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold"><i class="fas fa-edit text-warning"></i> Edit Question</h2>
+      <p class="text-muted mb-0">{{ exam.title }}</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{% url 'exams:view_exam_question' eq.pk %}" class="btn btn-outline-primary">
+        <i class="fas fa-eye"></i> View
+      </a>
+      <a href="{% url 'exams:exam_question_list' exam.pk %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Back
+      </a>
+    </div>
+  </div>
+
+  <div class="row">
+
+    <!-- Edit form -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-warning text-dark">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-edit"></i> Edit Question</h5>
+        </div>
+        <div class="card-body p-4">
+
+          <form method="POST">
+            {% csrf_token %}
+
+            <!-- Question text -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">
+                Question <span class="text-danger">*</span>
+              </label>
+              <textarea name="question_text"
+                        class="form-control"
+                        rows="3"
+                        required>{{ question.question_text }}</textarea>
+            </div>
+
+            <!-- Type & Marks -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Type</label>
+                <select name="question_type" class="form-select">
+                  <option value="mcq" {% if question.question_type == "mcq" %}selected{% endif %}>
+                    Multiple Choice
+                  </option>
+                  <option value="tf" {% if question.question_type == "tf" %}selected{% endif %}>
+                    True / False
+                  </option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Marks</label>
+                <input type="number"
+                       name="marks"
+                       class="form-control"
+                       value="{{ question.marks }}"
+                       min="1">
+              </div>
+            </div>
+
+            <!-- Choices -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">
+                Choices
+                <small class="text-muted fw-normal">(tick the correct answer)</small>
+              </label>
+              {% for i in "123456" %}
+              {% with idx=forloop.counter %}
+              {% with choice=choices_padded|slice:forloop.counter0|last %}
+              <div class="input-group mb-2">
+                <div class="input-group-text">
+                  <input type="checkbox"
+                         name="correct_{{ idx }}"
+                         class="form-check-input"
+                         title="Mark as correct"
+                         {% if choice and choice.is_correct %}checked{% endif %}>
+                </div>
+                <input type="text"
+                       name="choice_{{ idx }}"
+                       class="form-control"
+                       placeholder="Choice {{ idx }}"
+                       value="{% if choice %}{{ choice.choice_text }}{% endif %}">
+              </div>
+              {% endwith %}
+              {% endwith %}
+              {% endfor %}
+              <small class="text-muted">Leave blank choices empty to remove them.</small>
+            </div>
+
+            <!-- Explanation -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Explanation (optional)</label>
+              <textarea name="explanation"
+                        class="form-control"
+                        rows="3"
+                        placeholder="Explain the correct answer...">{{ question.explanation }}</textarea>
+            </div>
+
+            <hr>
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'exams:exam_question_list' exam.pk %}"
+                 class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancel
+              </a>
+              <button type="submit" class="btn btn-warning">
+                <i class="fas fa-save"></i> Save Changes
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Current choices preview -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white">
+          <h6 class="mb-0 fw-bold">Current Choices</h6>
+        </div>
+        <ul class="list-group list-group-flush">
+          {% for choice in question.choices.all %}
+          <li class="list-group-item d-flex align-items-center gap-2
+            {% if choice.is_correct %}list-group-item-success{% endif %}">
+            {% if choice.is_correct %}
+              <i class="fas fa-check-circle text-success"></i>
+            {% else %}
+              <i class="fas fa-circle text-muted" style="font-size:0.5rem;"></i>
+            {% endif %}
+            <span>{{ choice.choice_text }}</span>
+            {% if choice.is_correct %}
+              <span class="ms-auto badge bg-success">Correct</span>
+            {% endif %}
+          </li>
+          {% empty %}
+          <li class="list-group-item text-muted">No choices yet.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Delete Question{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+
+      <div class="card shadow-lg border-0">
+
+        <div class="card-header bg-danger text-white">
+          <h5 class="mb-0"><i class="fas fa-trash-alt"></i> Delete Question</h5>
+        </div>
+
+        <div class="card-body p-4">
+
+          <div class="alert alert-warning">
+            <strong>Warning:</strong> This action cannot be undone.
+            The question will be permanently removed from the question bank.
+          </div>
+
+          <div class="bg-light rounded p-3 mb-4">
+            <p class="fw-semibold mb-2">{{ question.question_text }}</p>
+            <div class="d-flex gap-2 flex-wrap">
+              <span class="badge bg-{{ question.get_type_badge_color }}">
+                {{ question.get_question_type_display }}
+              </span>
+              <span class="badge bg-{{ question.get_difficulty_badge_color }}">
+                {{ question.get_difficulty_display }}
+              </span>
+              {% if question.subject %}
+                <span class="badge bg-info text-dark">{{ question.subject.name }}</span>
+              {% endif %}
+              <span class="badge bg-secondary">{{ question.marks }} mark{{ question.marks|pluralize }}</span>
+            </div>
+          </div>
+
+          <form method="POST">
+            {% csrf_token %}
+            <div class="d-flex justify-content-end gap-3">
+              <a href="{% url 'question_bank:detail' question.pk %}" class="btn btn-secondary btn-lg">
+                <i class="fas fa-times"></i> Cancel
+              </a>
+              <button type="submit" class="btn btn-danger btn-lg">
+                <i class="fas fa-trash"></i> Yes, Delete It
+              </button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

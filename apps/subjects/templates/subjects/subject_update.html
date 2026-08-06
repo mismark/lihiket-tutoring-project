@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Update Subject{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold">
+        <i class="fas fa-edit text-warning"></i> Update Subject
+      </h2>
+      <p class="text-muted mb-0">Edit subject information.</p>
+    </div>
+    <a href="{% url 'subjects:subject_detail' subject.slug %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+  </div>
+
+  <div class="card shadow-lg border-0">
+    <div class="card-body p-4">
+
+      <form method="POST" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="row">
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">Subject Name</label>
+            {{ form.name }}
+            <div class="text-danger small">{{ form.name.errors }}</div>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">Grade Level</label>
+            {{ form.grade_level }}
+            <div class="text-danger small">{{ form.grade_level.errors }}</div>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">Subject Code</label>
+            {{ form.code }}
+            <div class="text-danger small">{{ form.code.errors }}</div>
+          </div>
+
+          <div class="col-12 mb-3">
+            <label class="form-label fw-semibold">Description</label>
+            {{ form.description }}
+            <div class="text-danger small">{{ form.description.errors }}</div>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">Subject Image</label>
+            {{ form.image }}
+            <div class="text-danger small">{{ form.image.errors }}</div>
+            {% if subject.image %}
+              <img id="imagePreview" src="{{ subject.image.url }}"
+                   class="img-fluid rounded shadow-sm mt-3" style="max-height:200px;">
+            {% else %}
+              <img id="imagePreview" src="" class="img-fluid rounded shadow-sm mt-3"
+                   style="max-height:200px;display:none;">
+            {% endif %}
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label class="form-label fw-semibold">Font Awesome Icon</label>
+            {{ form.icon }}
+            <div class="text-danger small">{{ form.icon.errors }}</div>
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label class="form-label fw-semibold">Theme Color</label>
+            {{ form.color }}
+            <div class="text-danger small">{{ form.color.errors }}</div>
+          </div>
+
+          <div class="col-12 mb-3">
+            <label class="form-label fw-semibold">
+              <i class="fas fa-chalkboard-teacher text-primary"></i>
+              Assign Teachers
+            </label>
+            <div class="text-danger small">{{ form.teachers.errors }}</div>
+
+            <div class="teacher-select-box border rounded p-3"
+                 style="max-height:260px;overflow-y:auto;background:#f8f9fa;">
+
+              {% if form.teachers.field.queryset.exists %}
+                {% for teacher in form.teachers.field.queryset %}
+                <div class="form-check d-flex align-items-center gap-3 py-2 px-2 mb-1
+                            teacher-option rounded"
+                     style="cursor:pointer;transition:background .15s;">
+
+                  <input
+                    class="form-check-input flex-shrink-0"
+                    type="checkbox"
+                    name="teachers"
+                    value="{{ teacher.pk }}"
+                    id="teacher_{{ teacher.pk }}"
+                    {% if teacher in form.instance.teachers.all %}checked{% endif %}>
+
+                  {% if teacher.profile_picture %}
+                    <img src="{{ teacher.profile_picture.url }}"
+                         width="38" height="38"
+                         class="rounded-circle object-fit-cover border flex-shrink-0"
+                         style="object-fit:cover;">
+                  {% else %}
+                    <span class="d-flex align-items-center justify-content-center
+                                 rounded-circle bg-primary text-white fw-bold flex-shrink-0"
+                          style="width:38px;height:38px;font-size:14px;">
+                      {{ teacher.first_name|first|upper }}{{ teacher.last_name|first|upper }}
+                    </span>
+                  {% endif %}
+
+                  <label class="form-check-label w-100 mb-0"
+                         for="teacher_{{ teacher.pk }}"
+                         style="cursor:pointer;">
+                    <span class="fw-semibold">
+                      {{ teacher.get_full_name|default:teacher.username }}
+                    </span>
+                    <br>
+                    <small class="text-muted">{{ teacher.email }}</small>
+                  </label>
+
+                </div>
+                {% endfor %}
+              {% else %}
+                <div class="text-muted text-center py-4">
+                  <i class="fas fa-user-slash fa-2x mb-2 d-block"></i>
+                  No teachers registered yet.
+                </div>
+              {% endif %}
+
+            </div>
+            <small class="text-muted">Select one or more teachers to assign to this subject.</small>
+          </div>
+
+          <div class="col-12 mb-4">
+            <div class="form-check">
+              {{ form.is_active }}
+              <label class="form-check-label">Active Subject</label>
+            </div>
+          </div>
+
+        </div>
+
+        <hr>
+
+        <div class="d-flex justify-content-end gap-2">
+          <a href="{% url 'subjects:subject_detail' subject.slug %}" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-warning">
+            <i class="fas fa-save"></i> Update Subject
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+</div>
+
+<style>
+.teacher-option:hover { background: #e8f0fe !important; }
+.teacher-option:has(input:checked) { background: #dbeafe !important; border: 1px solid #93c5fd; }
+</style>
+
+<script>
+const imageInput = document.getElementById("id_image");
+const preview    = document.getElementById("imagePreview");
+if (imageInput) {
+  imageInput.addEventListener("change", function () {
+    const file = this.files[0];
+    if (file) {
+      preview.src = URL.createObjectURL(file);
+      preview.style.display = "block";
+    }
+  });
+}
+</script>
+
+{% endblock %}

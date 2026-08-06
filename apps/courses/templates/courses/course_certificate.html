@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="container mt-5">
+
+
+<div class="card shadow">
+
+
+<div class="card-body text-center">
+
+
+<h1 class="text-success">
+🎉 Course Completed
+</h1>
+
+
+<hr>
+
+
+<h3>
+{{ course.title }}
+</h3>
+
+
+<p>
+Congratulations!
+You have successfully completed this course.
+</p>
+
+
+<br>
+
+
+<div class="progress">
+
+<div 
+class="progress-bar"
+role="progressbar"
+style="width: {{ progress.progress }}%;"
+>
+
+{{ progress.progress }}%
+
+</div>
+
+</div>
+
+
+<br>
+
+
+{% if progress.progress == 100 %}
+
+
+<a 
+href="{% url 'courses:download_certificate' course.pk %}"
+class="btn btn-success btn-lg"
+>
+
+<i class="fa fa-download"></i>
+Download Certificate
+
+</a>
+
+
+{% else %}
+
+
+<div class="alert alert-warning">
+
+Complete 100% of the course to download your certificate.
+
+</div>
+
+
+{% endif %}
+
+
+
+<br><br>
+
+
+<a 
+href="{% url 'courses:course_detail' course.pk %}"
+class="btn btn-secondary"
+>
+
+Back to Course
+
+</a>
+
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+{% endblock %}

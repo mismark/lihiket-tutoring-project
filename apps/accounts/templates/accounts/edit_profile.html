@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'accounts/css/accounts.css' %}">
+
+<div class="container py-5">
+
+<div class="edit-card">
+
+     
+<h2>Edit Profile</h2>
+
+<form method="POST" enctype="multipart/form-data">
+
+{% csrf_token %}
+
+<div class="text-center mb-4">
+
+<img
+id="preview"
+src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'images/default-user.png' %}{% endif %}"
+class="profile-img">
+
+</div>
+
+<div class="row">
+
+<div class="col-md-6 mb-3">
+<label>First Name</label>
+{{ form.first_name }}
+</div>
+
+<div class="col-md-6 mb-3">
+<label>Last Name</label>
+{{ form.last_name }}
+</div>
+
+<div class="col-md-6 mb-3">
+<label>Email</label>
+{{ form.email }}
+</div>
+
+<div class="col-md-6 mb-3">
+<label>Phone</label>
+{{ form.phone }}
+</div>
+
+<div class="col-md-6 mb-3">
+<label>Date of Birth</label>
+{{ form.date_of_birth }}
+</div>
+
+<div class="col-md-6 mb-3" id="grade_level_field"
+     style="display:{% if user.role == 'student' %}block{% else %}none{% endif %};">
+<label>Grade Level</label>
+{{ form.grade_level }}
+</div>
+
+<div class="col-12 mb-3">
+<label>Address</label>
+{{ form.address }}
+</div>
+
+<div class="col-12 mb-3">
+<label>Bio</label>
+{{ form.bio }}
+</div>
+
+<div class="col-md-6 mb-3">
+<label>Profile Picture</label>
+{{ form.profile_picture }}
+</div>
+
+</div>
+
+<button class="btn btn-primary w-100">
+Save Changes
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+<script src="{% static 'accounts/js/accounts.js' %}"></script>
+
+{% endblock %}

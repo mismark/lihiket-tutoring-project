@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Update Document{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'documents/css/documents.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-10">
+
+            <div class="card shadow border-0">
+
+                <div class="card-header bg-warning">
+
+                    <h3 class="mb-0 text-dark">
+
+                        <i class="fas fa-edit"></i>
+
+                        Update Document
+
+                    </h3>
+
+                </div>
+
+                <div class="card-body">
+
+                    <form method="POST"
+                          enctype="multipart/form-data">
+
+                        {% csrf_token %}
+
+                        {% if form.errors %}
+
+                        <div class="alert alert-danger">
+
+                            {{ form.errors }}
+
+                        </div>
+
+                        {% endif %}
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+
+                                    Subject
+
+                                </label>
+
+                                {{ form.subject }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+
+                                    Course
+
+                                </label>
+
+                                {{ form.course }}
+
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+
+                                <label class="form-label">
+
+                                    Lesson
+
+                                </label>
+
+                                {{ form.lesson }}
+
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+
+                                <label class="form-label">
+
+                                    Document Title
+
+                                </label>
+
+                                {{ form.title }}
+
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+
+                                <label class="form-label">
+
+                                    Description
+
+                                </label>
+
+                                {{ form.description }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+
+                                    Visibility
+
+                                </label>
+
+                                {{ form.visibility }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+
+                                    Replace File (Optional)
+
+                                </label>
+
+                                {{ form.file }}
+
+                            </div>
+
+                            <div class="col-12">
+
+                                <div class="alert alert-info">
+
+                                    <h6 class="mb-2">
+
+                                        Current File
+
+                                    </h6>
+
+                                    <strong>
+
+                                        {{ document.file_name }}
+
+                                    </strong>
+
+                                    <br>
+
+                                    Size:
+                                    {{ document.file_size }}
+
+                                    <br>
+
+                                    Type:
+                                    {{ document.file_extension|upper }}
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-12">
+
+                                <div class="border rounded p-3 bg-light">
+
+                                    <h6>
+
+                                        Selected New File
+
+                                    </h6>
+
+                                    <p id="selectedFile">
+
+                                        Keep existing file
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between">
+
+                            <a href="{% url 'documents:document_detail' document.pk %}"
+                               class="btn btn-secondary">
+
+                                <i class="fas fa-arrow-left"></i>
+
+                                Cancel
+
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-warning">
+
+                                <i class="fas fa-save"></i>
+
+                                Update Document
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script src="{% static 'documents/js/documents.js' %}"></script>
+
+<script>
+
+const fileInput = document.querySelector('input[type="file"]');
+
+const fileName = document.getElementById("selectedFile");
+
+if(fileInput){
+
+    fileInput.addEventListener("change",function(){
+
+        if(this.files.length){
+
+            fileName.innerHTML=this.files[0].name;
+
+        }else{
+
+            fileName.innerHTML="Keep existing file";
+
+        }
+
+    });
+
+}
+
+</script>
+
+{% endblock %}

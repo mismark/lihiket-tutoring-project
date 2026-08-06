@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ assignment.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold">{{ assignment.title }}</h2>
+      <p class="text-muted mb-0">
+        <i class="fas fa-book"></i> {{ assignment.course.title }}
+      </p>
+    </div>
+    <a href="{% url 'courses:course_detail' assignment.course.pk %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left"></i> Back to Course
+    </a>
+  </div>
+
+  <div class="row">
+
+    <!-- Left: description + actions -->
+    <div class="col-lg-8">
+
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-3">Instructions</h5>
+          <div class="text-muted">{{ assignment.description|linebreaks }}</div>
+
+          {% if assignment.file %}
+          <hr>
+          <a href="{{ assignment.file.url }}" target="_blank" class="btn btn-outline-primary">
+            <i class="fas fa-download"></i> Download Assignment File
+          </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- ── STUDENT ACTIONS ─────────────────────────────────────── -->
+      {% if request.user.role == "student" %}
+
+        {% if my_submission %}
+
+          <!-- Already submitted -->
+          <div class="card shadow-sm border-0 mb-4
+            {% if my_submission.status == 'graded' %}border-success{% endif %}">
+            <div class="card-header
+              {% if my_submission.status == 'graded' %}bg-success text-white
+              {% elif my_submission.status == 'late' %}bg-warning text-dark
+              {% else %}bg-light{% endif %}">
+              <h5 class="mb-0">
+                {% if my_submission.status == "graded" %}
+                  <i class="fas fa-check-circle"></i> Graded
+                {% elif my_submission.status == "late" %}
+                  <i class="fas fa-clock"></i> Submitted Late
+                {% else %}
+                  <i class="fas fa-paper-plane"></i> Submitted
+                {% endif %}
+              </h5>
+            </div>
+            <div class="card-body">
+              <p class="mb-1">
+                <strong>Submitted:</strong>
+                {{ my_submission.submitted_at|date:"M d, Y — H:i" }}
+              </p>
+
+              {% if my_submission.remarks %}
+              <p class="mb-1">
+                <strong>Your Remarks:</strong> {{ my_submission.remarks }}
+              </p>
+              {% endif %}
+
+              {% if my_submission.status == "graded" %}
+              <hr>
+              <!-- Result card -->
+              <div class="row text-center my-3">
+                <div class="col-4">
+                  <div class="p-3 bg-light rounded">
+                    <h2 class="text-success mb-0">
+                      {{ my_submission.marks }}<small class="fs-6 text-muted">/{{ assignment.max_marks }}</small>
+                    </h2>
+                    <small class="text-muted">Marks</small>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="p-3 bg-light rounded">
+                    <h2 class="mb-0
+                      {% if my_submission.grade == 'A+' or my_submission.grade == 'A' %}text-success
+                      {% elif my_submission.grade == 'F' %}text-danger
+                      {% else %}text-warning{% endif %}">
+                      {{ my_submission.grade|default:"—" }}
+                    </h2>
+                    <small class="text-muted">Grade</small>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="p-3 bg-light rounded">
+                    <h2 class="mb-0 text-info">
+                      {% if assignment.max_marks > 0 %}
+                        {{ my_submission.marks|floatformat:0 }}%
+                      {% else %}—{% endif %}
+                    </h2>
+                    <small class="text-muted">Score</small>
+                  </div>
+                </div>
+              </div>
+
+              {% if my_submission.feedback %}
+              <div class="alert alert-info mt-3">
+                <strong><i class="fas fa-comment-dots"></i> Teacher Feedback:</strong>
+                <p class="mb-0 mt-1">{{ my_submission.feedback }}</p>
+              </div>
+              {% endif %}
+
+              <p class="text-muted small mt-2">
+                Graded by {{ my_submission.graded_by.get_full_name|default:my_submission.graded_by.username }}
+                on {{ my_submission.graded_at|date:"M d, Y" }}
+              </p>
+
+              {% else %}
+              <!-- Awaiting grade -->
+              <div class="alert alert-warning mt-3 mb-0">
+                <i class="fas fa-hourglass-half"></i>
+                Your submission is awaiting review by the teacher.
+              </div>
+
+              {% if not is_past_due %}
+              <a href="{% url 'assignments:submit_assignment' assignment.pk %}"
+                 class="btn btn-outline-warning mt-3">
+                <i class="fas fa-edit"></i> Update Submission
+              </a>
+              {% endif %}
+
+              {% endif %}
+
+            </div>
+          </div>
+
+        {% else %}
+
+          <!-- Not submitted yet -->
+          {% if is_past_due %}
+          <div class="alert alert-danger">
+            <i class="fas fa-times-circle"></i>
+            The due date has passed. This assignment can no longer be submitted.
+          </div>
+          {% else %}
+          <a href="{% url 'assignments:submit_assignment' assignment.pk %}"
+             class="btn btn-success btn-lg">
+            <i class="fas fa-paper-plane"></i> Submit Assignment
+          </a>
+          {% endif %}
+
+        {% endif %}
+
+      {% endif %}
+      {# end student actions #}
+
+      <!-- ── TEACHER SUBMISSIONS TABLE ───────────────────────────── -->
+      {% if can_manage %}
+      <div class="card shadow-sm border-0 mt-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <i class="fas fa-users text-primary"></i>
+            Student Submissions
+            <span class="badge bg-primary ms-2">{{ submissions|length }}</span>
+          </h5>
+        </div>
+        <div class="table-responsive">
+          {% if submissions %}
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Student</th>
+                <th>Submitted</th>
+                <th>Status</th>
+                <th>Marks</th>
+                <th>Grade</th>
+                <th class="text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for sub in submissions %}
+              <tr>
+                <td>
+                  <span class="fw-semibold">
+                    {{ sub.student.get_full_name|default:sub.student.username }}
+                  </span>
+                </td>
+                <td>{{ sub.submitted_at|date:"M d, Y H:i" }}</td>
+                <td>
+                  {% if sub.status == "graded" %}
+                    <span class="badge bg-success">Graded</span>
+                  {% elif sub.status == "late" %}
+                    <span class="badge bg-danger">Late</span>
+                  {% else %}
+                    <span class="badge bg-warning text-dark">Pending</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if sub.marks is not None %}
+                    <strong>{{ sub.marks }}</strong>/{{ assignment.max_marks }}
+                  {% else %}
+                    <span class="text-muted">—</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if sub.grade %}
+                    <span class="badge bg-info text-dark">{{ sub.grade }}</span>
+                  {% else %}
+                    <span class="text-muted">—</span>
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  <a href="{% url 'assignments:grade_submission' sub.pk %}"
+                     class="btn btn-primary btn-sm">
+                    <i class="fas fa-{% if sub.status == 'graded' %}eye{% else %}check-circle{% endif %}"></i>
+                    {% if sub.status == "graded" %}View{% else %}Grade{% endif %}
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <div class="text-center py-5 text-muted">
+            <i class="fas fa-inbox fa-3x mb-2 d-block"></i>
+            No submissions yet.
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <!-- Right: info sidebar -->
+    <div class="col-lg-4">
+
+      <div class="card shadow-sm border-0 mb-3">
+        <div class="card-header bg-white">
+          <h6 class="mb-0 fw-bold">Assignment Info</h6>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Course</span>
+            <span class="fw-semibold">{{ assignment.course.title }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Teacher</span>
+            <span>{{ assignment.created_by.get_full_name|default:assignment.created_by.username }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Max Marks</span>
+            <strong>{{ assignment.max_marks }}</strong>
+          </li>
+          <li class="list-group-item">
+            <span class="text-muted d-block">Due Date</span>
+            <strong class="{% if is_past_due %}text-danger{% else %}text-success{% endif %}">
+              <i class="fas fa-calendar"></i>
+              {{ assignment.due_date|date:"M d, Y — H:i" }}
+            </strong>
+            {% if is_past_due %}
+              <br><small class="text-danger">Past due</small>
+            {% else %}
+              <br><small class="text-success">Open</small>
+            {% endif %}
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Status</span>
+            {% if assignment.is_active %}
+              <span class="badge bg-success">Active</span>
+            {% else %}
+              <span class="badge bg-secondary">Inactive</span>
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+
+      <!-- Teacher management buttons -->
+      {% if can_manage %}
+      <div class="d-grid gap-2">
+        <a href="{% url 'assignments:assignment_update' assignment.pk %}"
+           class="btn btn-warning">
+          <i class="fas fa-edit"></i> Edit Assignment
+        </a>
+        <a href="{% url 'assignments:assignment_delete' assignment.pk %}"
+           class="btn btn-outline-danger">
+          <i class="fas fa-trash"></i> Delete
+        </a>
+      </div>
+      {% endif %}
+
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

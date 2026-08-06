@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{% if form.instance.pk %}Update Quiz{% else %}Create Quiz{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">
+            <i class="fas fa-{% if form.instance.pk %}edit{% else %}plus-circle{% endif %}"></i>
+            {% if form.instance.pk %}Update Quiz{% else %}Create Quiz{% endif %}
+          </h4>
+        </div>
+
+        <div class="card-body p-4">
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+          {% endif %}
+
+          <form method="POST">
+            {% csrf_token %}
+
+            <!-- Course -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">
+                Course <span class="text-danger">*</span>
+              </label>
+              {{ form.course }}
+              {% if form.course.errors %}
+                <div class="text-danger small">{{ form.course.errors }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Title -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">
+                Quiz Title <span class="text-danger">*</span>
+              </label>
+              {{ form.title }}
+              {% if form.title.errors %}
+                <div class="text-danger small">{{ form.title.errors }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Description</label>
+              {{ form.description }}
+              {% if form.description.errors %}
+                <div class="text-danger small">{{ form.description.errors }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Duration / Passing Score / Max Attempts -->
+            <div class="row">
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label fw-semibold">Duration (minutes)</label>
+                {{ form.duration }}
+                {% if form.duration.errors %}
+                  <div class="text-danger small">{{ form.duration.errors }}</div>
+                {% endif %}
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label fw-semibold">Passing Score (%)</label>
+                {{ form.passing_score }}
+                {% if form.passing_score.errors %}
+                  <div class="text-danger small">{{ form.passing_score.errors }}</div>
+                {% endif %}
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label fw-semibold">Max Attempts</label>
+                {{ form.max_attempts }}
+                {% if form.max_attempts.errors %}
+                  <div class="text-danger small">{{ form.max_attempts.errors }}</div>
+                {% endif %}
+              </div>
+
+            </div>
+
+            <!-- Active toggle -->
+            <div class="form-check mb-4">
+              {{ form.is_active }}
+              <label class="form-check-label fw-semibold">
+                Publish Quiz (visible to students)
+              </label>
+            </div>
+
+            <hr>
+
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'quizzes:quiz_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back
+              </a>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i>
+                {% if form.instance.pk %}Update Quiz{% else %}Create Quiz{% endif %}
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

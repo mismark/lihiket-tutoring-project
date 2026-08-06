@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-0">
+        <i class="fas fa-bell text-primary me-2"></i>Notifications
+        {% if unread_count %}
+          <span class="badge rounded-pill ms-2" style="background:linear-gradient(135deg,#f5576c,#f093fb);font-size:.75rem;">
+            {{ unread_count }} new
+          </span>
+        {% endif %}
+      </h2>
+      <p class="text-muted mb-0 mt-1">All your activity updates in one place.</p>
+    </div>
+    {% if notifications %}
+    <div class="d-flex gap-2">
+      <form method="POST" action="{% url 'notifications:mark_all_as_read' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-primary rounded-pill px-4">
+          <i class="fas fa-check-double me-2"></i>Mark all read
+        </button>
+      </form>
+      <form method="POST" action="{% url 'notifications:delete_all' %}"
+            onsubmit="return confirm('Delete all notifications?')">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger rounded-pill px-4">
+          <i class="fas fa-trash me-2"></i>Clear all
+        </button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Notification list -->
+  {% if notifications %}
+  <div class="card border-0 shadow-sm" style="border-radius:20px;overflow:hidden;">
+    {% for notif in notifications %}
+    <div class="d-flex align-items-start gap-3 px-4 py-3 notif-item
+         {% if not notif.is_read %}notif-unread{% endif %}"
+         style="border-bottom:1px solid #f0f2ff;transition:background .2s;
+                {% if not notif.is_read %}background:#f8f9ff;{% else %}background:#fff;{% endif %}">
+
+      <!-- Icon -->
+      <div style="width:44px;height:44px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem;
+           {% if notif.notification_type == 'course_enrollment' %}background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;
+           {% elif notif.notification_type == 'assignment' %}background:linear-gradient(135deg,#f7971e,#ffd200);color:#fff;
+           {% elif notif.notification_type == 'quiz' %}background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;
+           {% elif notif.notification_type == 'exam' %}background:linear-gradient(135deg,#f5576c,#f093fb);color:#fff;
+           {% elif notif.notification_type == 'live_class' %}background:linear-gradient(135deg,#43e97b,#38f9d7);color:#fff;
+           {% elif notif.notification_type == 'certificate' %}background:linear-gradient(135deg,#f7971e,#ffd200);color:#fff;
+           {% else %}background:#f0f2ff;color:#667eea;{% endif %}">
+        <i class="fas fa-
+          {% if notif.notification_type == 'course_enrollment' %}user-plus
+          {% elif notif.notification_type == 'assignment' %}tasks
+          {% elif notif.notification_type == 'quiz' %}question-circle
+          {% elif notif.notification_type == 'exam' %}file-alt
+          {% elif notif.notification_type == 'live_class' %}video
+          {% elif notif.notification_type == 'certificate' %}certificate
+          {% elif notif.notification_type == 'message' %}comment
+          {% else %}bell{% endif %}"></i>
+      </div>
+
+      <!-- Content -->
+      <div style="flex:1;min-width:0;">
+        <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
+          <span class="fw-{% if not notif.is_read %}bold{% else %}semibold{% endif %}"
+                style="font-size:.9rem;color:#1a1a2e;">
+            {{ notif.title }}
+          </span>
+          <small class="text-muted flex-shrink-0" style="font-size:.75rem;">
+            {{ notif.created_at|timesince }} ago
+          </small>
+        </div>
+        <p class="mb-1 mt-1 text-muted" style="font-size:.83rem;line-height:1.5;">
+          {{ notif.message }}
+        </p>
+        <div class="d-flex gap-2 mt-2 flex-wrap align-items-center">
+          {% if notif.link %}
+          <a href="{{ notif.link }}"
+             class="btn btn-sm rounded-pill px-3 fw-semibold"
+             style="background:#f0f2ff;color:#667eea;border:none;font-size:.75rem;">
+            <i class="fas fa-arrow-right me-1"></i>View
+          </a>
+          {% endif %}
+          <form method="POST" action="{% url 'notifications:delete_notification' notif.pk %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm rounded-pill px-3 fw-semibold"
+                    style="background:#fff1f2;color:#f5576c;border:none;font-size:.75rem;">
+              <i class="fas fa-times me-1"></i>Dismiss
+            </button>
+          </form>
+          {% if not notif.is_read %}
+          <span class="badge rounded-pill" style="background:linear-gradient(135deg,#667eea,#764ba2);font-size:.65rem;">New</span>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="card border-0 shadow-sm text-center py-5" style="border-radius:20px;">
+    <div class="py-4">
+      <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#f0f2ff,#e8eaf6);display:inline-flex;align-items:center;justify-content:center;margin-bottom:1.25rem;">
+        <i class="fas fa-bell-slash fa-2x text-primary" style="opacity:.4;"></i>
+      </div>
+      <h5 class="fw-bold text-muted">No notifications yet</h5>
+      <p class="text-muted" style="font-size:.9rem;">You're all caught up! Notifications will appear here.</p>
+      <a href="{% url 'dashboard:home' %}" class="btn btn-primary rounded-pill px-4 mt-2">
+        <i class="fas fa-home me-2"></i>Go to Dashboard
+      </a>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Create Course{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <div class="card shadow border-0">
+
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0"><i class="fas fa-plus-circle"></i> Create New Course</h4>
+        </div>
+
+        <div class="card-body p-4">
+
+          <form method="POST" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <!-- Teacher field -->
+            {% if request.user.role == "teacher" %}
+            {# Hidden input carries the value; display-only text shows name #}
+            {{ form.teacher }}
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Teacher</label>
+              <input type="text"
+                     class="form-control bg-light"
+                     value="{{ request.user.get_full_name|default:request.user.username }}"
+                     readonly>
+              <small class="text-muted">You are the teacher for this course.</small>
+            </div>
+            {% else %}
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Teacher <span class="text-danger">*</span></label>
+              {{ form.teacher }}
+              <div class="text-danger small">{{ form.teacher.errors }}</div>
+            </div>
+            {% endif %}
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Subject <span class="text-danger">*</span></label>
+              {{ form.subject }}
+              <div class="text-danger small">{{ form.subject.errors }}</div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Course Title <span class="text-danger">*</span></label>
+              {{ form.title }}
+              <div class="text-danger small">{{ form.title.errors }}</div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Description <span class="text-danger">*</span></label>
+              {{ form.description }}
+              <div class="text-danger small">{{ form.description.errors }}</div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Thumbnail</label>
+              {{ form.thumbnail }}
+              <div class="text-danger small">{{ form.thumbnail.errors }}</div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label fw-semibold">Price</label>
+                {{ form.price }}
+                <div class="text-danger small">{{ form.price.errors }}</div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label fw-semibold">Level</label>
+                {{ form.level }}
+                <div class="text-danger small">{{ form.level.errors }}</div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label fw-semibold">Status</label>
+                {{ form.status }}
+                <div class="text-danger small">{{ form.status.errors }}</div>
+              </div>
+            </div>
+
+            <hr>
+            <div class="d-flex justify-content-end gap-2">
+              <a href="{% url 'courses:course_list' %}" class="btn btn-secondary">Cancel</a>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Create Course
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

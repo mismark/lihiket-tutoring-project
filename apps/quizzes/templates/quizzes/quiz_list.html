@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Quizzes
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet"
+      href="{% static 'quizzes/css/quizzes.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <!-- Header -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold">
+
+                Available Quizzes
+
+            </h2>
+
+            <p class="text-muted">
+
+                Test your knowledge and improve your learning.
+
+            </p>
+
+        </div>
+
+        {% if request.user.role == "teacher" or request.user.is_staff %}
+
+        <a href="{% url 'quizzes:quiz_create' %}"
+           class="btn btn-primary">
+
+            <i class="fas fa-plus"></i>
+
+            Create Quiz
+
+        </a>
+
+        {% endif %}
+
+    </div>
+
+    {% if quizzes %}
+
+    <div class="row">
+
+        {% for quiz in quizzes %}
+
+        <div class="col-lg-6 mb-4">
+
+            <div class="card shadow quiz-card h-100">
+
+                <div class="card-body">
+
+                    <h4>
+
+                        {{ quiz.title }}
+
+                    </h4>
+
+                    <p class="text-muted">
+
+                        {{ quiz.course.title }}
+
+                    </p>
+
+                    <p>
+
+                        {{ quiz.description|truncatewords:20 }}
+
+                    </p>
+
+                    <hr>
+
+                    <div class="mb-2">
+
+                        <strong>Duration:</strong>
+
+                        {{ quiz.duration }} minutes
+
+                    </div>
+
+                    <div class="mb-2">
+
+                        <strong>Passing Score:</strong>
+
+                        {{ quiz.passing_score }}%
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <strong>Questions:</strong>
+
+                        {{ quiz.questions.count }}
+
+                    </div>
+
+                    <div class="d-flex gap-2 flex-wrap">
+
+                        <a href="{% url 'quizzes:quiz_detail' quiz.pk %}"
+                           class="btn btn-outline-primary btn-sm">
+
+                            <i class="fas fa-eye"></i>
+
+                            View
+
+                        </a>
+
+                        {% if request.user.role == "student" %}
+
+                        <a href="{% url 'quizzes:start_quiz' quiz.pk %}"
+                           class="btn btn-success btn-sm">
+
+                            <i class="fas fa-play"></i>
+
+                            Start Quiz
+
+                        </a>
+
+                        {% endif %}
+
+                        {% if request.user.role == "teacher" or request.user.is_staff %}
+
+                        <a href="{% url 'quizzes:quiz_update' quiz.pk %}"
+                           class="btn btn-warning btn-sm">
+
+                            <i class="fas fa-edit"></i>
+
+                            Edit
+
+                        </a>
+
+                        <a href="{% url 'quizzes:quiz_delete' quiz.pk %}"
+                           class="btn btn-danger btn-sm">
+
+                            <i class="fas fa-trash"></i>
+
+                            Delete
+
+                        </a>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer bg-white">
+
+                    <small class="text-muted">
+
+                        Created by
+
+                        {{ quiz.created_by.get_full_name|default:quiz.created_by.username }}
+
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="alert alert-info">
+
+        No quizzes are available.
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'quizzes/js/quizzes.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Result — {{ submission.assignment.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <!-- Result Card -->
+      <div class="card shadow-sm border-0">
+
+        <div class="card-header
+          {% if submission.status == 'graded' %}bg-success text-white
+          {% elif submission.status == 'late' %}bg-danger text-white
+          {% else %}bg-warning text-dark{% endif %}">
+          <h4 class="mb-0">
+            {% if submission.status == "graded" %}
+              <i class="fas fa-trophy"></i> Assignment Result
+            {% elif submission.status == "late" %}
+              <i class="fas fa-clock"></i> Submitted Late
+            {% else %}
+              <i class="fas fa-hourglass-half"></i> Awaiting Grade
+            {% endif %}
+          </h4>
+        </div>
+
+        <div class="card-body p-4">
+
+          <h5 class="fw-bold">{{ submission.assignment.title }}</h5>
+          <p class="text-muted mb-4">{{ submission.assignment.course.title }}</p>
+
+          {% if submission.status == "graded" %}
+
+          <!-- Score panels -->
+          <div class="row text-center mb-4">
+            <div class="col-4">
+              <div class="p-4 rounded bg-light">
+                <h1 class="text-success mb-0 fw-bold">{{ submission.marks }}</h1>
+                <small class="text-muted">out of {{ submission.assignment.max_marks }}</small>
+                <p class="mb-0 mt-1 small fw-semibold">Marks</p>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="p-4 rounded bg-light">
+                <h1 class="mb-0 fw-bold
+                  {% if submission.grade == 'A+' or submission.grade == 'A' or submission.grade == 'A-' %}text-success
+                  {% elif submission.grade == 'F' %}text-danger
+                  {% else %}text-warning{% endif %}">
+                  {{ submission.grade|default:"—" }}
+                </h1>
+                <p class="mb-0 mt-1 small fw-semibold">Grade</p>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="p-4 rounded bg-light">
+                <h1 class="text-info mb-0 fw-bold">
+                  {% widthratio submission.marks submission.assignment.max_marks 100 %}%
+                </h1>
+                <p class="mb-0 mt-1 small fw-semibold">Percentage</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feedback -->
+          {% if submission.feedback %}
+          <div class="alert alert-info">
+            <h6 class="fw-bold mb-2">
+              <i class="fas fa-comment-dots"></i> Teacher Feedback
+            </h6>
+            <p class="mb-0">{{ submission.feedback }}</p>
+          </div>
+          {% else %}
+          <div class="alert alert-light border">
+            No feedback provided.
+          </div>
+          {% endif %}
+
+          <p class="text-muted small mt-3">
+            <i class="fas fa-user-check"></i>
+            Graded by
+            <strong>{{ submission.graded_by.get_full_name|default:submission.graded_by.username }}</strong>
+            on {{ submission.graded_at|date:"F d, Y — H:i" }}
+          </p>
+
+          {% else %}
+
+          <div class="alert alert-warning">
+            <i class="fas fa-hourglass-half"></i>
+            Your submission is awaiting review by the teacher.
+          </div>
+
+          {% endif %}
+
+          <hr>
+
+          <!-- Submission info -->
+          <table class="table table-borderless mb-0">
+            <tr>
+              <th class="text-muted" width="35%">Submitted On</th>
+              <td>{{ submission.submitted_at|date:"M d, Y — H:i" }}</td>
+            </tr>
+            <tr>
+              <th class="text-muted">Status</th>
+              <td>
+                {% if submission.status == "graded" %}
+                  <span class="badge bg-success">Graded</span>
+                {% elif submission.status == "late" %}
+                  <span class="badge bg-danger">Late</span>
+                {% else %}
+                  <span class="badge bg-warning text-dark">Submitted</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% if submission.remarks %}
+            <tr>
+              <th class="text-muted">Your Remarks</th>
+              <td>{{ submission.remarks }}</td>
+            </tr>
+            {% endif %}
+            <tr>
+              <th class="text-muted">Your File</th>
+              <td>
+                <a href="{{ submission.file.url }}" target="_blank"
+                   class="btn btn-outline-primary btn-sm">
+                  <i class="fas fa-download"></i> Download
+                </a>
+              </td>
+            </tr>
+          </table>
+
+          <div class="mt-4">
+            <a href="{% url 'assignments:assignment_detail' submission.assignment.pk %}"
+               class="btn btn-secondary">
+              <i class="fas fa-arrow-left"></i> Back to Assignment
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

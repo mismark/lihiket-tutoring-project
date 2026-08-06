@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Assignments
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet"
+      href="{% static 'assignments/css/assignments.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold">
+                Assignments
+            </h2>
+
+            <p class="text-muted mb-0">
+                View and manage course assignments.
+            </p>
+
+        </div>
+
+        {% if request.user.role == "teacher" or request.user.is_staff %}
+
+        <a href="{% url 'assignments:assignment_create' %}"
+           class="btn btn-primary">
+
+            <i class="fas fa-plus-circle"></i>
+            Create Assignment
+
+        </a>
+
+        {% endif %}
+
+    </div>
+
+    {% if assignments %}
+
+    <div class="row">
+
+        {% for assignment in assignments %}
+
+        <div class="col-lg-6 mb-4">
+
+            <div class="card shadow-sm h-100 assignment-card">
+
+                <div class="card-body">
+
+                    <h4 class="card-title">
+
+                        {{ assignment.title }}
+
+                    </h4>
+
+                    <p class="text-muted">
+
+                        <strong>Course:</strong>
+
+                        {{ assignment.course.title }}
+
+                    </p>
+
+                    <p>
+
+                        {{ assignment.description|truncatewords:25 }}
+
+                    </p>
+
+                    <hr>
+
+                    <div class="mb-2">
+
+                        <strong>Due Date:</strong>
+
+                        {{ assignment.due_date }}
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <strong>Maximum Marks:</strong>
+
+                        {{ assignment.max_marks }}
+
+                    </div>
+
+                    <a href="{% url 'assignments:assignment_detail' assignment.pk %}"
+                       class="btn btn-outline-primary btn-sm">
+
+                        View Details
+
+                    </a>
+
+                    {% if request.user.role == "teacher" or request.user.is_staff %}
+
+                    <a href="{% url 'assignments:assignment_update' assignment.pk %}"
+                       class="btn btn-warning btn-sm">
+
+                        Edit
+
+                    </a>
+
+                    <a href="{% url 'assignments:assignment_delete' assignment.pk %}"
+                       class="btn btn-danger btn-sm">
+
+                        Delete
+
+                    </a>
+
+                    {% else %}
+
+                    <a href="{% url 'assignments:submit_assignment' assignment.pk %}"
+                       class="btn btn-success btn-sm">
+
+                        Submit
+
+                    </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="alert alert-info">
+
+        No assignments available.
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script src="{% static 'assignments/js/assignments.js' %}"></script>
+{% endblock %}

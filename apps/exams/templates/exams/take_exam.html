@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ exam.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Header with countdown timer -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold">{{ exam.title }}</h2>
+      <p class="text-muted mb-0">{{ exam.course.title }}</p>
+    </div>
+    <div class="text-center">
+      <div class="text-muted small mb-1">Time Remaining</div>
+      <div id="timer"
+           class="fw-bold fs-3 text-danger px-4 py-2 rounded border border-danger"
+           style="min-width:110px;">
+        --:--
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="progress mb-4" style="height:6px;">
+    <div id="timerBar" class="progress-bar bg-danger" style="width:100%;"></div>
+  </div>
+
+  <form method="POST"
+        action="{% url 'exams:submit_exam' attempt.pk %}"
+        id="examForm">
+    {% csrf_token %}
+
+    {% for item in questions %}
+    {% with question=item.question %}
+    <div class="card shadow-sm border-0 mb-4">
+      <div class="card-header d-flex justify-content-between bg-white">
+        <strong>Question {{ forloop.counter }}</strong>
+        <span class="badge bg-primary">{{ question.marks }} mark{{ question.marks|pluralize }}</span>
+      </div>
+      <div class="card-body">
+        <h5 class="mb-3">{{ question.question_text }}</h5>
+        <hr>
+        {% for choice in question.choices.all %}
+        <div class="form-check mb-2 p-2 rounded choice-row"
+             style="cursor:pointer;transition:background .15s;">
+          <input class="form-check-input"
+                 type="radio"
+                 name="question_{{ question.id }}"
+                 id="c{{ choice.id }}"
+                 value="{{ choice.id }}">
+          <label class="form-check-label w-100"
+                 for="c{{ choice.id }}"
+                 style="cursor:pointer;">
+            {{ choice.choice_text }}
+          </label>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endwith %}
+    {% empty %}
+    <div class="alert alert-warning">This exam has no questions.</div>
+    {% endfor %}
+
+    {% if questions %}
+    <div class="d-flex justify-content-center mt-4">
+      <button type="submit" class="btn btn-danger btn-lg px-5" id="submitBtn">
+        <i class="fas fa-paper-plane"></i> Submit Exam
+      </button>
+    </div>
+    {% endif %}
+
+  </form>
+</div>
+
+<script>
+(function () {
+  const totalSeconds = {{ remaining_seconds }};
+  const timerEl      = document.getElementById('timer');
+  const timerBar     = document.getElementById('timerBar');
+  const form         = document.getElementById('examForm');
+  const submitBtn    = document.getElementById('submitBtn');
+
+  let remaining      = totalSeconds;
+  let submitted      = false;
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function format(s) {
+    return pad(Math.floor(s / 60)) + ':' + pad(s % 60);
+  }
+
+  function autoSubmit() {
+    if (submitted) return;
+    submitted = true;
+
+    // Remove the beforeunload warning before auto-submit
+    window.onbeforeunload = null;
+
+    // Show overlay
+    const overlay = document.getElementById('submittingOverlay');
+    if (overlay) overlay.style.display = 'flex';
+
+    if (submitBtn) submitBtn.disabled = true;
+    form.submit();
+  }
+
+  function tick() {
+    if (remaining <= 0) {
+      timerEl.textContent = '00:00';
+      timerEl.className   = 'fw-bold fs-3 text-white bg-danger px-4 py-2 rounded border border-danger';
+      timerBar.style.width = '0%';
+      autoSubmit();
+      return;
+    }
+
+    timerEl.textContent  = format(remaining);
+    timerBar.style.width = (remaining / totalSeconds * 100) + '%';
+
+    // Orange under 5 minutes
+    if (remaining <= 300 && remaining > 60) {
+      timerEl.className = 'fw-bold fs-3 text-dark bg-warning px-4 py-2 rounded border border-warning';
+      timerBar.className = 'progress-bar bg-warning';
+    }
+
+    // Red under 1 minute
+    if (remaining <= 60) {
+      timerEl.className = 'fw-bold fs-3 text-white bg-danger px-4 py-2 rounded border border-danger';
+      timerBar.className = 'progress-bar bg-danger';
+    }
+
+    remaining--;
+    setTimeout(tick, 1000);
+  }
+
+  tick();
+
+  // Highlight selected choice
+  document.querySelectorAll('.choice-row input[type="radio"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      const name = this.name;
+      document.querySelectorAll('input[name="' + name + '"]').forEach(function (r) {
+        r.closest('.choice-row').style.background = '';
+      });
+      this.closest('.choice-row').style.background = '#e8f0fe';
+    });
+  });
+
+  // Warn if student tries to leave mid-exam
+  window.onbeforeunload = function (e) {
+    if (!submitted) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  };
+
+  // Clear warning on manual submit
+  if (submitBtn) {
+    submitBtn.addEventListener('click', function () {
+      submitted = true;
+      window.onbeforeunload = null;
+      const overlay = document.getElementById('submittingOverlay');
+      if (overlay) overlay.style.display = 'flex';
+    });
+  }
+})();
+</script>
+
+<!-- Submitting overlay -->
+<div id="submittingOverlay"
+     style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+            background:rgba(0,0,0,0.7);z-index:9999;
+            align-items:center;justify-content:center;flex-direction:column;">
+  <div class="spinner-border text-white mb-3" style="width:3rem;height:3rem;"></div>
+  <h4 class="text-white fw-bold">Submitting your exam...</h4>
+  <p class="text-white-50">Please wait, do not close this page.</p>
+</div>
+{% endblock %}

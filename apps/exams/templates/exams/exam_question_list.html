@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Questions — {{ exam.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold">
+        <i class="fas fa-list-ul text-danger"></i> Exam Questions
+      </h2>
+      <p class="text-muted mb-0">{{ exam.title }} &nbsp;·&nbsp; {{ exam.course.title }}</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{% url 'exams:import_exam_questions' exam.pk %}" class="btn btn-info">
+        <i class="fas fa-file-import"></i> Import from Question Bank
+      </a>
+      <a href="{% url 'exams:exam_detail' exam.pk %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Exam
+      </a>
+    </div>
+  </div>
+
+  {% if messages %}
+    {% for m in messages %}
+      <div class="alert alert-{{ m.tags }} alert-dismissible">
+        {{ m }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="row">
+
+    <!-- Left: question list -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <span class="fw-semibold">
+            {{ questions|length }} question{{ questions|length|pluralize }}
+          </span>
+          <span class="fw-semibold text-primary">
+            Total: {{ total_marks }} marks
+          </span>
+        </div>
+
+        {% if questions %}
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th width="4%">#</th>
+                <th>Question</th>
+                <th>Type</th>
+                <th>Marks</th>
+                <th>Choices</th>
+                <th class="text-center" width="12%">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for eq in questions %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td class="fw-semibold">{{ eq.question.question_text|truncatewords:12 }}</td>
+                <td>
+                  <span class="badge bg-primary">
+                    {{ eq.question.get_question_type_display }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge bg-light text-dark border">
+                    {{ eq.question.marks }} mk
+                  </span>
+                </td>
+                <td>
+                  {% for c in eq.question.choices.all %}
+                  <span class="badge {% if c.is_correct %}bg-success{% else %}bg-light text-dark border{% endif %} me-1">
+                    {% if c.is_correct %}<i class="fas fa-check"></i>{% endif %}
+                    {{ c.choice_text|truncatewords:3 }}
+                  </span>
+                  {% endfor %}
+                </td>
+                <td class="text-center">
+                  <div class="btn-group btn-group-sm">
+                    <!-- View -->
+                    <a href="{% url 'exams:view_exam_question' eq.pk %}"
+                       class="btn btn-outline-primary"
+                       title="View question">
+                      <i class="fas fa-eye"></i>
+                    </a>
+                    <!-- Edit -->
+                    <a href="{% url 'exams:edit_exam_question' eq.pk %}"
+                       class="btn btn-outline-warning"
+                       title="Edit question">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <!-- Remove -->
+                    <form method="POST"
+                          action="{% url 'exams:exam_question_delete' eq.pk %}"
+                          class="d-inline"
+                          onsubmit="return confirm('Remove this question from the exam?')">
+                      {% csrf_token %}
+                      <button type="submit"
+                              class="btn btn-outline-danger"
+                              title="Remove from exam">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="card-body text-center py-5 text-muted">
+          <i class="fas fa-question-circle fa-3x mb-3 d-block"></i>
+          <p>No questions yet. Add one manually or import from your question bank.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Right: Add question manually -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-danger text-white">
+          <h6 class="mb-0 fw-bold">
+            <i class="fas fa-plus-circle"></i> Add Question Manually
+          </h6>
+        </div>
+        <div class="card-body p-3">
+          <form method="POST"
+                action="{% url 'exams:add_exam_question' exam.pk %}">
+            {% csrf_token %}
+
+            <!-- Question text -->
+            <div class="mb-2">
+              <label class="form-label small fw-semibold">
+                Question <span class="text-danger">*</span>
+              </label>
+              <textarea name="question_text"
+                        class="form-control form-control-sm"
+                        rows="3"
+                        placeholder="Enter question text..."
+                        required></textarea>
+            </div>
+
+            <!-- Type & Marks -->
+            <div class="row g-2 mb-2">
+              <div class="col-7">
+                <label class="form-label small fw-semibold">Type</label>
+                <select name="question_type" class="form-select form-select-sm">
+                  <option value="mcq">Multiple Choice</option>
+                  <option value="tf">True / False</option>
+                </select>
+              </div>
+              <div class="col-5">
+                <label class="form-label small fw-semibold">Marks</label>
+                <input type="number" name="marks"
+                       class="form-control form-control-sm"
+                       value="1" min="1">
+              </div>
+            </div>
+
+            <!-- Choices -->
+            <div class="mb-2">
+              <label class="form-label small fw-semibold">
+                Choices <small class="text-muted">(tick the correct one)</small>
+              </label>
+              {% for i in "123456" %}
+              <div class="input-group input-group-sm mb-1">
+                <div class="input-group-text">
+                  <input type="checkbox"
+                         name="correct_{{ forloop.counter }}"
+                         title="Mark as correct">
+                </div>
+                <input type="text"
+                       name="choice_{{ forloop.counter }}"
+                       class="form-control"
+                       placeholder="Choice {{ forloop.counter }}">
+              </div>
+              {% endfor %}
+              <small class="text-muted">Leave blank choices empty.</small>
+            </div>
+
+            <!-- Explanation -->
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Explanation (optional)</label>
+              <textarea name="explanation"
+                        class="form-control form-control-sm"
+                        rows="2"
+                        placeholder="Explain the correct answer..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-danger w-100">
+              <i class="fas fa-plus"></i> Add Question
+            </button>
+
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

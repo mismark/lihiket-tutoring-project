@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ exam.title }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold">{{ exam.title }}</h2>
+      <p class="text-muted mb-0"><i class="fas fa-book"></i> {{ exam.course.title }}</p>
+    </div>
+    <a href="{% url 'exams:exam_list' %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+  </div>
+
+  {% if messages %}
+    {% for m in messages %}<div class="alert alert-{{ m.tags }}">{{ m }}</div>{% endfor %}
+  {% endif %}
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-3">About This Exam</h5>
+          <p>{{ exam.description|linebreaks|default:"No description provided." }}</p>
+          <hr>
+
+          <!-- Student actions -->
+          {% if request.user.role == "student" %}
+            {% if my_attempt and my_attempt.submitted_at %}
+              <div class="alert {% if my_attempt.passed %}alert-success{% else %}alert-danger{% endif %}">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <strong>
+                      {% if my_attempt.passed %}<i class="fas fa-trophy"></i> You passed!
+                      {% else %}<i class="fas fa-times-circle"></i> You did not pass.{% endif %}
+                    </strong>
+                    <p class="mb-0 mt-1">
+                      Score: <strong>{{ my_attempt.score }}/{{ total_marks }}</strong>
+                      &nbsp;·&nbsp; {{ my_attempt.percentage|floatformat:1 }}%
+                    </p>
+                  </div>
+                  <a href="{% url 'exams:exam_result' my_attempt.pk %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-chart-bar"></i> View Result
+                  </a>
+                </div>
+              </div>
+            {% elif is_upcoming %}
+              <!-- Countdown to exam start — auto-redirects when it hits 0 -->
+              <div class="alert alert-warning mb-3">
+                <i class="fas fa-clock"></i>
+                Exam starts on <strong>{{ exam.start_time|date:"F d, Y at H:i" }}</strong>
+              </div>
+
+              <div class="text-center py-3">
+                <p class="text-muted mb-2 fw-semibold">Exam starts in</p>
+                <div class="d-inline-flex gap-3 mb-3" id="startCountdown">
+                  <div class="text-center">
+                    <div class="display-5 fw-bold text-danger" id="cd-hours">--</div>
+                    <small class="text-muted">Hours</small>
+                  </div>
+                  <div class="display-5 fw-bold text-muted">:</div>
+                  <div class="text-center">
+                    <div class="display-5 fw-bold text-danger" id="cd-minutes">--</div>
+                    <small class="text-muted">Minutes</small>
+                  </div>
+                  <div class="display-5 fw-bold text-muted">:</div>
+                  <div class="text-center">
+                    <div class="display-5 fw-bold text-danger" id="cd-seconds">--</div>
+                    <small class="text-muted">Seconds</small>
+                  </div>
+                </div>
+                <p class="text-muted small">The exam will start automatically when the countdown reaches zero.</p>
+              </div>
+
+              <script>
+              (function () {
+                // Use Unix timestamp (seconds) — avoids all timezone issues
+                var startTimestamp = {{ exam.start_time|date:"U" }} * 1000; // ms
+                var hoursEl   = document.getElementById('cd-hours');
+                var minutesEl = document.getElementById('cd-minutes');
+                var secondsEl = document.getElementById('cd-seconds');
+                var takeUrl   = "{% url 'exams:take_exam' exam.pk %}";
+
+                function pad(n) { return String(n).padStart(2, '0'); }
+
+                function updateCountdown() {
+                  var now  = Date.now(); // browser local time in ms — same epoch
+                  var diff = Math.floor((startTimestamp - now) / 1000);
+
+                  if (diff <= 0) {
+                    hoursEl.textContent   = '00';
+                    minutesEl.textContent = '00';
+                    secondsEl.textContent = '00';
+                    window.location.href  = takeUrl;
+                    return;
+                  }
+
+                  var h = Math.floor(diff / 3600);
+                  var m = Math.floor((diff % 3600) / 60);
+                  var s = diff % 60;
+
+                  hoursEl.textContent   = pad(h);
+                  minutesEl.textContent = pad(m);
+                  secondsEl.textContent = pad(s);
+
+                  setTimeout(updateCountdown, 1000);
+                }
+
+                updateCountdown();
+              })();
+              </script>
+            {% elif is_expired %}
+              <div class="alert alert-secondary">
+                <i class="fas fa-ban"></i> This exam has ended.
+              </div>
+            {% elif is_open %}
+              <a href="{% url 'exams:take_exam' exam.pk %}" class="btn btn-danger btn-lg">
+                <i class="fas fa-play"></i> Start Exam Now
+              </a>
+            {% endif %}
+          {% endif %}
+
+          <!-- Teacher actions -->
+          {% if can_manage %}
+          <div class="d-flex flex-wrap gap-2 mt-3">
+            <a href="{% url 'exams:exam_question_list' exam.pk %}" class="btn btn-danger">
+              <i class="fas fa-list"></i> Manage Questions
+            </a>
+            <a href="{% url 'exams:import_exam_questions' exam.pk %}" class="btn btn-info">
+              <i class="fas fa-file-import"></i> Import Questions
+            </a>
+            <a href="{% url 'exams:exam_results' exam.pk %}" class="btn btn-primary">
+              <i class="fas fa-chart-bar"></i> All Results
+            </a>
+            <a href="{% url 'exams:exam_update' exam.pk %}" class="btn btn-warning">
+              <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="{% url 'exams:exam_delete' exam.pk %}" class="btn btn-outline-danger">
+              <i class="fas fa-trash"></i> Delete
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Questions preview (teacher) -->
+      {% if can_manage %}
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white">
+          <h6 class="mb-0 fw-bold">
+            <i class="fas fa-question-circle text-primary"></i>
+            Questions ({{ exam.questions.count }}) — Total: {{ total_marks }} marks
+          </h6>
+        </div>
+        <ul class="list-group list-group-flush">
+          {% for eq in exam.questions.all %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <span class="fw-semibold">{{ forloop.counter }}.</span>
+              {{ eq.question.question_text|truncatewords:15 }}
+            </div>
+            <div class="d-flex gap-2 align-items-center">
+              <span class="badge bg-secondary">{{ eq.question.get_question_type_display }}</span>
+              <span class="badge bg-primary">{{ eq.question.marks }} mk</span>
+              <form method="POST"
+                    action="{% url 'exams:exam_question_delete' eq.pk %}"
+                    class="d-inline"
+                    onsubmit="return confirm('Remove this question from the exam?')">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger btn-sm">
+                  <i class="fas fa-times"></i>
+                </button>
+              </form>
+            </div>
+          </li>
+          {% empty %}
+          <li class="list-group-item text-muted text-center py-3">
+            No questions yet.
+            <a href="{% url 'exams:import_exam_questions' exam.pk %}">Import questions</a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white"><h6 class="mb-0 fw-bold">Exam Info</h6></div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Course</span>
+            <span class="fw-semibold">{{ exam.course.title }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Teacher</span>
+            <span>{{ exam.created_by.get_full_name|default:exam.created_by.username }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Duration</span>
+            <strong>{{ exam.duration }} min</strong>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Pass Score</span>
+            <strong>{{ exam.passing_score }}%</strong>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Total Marks</span>
+            <strong>{{ total_marks }}</strong>
+          </li>
+          <li class="list-group-item">
+            <span class="text-muted d-block mb-1">Starts</span>
+            <strong>{{ exam.start_time|date:"M d, Y H:i" }}</strong>
+          </li>
+          <li class="list-group-item">
+            <span class="text-muted d-block mb-1">Closes (computed)</span>
+            <strong>{{ exam.end_time|date:"M d, Y H:i" }}</strong>
+            <br><small class="text-muted">start + {{ exam.duration }} min</small>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Status</span>
+            {% if is_open %}<span class="badge bg-success">Open</span>
+            {% elif is_upcoming %}<span class="badge bg-warning text-dark">Upcoming</span>
+            {% else %}<span class="badge bg-secondary">Ended</span>{% endif %}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

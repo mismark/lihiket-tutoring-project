@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+
+{% block title %}
+My Certificates
+{% endblock %}
+
+
+
+{% block content %}
+
+
+<div class="container mt-5">
+
+
+    <h2 class="mb-4">
+        <i class="fa-solid fa-certificate"></i>
+        My Certificates
+    </h2>
+
+
+
+    <div class="row">
+
+
+        {% for certificate in certificates %}
+
+
+        <div class="col-md-4 mb-4">
+
+
+            <div class="card shadow h-100">
+
+
+                <div class="card-body text-center">
+
+
+                    <img src="{% static 'images/logo.png' %}"
+                         width="80"
+                         class="mb-3">
+
+
+
+                    <h4>
+                        {{ certificate.course.title }}
+                    </h4>
+
+
+
+                    <p>
+                        Certificate No:
+                        <strong>
+                        {{ certificate.certificate_number }}
+                        </strong>
+                    </p>
+
+
+
+                    <p>
+                        Issued:
+                        {{ certificate.issued_at|date:"M d, Y" }}
+                    </p>
+
+
+
+                    <a href="{% url 'certificates:verify_certificate' certificate.certificate_id %}"
+                       class="btn btn-success">
+
+                        <i class="fa-solid fa-check"></i>
+                        Verify
+
+                    </a>
+
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+        {% empty %}
+
+
+        <div class="alert alert-info">
+
+            You don't have any certificates yet.
+
+        </div>
+
+
+        {% endfor %}
+
+
+
+    </div>
+
+
+</div>
+
+
+
+{% endblock %}

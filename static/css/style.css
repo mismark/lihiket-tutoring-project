@@ -1,0 +1,57 @@
+body{
+
+font-family:Poppins,Arial,sans-serif;
+
+background:#f5f7fb;
+
+margin:0;
+
+
+}
+
+
+
+.card{
+
+border:none;
+
+border-radius:20px;
+
+}
+.contact-link a{
+    padding-left: 15px;
+    margin: 15px;
+}
+
+.contact-link a:hover{
+
+    background-color: blue;
+    color: #f5f7fb;
+    padding: 15px;
+    border-radius: 15px;
+    transform: rotate(10deg);
+
+    
+}
+
+
+footer{
+margin-bottom: 0;
+margin-left:0;
+
+}
+
+
+
+@media(max-width:768px){
+
+
+footer{
+
+margin-left:0;
+
+}
+
+
+}
+

@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{{ quiz.title }}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet"
+      href="{% static 'quizzes/css/quizzes.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <!-- Quiz Header -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold">
+
+                {{ quiz.title }}
+
+            </h2>
+
+            <p class="text-muted">
+
+                {{ quiz.course.title }}
+
+            </p>
+
+        </div>
+
+        <div class="text-end">
+
+            <h5>
+
+                Time Remaining
+
+            </h5>
+
+            <h3 id="timer"
+                class="text-danger">
+
+                {{ quiz.duration }}:00
+
+            </h3>
+
+        </div>
+
+    </div>
+
+    <form method="POST"
+          action="{% url 'quizzes:submit_quiz' attempt.pk %}"
+          id="quizForm">
+
+        {% csrf_token %}
+
+        {% for question in quiz.questions.all %}
+
+        <div class="card shadow mb-4">
+
+            <div class="card-header">
+
+                <strong>
+
+                    Question {{ forloop.counter }}
+
+                </strong>
+
+                <span class="float-end">
+
+                    {{ question.marks }} Mark{{ question.marks|pluralize }}
+
+                </span>
+
+            </div>
+
+            <div class="card-body">
+
+                <h5>
+
+                    {{ question.question_text }}
+
+                </h5>
+
+                <hr>
+
+                {% for choice in question.choices.all %}
+
+                <div class="form-check mb-2">
+
+                    <input
+                        class="form-check-input"
+                        type="radio"
+                        name="question_{{ question.id }}"
+                        id="choice{{ choice.id }}"
+                        value="{{ choice.id }}">
+
+                    <label
+                        class="form-check-label"
+                        for="choice{{ choice.id }}">
+
+                        {{ choice.choice_text }}
+
+                    </label>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <div class="alert alert-warning">
+
+            This quiz has no questions.
+
+        </div>
+
+        {% endfor %}
+
+        {% if quiz.questions.exists %}
+
+        <div class="text-center">
+
+            <button
+                type="submit"
+                class="btn btn-success btn-lg">
+
+                <i class="fas fa-paper-plane"></i>
+
+                Submit Quiz
+
+            </button>
+
+        </div>
+
+        {% endif %}
+
+    </form>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script src="{% static 'quizzes/js/quizzes.js' %}"></script>
+
+<script>
+
+let minutes = {{ quiz.duration }};
+let seconds = 0;
+
+const timer = document.getElementById("timer");
+
+const countdown = setInterval(function(){
+
+    if(minutes === 0 && seconds === 0){
+
+        clearInterval(countdown);
+
+        alert("Time is up! Your quiz will be submitted.");
+
+        document.getElementById("quizForm").submit();
+
+        return;
+
+    }
+
+    if(seconds === 0){
+
+        minutes--;
+        seconds = 59;
+
+    }else{
+
+        seconds--;
+
+    }
+
+    let displayMinutes = String(minutes).padStart(2,"0");
+    let displaySeconds = String(seconds).padStart(2,"0");
+
+    timer.innerHTML = displayMinutes + ":" + displaySeconds;
+
+},1000);
+
+</script>
+
+{% endblock %}

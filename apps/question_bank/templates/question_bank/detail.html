@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Question Detail{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'question_bank:list' %}">Question Bank</a></li>
+      <li class="breadcrumb-item active">Question #{{ question.pk }}</li>
+    </ol>
+  </nav>
+
+  <div class="row">
+    <div class="col-lg-8">
+
+      <!-- Question Card -->
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+          <h5 class="mb-0 fw-bold">
+            <i class="fas fa-question-circle text-primary"></i> Question
+          </h5>
+          <div class="d-flex gap-2">
+            <span class="badge bg-{{ question.get_type_badge_color }} fs-6">
+              {{ question.get_question_type_display }}
+            </span>
+            <span class="badge bg-{{ question.get_difficulty_badge_color }} fs-6">
+              {{ question.get_difficulty_display }}
+            </span>
+            {% if question.is_active %}
+              <span class="badge bg-success fs-6">Active</span>
+            {% else %}
+              <span class="badge bg-secondary fs-6">Inactive</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="card-body p-4">
+
+          <p class="fs-5 fw-semibold">{{ question.question_text }}</p>
+
+          <!-- Choices (MCQ / True-False) -->
+          {% if question.question_type in "mcq,tf" %}
+            {% with choices=question.choices.all %}
+            {% if choices %}
+            <hr>
+            <h6 class="text-muted mb-3">Answer Choices</h6>
+            <div class="list-group">
+              {% for choice in choices %}
+              <div class="list-group-item d-flex justify-content-between align-items-center
+                          {% if choice.is_correct %}list-group-item-success{% endif %}">
+                <span>
+                  <strong>{{ forloop.counter }}.</strong> {{ choice.choice_text }}
+                </span>
+                {% if choice.is_correct %}
+                  <span class="badge bg-success">
+                    <i class="fas fa-check"></i> Correct
+                  </span>
+                {% endif %}
+              </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+          {% endif %}
+
+          <!-- Explanation -->
+          {% if question.explanation %}
+          <hr>
+          <div class="alert alert-info mb-0">
+            <strong><i class="fas fa-lightbulb"></i> Explanation:</strong>
+            <p class="mb-0 mt-1">{{ question.explanation }}</p>
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+
+      <div class="card shadow-sm border-0 mb-3">
+        <div class="card-header bg-white">
+          <h6 class="mb-0 fw-bold">Details</h6>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Subject</span>
+            <span>{% if question.subject %}{{ question.subject.name }} — {{ question.subject.get_grade_level_display }}{% else %}—{% endif %}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Marks</span>
+            <strong>{{ question.marks }}</strong>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Created By</span>
+            <span>{{ question.created_by.get_full_name|default:question.created_by.username }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Created</span>
+            <span>{{ question.created_at|date:"M d, Y" }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Updated</span>
+            <span>{{ question.updated_at|date:"M d, Y" }}</span>
+          </li>
+          {% if question.tags %}
+          <li class="list-group-item">
+            <span class="text-muted d-block mb-2">Tags</span>
+            {% for tag in question.tags.split %}
+              <span class="badge bg-light text-dark border me-1">{{ tag|cut:"," }}</span>
+            {% endfor %}
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+
+      <!-- Actions -->
+      <div class="d-grid gap-2">
+        <a href="{% url 'question_bank:edit' question.pk %}" class="btn btn-warning">
+          <i class="fas fa-edit"></i> Edit Question
+        </a>
+        <a href="{% url 'question_bank:delete' question.pk %}" class="btn btn-outline-danger">
+          <i class="fas fa-trash"></i> Delete Question
+        </a>
+        <a href="{% url 'question_bank:list' %}" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

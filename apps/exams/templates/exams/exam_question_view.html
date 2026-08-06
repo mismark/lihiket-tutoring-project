@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}View Question{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold"><i class="fas fa-eye text-primary"></i> View Question</h2>
+      <p class="text-muted mb-0">{{ exam.title }}</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{% url 'exams:edit_exam_question' eq.pk %}" class="btn btn-warning">
+        <i class="fas fa-edit"></i> Edit
+      </a>
+      <a href="{% url 'exams:exam_question_list' exam.pk %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Back
+      </a>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold">Question</h5>
+          <div class="d-flex gap-2">
+            <span class="badge bg-primary">{{ eq.question.get_question_type_display }}</span>
+            <span class="badge bg-light text-dark border">
+              <i class="fas fa-star text-warning"></i> {{ eq.question.marks }} marks
+            </span>
+          </div>
+        </div>
+
+        <div class="card-body p-4">
+
+          <h5 class="mb-4">{{ eq.question.question_text }}</h5>
+
+          <h6 class="fw-bold text-muted mb-3">Answer Choices</h6>
+          {% for choice in eq.question.choices.all %}
+          <div class="p-3 rounded mb-2 d-flex align-items-center gap-3
+            {% if choice.is_correct %}bg-success bg-opacity-10 border border-success
+            {% else %}bg-light border{% endif %}">
+            {% if choice.is_correct %}
+              <i class="fas fa-check-circle text-success fs-5"></i>
+            {% else %}
+              <i class="fas fa-circle text-muted" style="font-size:0.5rem;"></i>
+            {% endif %}
+            <span class="{% if choice.is_correct %}fw-semibold{% endif %}">
+              {{ choice.choice_text }}
+            </span>
+            {% if choice.is_correct %}
+              <span class="ms-auto badge bg-success">Correct Answer</span>
+            {% endif %}
+          </div>
+          {% empty %}
+          <div class="text-muted">No choices defined.</div>
+          {% endfor %}
+
+          {% if eq.question.explanation %}
+          <div class="alert alert-info mt-4 mb-0">
+            <strong><i class="fas fa-lightbulb"></i> Explanation:</strong>
+            <p class="mb-0 mt-1">{{ eq.question.explanation }}</p>
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

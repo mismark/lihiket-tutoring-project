@@ -1,0 +1,56 @@
+online_tutoring/
+│
+├── venv/                      # Virtual Environment
+│
+├── config/                    # Django Project
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   ├── asgi.py
+│   └── wsgi.py
+│├── apps/
+│   ├── accounts/
+│   ├── dashboard/
+│   ├── courses/
+│   ├── subjects/
+│   ├── lessons/
+│   ├── live_classes/
+│   ├── documents/
+│   ├── assignments/
+│   ├── quizzes/
+│   ├── exams/
+│   ├── payments/
+│   ├── chat/
+│   ├── notifications/
+│   └── certificates/
+│
+├── templates/                 # Global Templates
+│   ├── base.html
+│   ├── home.html
+│   ├── includes/
+│   │   ├── navbar.html
+│   │   ├── sidebar.html
+│   │   └── footer.html
+│   └── registration/
+│
+├── static/                    # Global Static Files
+│   ├── css/
+│   ├── js/
+│   ├── images/
+│   ├── fonts/
+│   └── vendor/
+│
+├── media/                     # Uploaded Files
+│   ├── profiles/
+│   ├── course_images/
+│   ├── videos/
+│   ├── pdfs/
+│   ├── assignments/
+│   ├── submissions/
+│   └── certificates/
+│
+├── manage.py
+├── requirements.txt
+├── .gitignore
+├── .env
+└── README.md

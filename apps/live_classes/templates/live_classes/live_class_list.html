@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Live Classes{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold">
+        <i class="fas fa-video text-primary"></i> Live Classes
+      </h2>
+      <p class="text-muted mb-0">Attend, manage and monitor all scheduled live classes.</p>
+    </div>
+    {% if request.user.role == "admin" or request.user.role == "teacher" %}
+    <a href="{% url 'live_classes:live_class_create' %}" class="btn btn-primary">
+      <i class="fas fa-plus-circle"></i> Schedule Live Class
+    </a>
+    {% endif %}
+  </div>
+
+  <!-- Search -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+      <form method="get" class="row g-2">
+        <div class="col-md-10">
+          <input type="text" name="search" class="form-control"
+                 placeholder="Search by title, teacher or course..."
+                 value="{{ search }}">
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="fas fa-search"></i> Search
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Live Classes -->
+  <div class="row">
+
+    {% for lc in live_classes %}
+    <div class="col-lg-4 col-md-6 mb-4">
+      <div class="card shadow border-0 h-100">
+
+        <!-- Thumbnail -->
+        {% if lc.thumbnail %}
+          <img src="{{ lc.thumbnail.url }}" class="card-img-top" style="height:200px;object-fit:cover;">
+        {% else %}
+          <div class="d-flex align-items-center justify-content-center bg-light"
+               style="height:200px;">
+            <i class="fas fa-video fa-4x text-primary"></i>
+          </div>
+        {% endif %}
+
+        <div class="card-body">
+
+          <!-- Title + Status -->
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="fw-bold mb-0">{{ lc.title }}</h5>
+            {% if lc.computed_status == "upcoming" %}
+              <span class="badge bg-primary ms-2">Upcoming</span>
+            {% elif lc.computed_status == "live" %}
+              <span class="badge bg-success ms-2">
+                <i class="fas fa-circle fa-xs"></i> LIVE
+              </span>
+            {% elif lc.computed_status == "completed" %}
+              <span class="badge bg-secondary ms-2">Ended</span>
+            {% else %}
+              <span class="badge bg-danger ms-2">Cancelled</span>
+            {% endif %}
+          </div>
+
+          <p class="text-muted small mb-2">
+            <i class="fas fa-book"></i> {{ lc.course.title }}
+            &nbsp;·&nbsp;
+            <i class="fas fa-chalkboard-teacher"></i>
+            {{ lc.teacher.get_full_name|default:lc.teacher.username }}
+          </p>
+
+          <p class="small mb-1">
+            <i class="fas fa-tv text-muted"></i> {{ lc.get_platform_display }}
+            &nbsp;·&nbsp;
+            <i class="fas fa-clock text-muted"></i> {{ lc.duration }} min
+          </p>
+
+          <p class="small text-muted mb-2">
+            <i class="fas fa-calendar-alt"></i>
+            {{ lc.start_datetime|date:"M d, Y  H:i" }}
+          </p>
+
+          <!-- ── COUNTDOWN (upcoming only) ─────────────────────────── -->
+          {% if lc.computed_status == "upcoming" %}
+          <div class="mt-2 p-2 rounded bg-light border text-center"
+               id="cd-wrap-{{ lc.pk }}">
+            <small class="text-muted d-block mb-1">Starts in</small>
+            <span class="fw-bold text-primary fs-5"
+                  id="cd-{{ lc.pk }}"
+                  data-ts="{{ lc.start_datetime|date:'U' }}">
+              --:--:--
+            </span>
+          </div>
+          {% endif %}
+
+          <!-- LIVE now banner -->
+          {% if lc.computed_status == "live" %}
+          <div class="mt-2 p-2 rounded bg-success text-white text-center">
+            <i class="fas fa-circle fa-xs"></i>
+            <strong>Live Now — Join immediately!</strong>
+          </div>
+          {% endif %}
+
+          <!-- Ended banner -->
+          {% if lc.computed_status == "completed" %}
+          <div class="mt-2 p-2 rounded bg-light text-muted text-center border">
+            <i class="fas fa-flag-checkered"></i>
+            <span>Class ended</span>
+            {% if lc.is_recorded and lc.recording_url %}
+              · <a href="{{ lc.recording_url }}" target="_blank">Watch recording</a>
+            {% endif %}
+          </div>
+          {% endif %}
+
+        </div>
+
+        <!-- Card footer actions -->
+        <div class="card-footer bg-white d-flex flex-wrap gap-2">
+          <a href="{% url 'live_classes:live_class_detail' lc.pk %}"
+             class="btn btn-outline-primary btn-sm">
+            <i class="fas fa-eye"></i> Details
+          </a>
+
+          {% if lc.computed_status != "cancelled" and lc.computed_status != "completed" %}
+          <a href="{% url 'live_classes:join_live_class' lc.pk %}"
+             class="btn {% if lc.computed_status == 'live' %}btn-success{% else %}btn-outline-success{% endif %} btn-sm">
+            <i class="fas fa-video"></i> {% if lc.computed_status == 'live' %}Join Now{% else %}Join{% endif %}
+          </a>
+          {% endif %}
+
+          {% if request.user.role == "teacher" or request.user.role == "admin" %}
+          <a href="{% url 'live_classes:live_class_update' lc.pk %}"
+             class="btn btn-warning btn-sm">
+            <i class="fas fa-edit"></i>
+          </a>
+          <a href="{% url 'live_classes:live_class_delete' lc.pk %}"
+             class="btn btn-danger btn-sm">
+            <i class="fas fa-trash"></i>
+          </a>
+          {% endif %}
+
+          {% if lc.is_recorded and lc.recording_url %}
+          <a href="{{ lc.recording_url }}" target="_blank"
+             class="btn btn-info btn-sm">
+            <i class="fas fa-play-circle"></i> Recording
+          </a>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+      <div class="alert alert-info text-center py-5">
+        <i class="fas fa-video fa-3x mb-3 d-block"></i>
+        <h5>No live classes found.</h5>
+        {% if request.user.role == "teacher" or request.user.role == "admin" %}
+        <a href="{% url 'live_classes:live_class_create' %}" class="btn btn-primary mt-2">
+          Schedule First Live Class
+        </a>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+
+  </div>
+</div>
+
+<script>
+(function () {
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function formatDiff(diff) {
+    if (diff <= 0) return null; // signals "start now"
+    var h = Math.floor(diff / 3600);
+    var m = Math.floor((diff % 3600) / 60);
+    var s = diff % 60;
+    return pad(h) + ':' + pad(m) + ':' + pad(s);
+  }
+
+  // Find all countdown elements
+  document.querySelectorAll('[id^="cd-"]').forEach(function (el) {
+    if (!el.dataset.ts) return;
+
+    var startMs  = parseInt(el.dataset.ts, 10) * 1000;
+    var wrapEl   = document.getElementById('cd-wrap-' + el.id.replace('cd-', ''));
+
+    function tick() {
+      var diff = Math.floor((startMs - Date.now()) / 1000);
+      var str  = formatDiff(diff);
+
+      if (str === null) {
+        // Class started — update display
+        el.textContent = 'Starting now!';
+        el.className   = 'fw-bold text-success fs-5';
+        if (wrapEl) {
+          wrapEl.className = 'mt-2 p-2 rounded bg-success text-white text-center';
+          var label = wrapEl.querySelector('small');
+          if (label) label.textContent = '';
+        }
+        return; // stop ticking
+      }
+
+      // Color: green < 5 min, orange < 30 min, blue otherwise
+      if (diff <= 300) {
+        el.className = 'fw-bold text-danger fs-5';
+      } else if (diff <= 1800) {
+        el.className = 'fw-bold text-warning fs-5';
+      } else {
+        el.className = 'fw-bold text-primary fs-5';
+      }
+
+      el.textContent = str;
+      setTimeout(tick, 1000);
+    }
+
+    tick();
+  });
+})();
+</script>
+
+{% endblock %}

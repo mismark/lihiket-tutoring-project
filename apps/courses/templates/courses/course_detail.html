@@ -1,0 +1,868 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ course.title }}{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'courses:course_list' %}">Courses</a></li>
+      <li class="breadcrumb-item active">{{ course.title }}</li>
+    </ol>
+  </nav>
+
+  <!-- Course Header -->
+  <div class="card shadow-lg border-0 mb-4">
+    <div class="row g-0">
+
+      <div class="col-lg-4">
+        {% if course.thumbnail %}
+          <img src="{{ course.thumbnail.url }}"
+               class="img-fluid rounded-start w-100"
+               style="height:320px;object-fit:cover;"
+               alt="{{ course.title }}">
+        {% else %}
+          <div class="d-flex align-items-center justify-content-center rounded-start w-100 bg-light"
+               style="height:320px;">
+            <i class="fas fa-book-open fa-5x text-primary"></i>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="col-lg-8">
+        <div class="card-body p-4">
+
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h2 class="fw-bold">{{ course.title }}</h2>
+            {% if course.status == "published" %}
+              <span class="badge bg-success fs-6">Published</span>
+            {% else %}
+              <span class="badge bg-secondary fs-6">Draft</span>
+            {% endif %}
+          </div>
+
+          <!-- Course meta -->
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <span class="badge bg-primary">{{ course.get_level_display }}</span>
+            {% if course.subject %}
+              <span class="badge bg-info text-dark">
+                <i class="fas fa-book"></i>
+                {{ course.subject.name }} — {{ course.subject.get_grade_level_display }}
+              </span>
+            {% endif %}
+            {% if course.price == 0 %}
+              <span class="badge bg-success">Free</span>
+            {% else %}
+              <span class="badge bg-warning text-dark">${{ course.price }}</span>
+            {% endif %}
+          </div>
+
+          <p class="text-muted">{{ course.description }}</p>
+
+          <hr>
+
+          <!-- Teacher info — shown to teachers/admins and enrolled students -->
+          {% if can_edit or is_enrolled %}
+          <p class="mb-1">
+            <i class="fas fa-chalkboard-teacher text-success"></i>
+            <strong>Teacher:</strong>
+            {{ course.teacher.get_full_name|default:course.teacher.username }}
+          </p>
+          {% endif %}
+
+          <p class="mb-1 text-muted small">
+            Created {{ course.created_at|date:"F d, Y" }} &nbsp;·&nbsp;
+            Updated {{ course.updated_at|date:"M d, Y" }}
+          </p>
+
+          <hr>
+
+          <!-- Action buttons -->
+          <div class="d-flex flex-wrap gap-2">
+
+            {% if can_edit %}
+              <a href="{% url 'courses:course_update' course.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Edit
+              </a>
+              <a href="{% url 'courses:course_delete' course.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Delete
+              </a>
+            {% endif %}
+
+            {% if request.user.role == "student" %}
+              {% if not is_enrolled %}
+                {% if can_enroll %}
+                  <a href="{% url 'courses:enroll_course' course.pk %}" class="btn btn-success">
+                    <i class="fas fa-user-plus"></i> Enroll Now
+                  </a>
+                {% else %}
+                  <button class="btn btn-secondary" disabled>
+                    <i class="fas fa-lock"></i> Not Available for Your Grade
+                  </button>
+                {% endif %}
+              {% else %}
+                <button class="btn btn-success" disabled>
+                  <i class="fas fa-check"></i> Enrolled
+                </button>
+                {% if progress and progress.progress == 100 %}
+                  <a href="{% url 'courses:course_certificate' course.pk %}" class="btn btn-warning">
+                    <i class="fas fa-certificate"></i> View Certificate
+                  </a>
+                {% endif %}
+              {% endif %}
+            {% endif %}
+
+            <a href="{% url 'courses:course_list' %}" class="btn btn-outline-secondary">
+              <i class="fas fa-arrow-left"></i> Back
+            </a>
+
+          </div>
+
+          <!-- Grade mismatch warning -->
+          {% if request.user.role == "student" and not is_enrolled and enroll_blocked_reason %}
+          <div class="alert alert-warning mt-3 mb-0">
+            <i class="fas fa-info-circle"></i> {{ enroll_blocked_reason }}
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       STUDENT VIEW — enrolled students see tabs for all course content
+  ════════════════════════════════════════════════════════════════════ -->
+  {% if request.user.role == "student" and is_enrolled %}
+
+  <!-- Progress card -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+      <div class="d-flex justify-content-between mb-1">
+        <span class="fw-semibold">Your Progress — {{ progress.progress }}%</span>
+        {% if progress.progress == 100 %}
+          <span class="text-success fw-bold"><i class="fas fa-trophy"></i> Completed!</span>
+        {% endif %}
+      </div>
+      <div class="progress mb-3" style="height:14px;">
+        <div class="progress-bar bg-success"
+             role="progressbar"
+             style="width:{{ progress.progress }}%;">
+        </div>
+      </div>
+      <form method="POST" action="{% url 'courses:update_progress' course.pk %}" class="d-flex gap-2 align-items-center">
+        {% csrf_token %}
+        <input type="range" name="progress"
+               class="form-range flex-grow-1"
+               min="0" max="100" step="5"
+               value="{{ progress.progress }}"
+               oninput="this.nextElementSibling.textContent = this.value + '%'">
+        <span class="fw-bold text-nowrap" style="min-width:42px;">{{ progress.progress }}%</span>
+        <button type="submit" class="btn btn-primary btn-sm text-nowrap">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Tab navigation -->
+  <ul class="nav nav-tabs mb-0" id="courseTabs" role="tablist">
+
+    <li class="nav-item">
+      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-lessons" type="button">
+        <i class="fas fa-play-circle text-primary"></i>
+        Lessons
+        <span class="badge bg-primary ms-1">{{ lessons_count }}</span>
+      </button>
+    </li>
+
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-documents" type="button">
+        <i class="fas fa-folder-open text-warning"></i>
+        Documents
+        <span class="badge bg-warning text-dark ms-1">{{ documents_count }}</span>
+      </button>
+    </li>
+
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-assignments" type="button">
+        <i class="fas fa-tasks text-success"></i>
+        Assignments
+        <span class="badge bg-success ms-1">{{ assignments_count }}</span>
+      </button>
+    </li>
+
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-quizzes" type="button">
+        <i class="fas fa-question-circle text-info"></i>
+        Quizzes
+        <span class="badge bg-info text-dark ms-1">{{ quizzes_count }}</span>
+      </button>
+    </li>
+
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-exams" type="button">
+        <i class="fas fa-file-alt text-danger"></i>
+        Exams
+        <span class="badge bg-danger ms-1">{{ exams_count }}</span>
+      </button>
+    </li>
+
+
+    <li class="nav-item">
+      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-lessons" type="button">
+        <i class="fas fa-play-circle text-primary"></i>
+        Live Lessons
+        <span class="badge bg-primary ms-1">{{ lessons_count }}</span>
+      </button>
+    </li>
+
+
+  </ul>
+
+  <!-- Tab content -->
+  <div class="tab-content border border-top-0 rounded-bottom shadow-sm bg-white p-4 mb-4">
+
+
+    <!-- ── LESSONS ─────────────────────────────────────────────── -->
+    <div class="tab-pane fade show active" id="tab-lessons">
+      {% if lessons %}
+        <div class="list-group list-group-flush">
+          {% for lesson in lessons %}
+          <a href="{% url 'lessons:lesson_detail' lesson.slug %}"
+             class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3">
+
+            {% if lesson.thumbnail %}
+              <img src="{{ lesson.thumbnail.url }}"
+                   class="rounded flex-shrink-0"
+                   style="width:70px;height:50px;object-fit:cover;">
+            {% else %}
+              <div class="d-flex align-items-center justify-content-center rounded bg-light flex-shrink-0"
+                   style="width:70px;height:50px;">
+                <i class="fas fa-play text-primary"></i>
+              </div>
+            {% endif %}
+
+            <div class="flex-grow-1">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-semibold">
+                  {{ lesson.lesson_order }}. {{ lesson.title }}
+                </span>
+                <span class="text-muted small">
+                  <i class="fas fa-clock"></i> {{ lesson.duration }}
+                </span>
+              </div>
+              <small class="text-muted">{{ lesson.description|truncatewords:12 }}</small>
+            </div>
+
+            {% if lesson.is_preview %}
+              <span class="badge bg-info flex-shrink-0">Free</span>
+            {% endif %}
+
+          </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center py-5 text-muted">
+          <i class="fas fa-play-circle fa-3x mb-3 d-block"></i>
+          <p>No lessons published yet.</p>
+        </div>
+      {% endif %}
+    </div>
+
+
+    <!-- ── DOCUMENTS ───────────────────────────────────────────── -->
+    <div class="tab-pane fade" id="tab-documents">
+      {% if documents %}
+        <ul class="list-group list-group-flush">
+          {% for doc in documents %}
+          <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+            <div class="d-flex align-items-center gap-3">
+
+              {% if doc.file_extension == "pdf" %}
+                <i class="fas fa-file-pdf fa-2x text-danger flex-shrink-0"></i>
+              {% elif doc.file_extension == "doc" or doc.file_extension == "docx" %}
+                <i class="fas fa-file-word fa-2x text-primary flex-shrink-0"></i>
+              {% elif doc.file_extension == "ppt" or doc.file_extension == "pptx" %}
+                <i class="fas fa-file-powerpoint fa-2x text-warning flex-shrink-0"></i>
+              {% else %}
+                <i class="fas fa-file-alt fa-2x text-info flex-shrink-0"></i>
+              {% endif %}
+
+              <div>
+                <span class="fw-semibold d-block">{{ doc.title }}</span>
+                {% if doc.description %}
+                  <small class="text-muted">{{ doc.description|truncatewords:10 }}</small>
+                {% endif %}
+                <small class="text-muted d-block">
+                  {{ doc.file_extension|upper }} · {{ doc.file_size }}
+                  · <i class="fas fa-download"></i> {{ doc.download_count }}
+                </small>
+              </div>
+
+            </div>
+            <div class="d-flex gap-2 flex-shrink-0">
+              <a href="{% url 'documents:document_detail' doc.pk %}"
+                 class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-eye"></i>
+              </a>
+              <a href="{% url 'documents:download_document' doc.pk %}"
+                 class="btn btn-success btn-sm">
+                <i class="fas fa-download"></i>
+              </a>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="text-center py-5 text-muted">
+          <i class="fas fa-folder-open fa-3x mb-3 d-block"></i>
+          <p>No documents uploaded for this course yet.</p>
+        </div>
+      {% endif %}
+    </div>
+
+
+    <!-- ── ASSIGNMENTS ─────────────────────────────────────────── -->
+    <div class="tab-pane fade" id="tab-assignments">
+      {% if assignments %}
+        <div class="list-group list-group-flush">
+          {% for assignment in assignments %}
+          <div class="list-group-item py-3">
+            <div class="row align-items-center g-2">
+
+              <!-- Info -->
+              <div class="col-lg-5">
+                <h6 class="fw-bold mb-1">{{ assignment.title }}</h6>
+                <div class="d-flex flex-wrap gap-1 mb-1">
+
+                  {% if assignment.is_past_due %}
+                    <span class="badge bg-danger">
+                      <i class="fas fa-calendar-times"></i> Past Due
+                    </span>
+                  {% else %}
+                    <span class="badge bg-success">
+                      <i class="fas fa-calendar-check"></i> Due {{ assignment.due_date|date:"M d, Y" }}
+                    </span>
+                  {% endif %}
+
+                  {% if assignment.my_submission %}
+                    {% if assignment.my_submission.status == "graded" %}
+                      <span class="badge bg-primary">
+                        <i class="fas fa-star"></i>
+                        {{ assignment.my_submission.marks }}/{{ assignment.max_marks }}
+                        {% if assignment.my_submission.grade %}
+                          ({{ assignment.my_submission.grade }})
+                        {% endif %}
+                      </span>
+                    {% elif assignment.my_submission.status == "late" %}
+                      <span class="badge bg-warning text-dark">
+                        <i class="fas fa-clock"></i> Late
+                      </span>
+                    {% else %}
+                      <span class="badge bg-info text-dark">
+                        <i class="fas fa-paper-plane"></i> Submitted
+                      </span>
+                    {% endif %}
+                  {% else %}
+                    <span class="badge bg-secondary">Not Submitted</span>
+                  {% endif %}
+
+                </div>
+                <small class="text-muted">
+                  <i class="fas fa-star text-warning"></i> {{ assignment.max_marks }} marks
+                </small>
+              </div>
+
+              <!-- Action buttons on same row -->
+              <div class="col-lg-7 d-flex justify-content-lg-end align-items-center gap-2 flex-wrap">
+
+                {% if assignment.file %}
+                <a href="{{ assignment.file.url }}"
+                   target="_blank"
+                   class="btn btn-outline-primary btn-sm">
+                  <i class="fas fa-download"></i> Download
+                </a>
+                {% endif %}
+
+                <a href="{% url 'assignments:assignment_detail' assignment.pk %}"
+                   class="btn btn-outline-secondary btn-sm">
+                  <i class="fas fa-eye"></i> View
+                </a>
+
+                {% if assignment.my_submission %}
+                  {% if assignment.my_submission.status == "graded" %}
+                    <a href="{% url 'assignments:submission_detail' assignment.my_submission.pk %}"
+                       class="btn btn-success btn-sm">
+                      <i class="fas fa-trophy"></i> Result
+                    </a>
+                  {% else %}
+                    {% if not assignment.is_past_due %}
+                    <a href="{% url 'assignments:submit_assignment' assignment.pk %}"
+                       class="btn btn-warning btn-sm">
+                      <i class="fas fa-edit"></i> Update
+                    </a>
+                    {% endif %}
+                  {% endif %}
+                {% else %}
+                  {% if assignment.is_past_due %}
+                    <button class="btn btn-secondary btn-sm" disabled>
+                      <i class="fas fa-lock"></i> Closed
+                    </button>
+                  {% else %}
+                    <a href="{% url 'assignments:submit_assignment' assignment.pk %}"
+                       class="btn btn-success btn-sm">
+                      <i class="fas fa-paper-plane"></i> Submit
+                    </a>
+                  {% endif %}
+                {% endif %}
+
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="p-3 border-top text-muted small">
+          <i class="fas fa-info-circle"></i>
+          {{ submitted_count }} of {{ assignments_count }} submitted &nbsp;·&nbsp;
+          {{ pending_count }} pending
+        </div>
+      {% else %}
+        <div class="text-center py-5 text-muted">
+          <i class="fas fa-tasks fa-3x mb-3 d-block"></i>
+          <p>No assignments for this course yet.</p>
+        </div>
+      {% endif %}
+    </div>
+
+
+    <!-- ── QUIZZES ─────────────────────────────────────────────── -->
+    <div class="tab-pane fade" id="tab-quizzes">
+      {% if quizzes %}
+        <div class="list-group list-group-flush">
+          {% for quiz in quizzes %}
+          <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+            <div>
+              <span class="fw-semibold d-block">{{ quiz.title }}</span>
+              <small class="text-muted">
+                <i class="fas fa-clock"></i> {{ quiz.duration }} min &nbsp;·&nbsp;
+                Pass: {{ quiz.passing_score }}%
+              </small>
+              {% if quiz.description %}
+                <small class="text-muted d-block">{{ quiz.description|truncatewords:15 }}</small>
+              {% endif %}
+            </div>
+            <a href="{% url 'quizzes:quiz_detail' quiz.pk %}"
+               class="btn btn-outline-info btn-sm flex-shrink-0">
+              <i class="fas fa-play"></i> Start Quiz
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center py-5 text-muted">
+          <i class="fas fa-question-circle fa-3x mb-3 d-block"></i>
+          <p>No quizzes available for this course yet.</p>
+        </div>
+      {% endif %}
+    </div>
+
+
+    <!-- ── EXAMS ───────────────────────────────────────────────── -->
+    <div class="tab-pane fade" id="tab-exams">
+      {% if exams %}
+        <div class="list-group list-group-flush">
+          {% for exam in exams %}
+          <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+            <div>
+              <span class="fw-semibold d-block">{{ exam.title }}</span>
+              <small class="text-muted">
+                <i class="fas fa-clock"></i> {{ exam.duration }} min &nbsp;·&nbsp;
+                Pass: {{ exam.passing_score }}%
+              </small>
+              {% if exam.start_time %}
+                <small class="text-muted d-block">
+                  <i class="fas fa-calendar"></i>
+                  {{ exam.start_time|date:"M d, Y H:i" }} — {{ exam.end_time|date:"M d, Y H:i" }}
+                </small>
+              {% endif %}
+            </div>
+            <a href="{% url 'exams:exam_detail' exam.pk %}"
+               class="btn btn-outline-danger btn-sm flex-shrink-0">
+              <i class="fas fa-file-alt"></i> View Exam
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center py-5 text-muted">
+          <i class="fas fa-file-alt fa-3x mb-3 d-block"></i>
+          <p>No exams scheduled for this course yet.</p>
+        </div>
+      {% endif %}
+    </div>
+
+
+  </div>
+  {# end tab-content #}
+
+  {% endif %}
+  {# end student enrolled section #}
+
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       TEACHER / ADMIN VIEW — manage course content with tabs
+  ════════════════════════════════════════════════════════════════════ -->
+  {% if can_edit %}
+
+  <!-- Stats row -->
+  <div class="row mb-4">
+    <div class="col-md-2">
+      <div class="card shadow-sm border-0 text-center p-3">
+        <i class="fas fa-user-graduate fa-2x text-info mb-1"></i>
+        <h3 class="mb-0">{{ enrolled_students_count }}</h3>
+        <small class="text-muted">Students</small>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card shadow-sm border-0 text-center p-3">
+        <i class="fas fa-play-circle fa-2x text-primary mb-1"></i>
+        <h3 class="mb-0">{{ t_lessons_count }}</h3>
+        <small class="text-muted">Lessons</small>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card shadow-sm border-0 text-center p-3">
+        <i class="fas fa-folder-open fa-2x text-warning mb-1"></i>
+        <h3 class="mb-0">{{ t_documents_count }}</h3>
+        <small class="text-muted">Documents</small>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card shadow-sm border-0 text-center p-3">
+        <i class="fas fa-tasks fa-2x text-success mb-1"></i>
+        <h3 class="mb-0">{{ t_assignments_count }}</h3>
+        <small class="text-muted">Assignments</small>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card shadow-sm border-0 text-center p-3">
+        <i class="fas fa-question-circle fa-2x text-info mb-1"></i>
+        <h3 class="mb-0">{{ t_quizzes_count }}</h3>
+        <small class="text-muted">Quizzes</small>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card shadow-sm border-0 text-center p-3">
+        <i class="fas fa-file-alt fa-2x text-danger mb-1"></i>
+        <h3 class="mb-0">{{ t_exams_count }}</h3>
+        <small class="text-muted">Exams</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Teacher tabs -->
+  <ul class="nav nav-tabs mb-0" id="teacherTabs" role="tablist">
+    <li class="nav-item">
+      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tt-lessons" type="button">
+        <i class="fas fa-play-circle text-primary"></i> Lessons
+        <span class="badge bg-primary ms-1">{{ t_lessons_count }}</span>
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tt-documents" type="button">
+        <i class="fas fa-folder-open text-warning"></i> Documents
+        <span class="badge bg-warning text-dark ms-1">{{ t_documents_count }}</span>
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tt-assignments" type="button">
+        <i class="fas fa-tasks text-success"></i> Assignments
+        <span class="badge bg-success ms-1">{{ t_assignments_count }}</span>
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tt-quizzes" type="button">
+        <i class="fas fa-question-circle text-info"></i> Quizzes
+        <span class="badge bg-info text-dark ms-1">{{ t_quizzes_count }}</span>
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tt-exams" type="button">
+        <i class="fas fa-file-alt text-danger"></i> Exams
+        <span class="badge bg-danger ms-1">{{ t_exams_count }}</span>
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content border border-top-0 rounded-bottom shadow-sm bg-white p-4 mb-4">
+
+
+    <!-- ── TEACHER: LESSONS ──────────────────────────────────── -->
+    <div class="tab-pane fade show active" id="tt-lessons">
+      <div class="d-flex justify-content-end mb-3">
+        <a href="{% url 'lessons:lesson_create' %}?course={{ course.pk }}"
+           class="btn btn-primary btn-sm">
+          <i class="fas fa-plus-circle"></i> Add Lesson
+        </a>
+      </div>
+      {% if t_lessons %}
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr><th>#</th><th>Title</th><th>Duration</th><th>Status</th><th>Preview</th><th class="text-center">Actions</th></tr>
+            </thead>
+            <tbody>
+              {% for lesson in t_lessons %}
+              <tr>
+                <td>{{ lesson.lesson_order }}</td>
+                <td class="fw-semibold">{{ lesson.title }}</td>
+                <td>{{ lesson.duration }}</td>
+                <td>
+                  {% if lesson.status == "published" %}
+                    <span class="badge bg-success">Published</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Draft</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if lesson.is_preview %}
+                    <span class="badge bg-info">Yes</span>
+                  {% else %}
+                    <span class="badge bg-light text-dark">No</span>
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  <div class="btn-group btn-group-sm">
+                    <a href="{% url 'lessons:lesson_detail' lesson.slug %}" class="btn btn-outline-primary"><i class="fas fa-eye"></i></a>
+                    <a href="{% url 'lessons:lesson_update' lesson.slug %}" class="btn btn-outline-warning"><i class="fas fa-edit"></i></a>
+                    <a href="{% url 'lessons:lesson_delete' lesson.slug %}" class="btn btn-outline-danger"><i class="fas fa-trash"></i></a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center py-4 text-muted">
+          <i class="fas fa-play-circle fa-3x mb-2 d-block"></i>
+          No lessons yet.
+          <a href="{% url 'lessons:lesson_create' %}?course={{ course.pk }}" class="d-block mt-2">Create your first lesson</a>
+        </div>
+      {% endif %}
+    </div>
+
+
+    <!-- ── TEACHER: DOCUMENTS ────────────────────────────────── -->
+    <div class="tab-pane fade" id="tt-documents">
+      <div class="d-flex justify-content-end mb-3">
+        <a href="{% url 'documents:document_create' %}?course={{ course.pk }}"
+           class="btn btn-warning btn-sm">
+          <i class="fas fa-upload"></i> Upload Document
+        </a>
+      </div>
+      {% if t_documents %}
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr><th>Title</th><th>Type</th><th>Size</th><th>Visibility</th><th>Downloads</th><th class="text-center">Actions</th></tr>
+            </thead>
+            <tbody>
+              {% for doc in t_documents %}
+              <tr>
+                <td class="fw-semibold">{{ doc.title }}</td>
+                <td><span class="badge bg-secondary">{{ doc.file_extension|upper }}</span></td>
+                <td>{{ doc.file_size }}</td>
+                <td><span class="badge bg-primary">{{ doc.get_visibility_display }}</span></td>
+                <td>{{ doc.download_count }}</td>
+                <td class="text-center">
+                  <div class="btn-group btn-group-sm">
+                    <a href="{% url 'documents:document_detail' doc.pk %}" class="btn btn-outline-primary"><i class="fas fa-eye"></i></a>
+                    <a href="{% url 'documents:document_update' doc.pk %}" class="btn btn-outline-warning"><i class="fas fa-edit"></i></a>
+                    <a href="{% url 'documents:document_delete' doc.pk %}" class="btn btn-outline-danger"><i class="fas fa-trash"></i></a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center py-4 text-muted">
+          <i class="fas fa-folder-open fa-3x mb-2 d-block"></i>
+          No documents yet.
+          <a href="{% url 'documents:document_create' %}?course={{ course.pk }}" class="d-block mt-2">Upload first document</a>
+        </div>
+      {% endif %}
+    </div>
+
+
+    <!-- ── TEACHER: ASSIGNMENTS ──────────────────────────────── -->
+    <div class="tab-pane fade" id="tt-assignments">
+      <div class="d-flex justify-content-end mb-3">
+        <a href="{% url 'assignments:assignment_create' %}?course={{ course.pk }}"
+           class="btn btn-success btn-sm">
+          <i class="fas fa-plus-circle"></i> Add Assignment
+        </a>
+      </div>
+      {% if t_assignments %}
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr><th>Title</th><th>Due Date</th><th>Max Marks</th><th>Status</th><th class="text-center">Actions</th></tr>
+            </thead>
+            <tbody>
+              {% for a in t_assignments %}
+              <tr>
+                <td class="fw-semibold">{{ a.title }}</td>
+                <td>{{ a.due_date|date:"M d, Y" }}</td>
+                <td>{{ a.max_marks }}</td>
+                <td>
+                  {% if a.is_active %}
+                    <span class="badge bg-success">Active</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Inactive</span>
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  <div class="btn-group btn-group-sm">
+                    <a href="{% url 'assignments:assignment_detail' a.pk %}" class="btn btn-outline-primary"><i class="fas fa-eye"></i></a>
+                    <a href="{% url 'assignments:assignment_update' a.pk %}" class="btn btn-outline-warning"><i class="fas fa-edit"></i></a>
+                    <a href="{% url 'assignments:assignment_delete' a.pk %}" class="btn btn-outline-danger"><i class="fas fa-trash"></i></a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center py-4 text-muted">
+          <i class="fas fa-tasks fa-3x mb-2 d-block"></i>
+          No assignments yet.
+          <a href="{% url 'assignments:assignment_create' %}?course={{ course.pk }}" class="d-block mt-2">Create first assignment</a>
+        </div>
+      {% endif %}
+    </div>
+
+
+    <!-- ── TEACHER: QUIZZES ──────────────────────────────────── -->
+    <div class="tab-pane fade" id="tt-quizzes">
+      <div class="d-flex justify-content-end mb-3">
+        <a href="{% url 'quizzes:quiz_create' %}?course={{ course.pk }}"
+           class="btn btn-info btn-sm">
+          <i class="fas fa-plus-circle"></i> Add Quiz
+        </a>
+      </div>
+      {% if t_quizzes %}
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr><th>Title</th><th>Duration</th><th>Pass Score</th><th>Status</th><th class="text-center">Actions</th></tr>
+            </thead>
+            <tbody>
+              {% for q in t_quizzes %}
+              <tr>
+                <td class="fw-semibold">{{ q.title }}</td>
+                <td>{{ q.duration }} min</td>
+                <td>{{ q.passing_score }}%</td>
+                <td>
+                  {% if q.is_active %}
+                    <span class="badge bg-success">Active</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Inactive</span>
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  <div class="btn-group btn-group-sm">
+                    <a href="{% url 'quizzes:quiz_detail' q.pk %}" class="btn btn-outline-primary"><i class="fas fa-eye"></i></a>
+                    <a href="{% url 'quizzes:quiz_update' q.pk %}" class="btn btn-outline-warning"><i class="fas fa-edit"></i></a>
+                    <a href="{% url 'quizzes:quiz_delete' q.pk %}" class="btn btn-outline-danger"><i class="fas fa-trash"></i></a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center py-4 text-muted">
+          <i class="fas fa-question-circle fa-3x mb-2 d-block"></i>
+          No quizzes yet.
+          <a href="{% url 'quizzes:quiz_create' %}?course={{ course.pk }}" class="d-block mt-2">Create first quiz</a>
+        </div>
+      {% endif %}
+    </div>
+
+
+    <!-- ── TEACHER: EXAMS ────────────────────────────────────── -->
+    <div class="tab-pane fade" id="tt-exams">
+      <div class="d-flex justify-content-end mb-3">
+        <a href="{% url 'exams:exam_create' %}?course={{ course.pk }}"
+           class="btn btn-danger btn-sm">
+          <i class="fas fa-plus-circle"></i> Add Exam
+        </a>
+      </div>
+      {% if t_exams %}
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr><th>Title</th><th>Duration</th><th>Pass Score</th><th>Schedule</th><th>Status</th><th class="text-center">Actions</th></tr>
+            </thead>
+            <tbody>
+              {% for e in t_exams %}
+              <tr>
+                <td class="fw-semibold">{{ e.title }}</td>
+                <td>{{ e.duration }} min</td>
+                <td>{{ e.passing_score }}%</td>
+                <td>
+                  {% if e.start_time %}
+                    <small>{{ e.start_time|date:"M d, H:i" }}<br>→ {{ e.end_time|date:"M d, H:i" }}</small>
+                  {% else %}
+                    <span class="text-muted">—</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if e.is_active %}
+                    <span class="badge bg-success">Active</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Inactive</span>
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  <div class="btn-group btn-group-sm">
+                    <a href="{% url 'exams:exam_detail' e.pk %}" class="btn btn-outline-primary"><i class="fas fa-eye"></i></a>
+                    <a href="{% url 'exams:exam_update' e.pk %}" class="btn btn-outline-warning"><i class="fas fa-edit"></i></a>
+                    <a href="{% url 'exams:exam_delete' e.pk %}" class="btn btn-outline-danger"><i class="fas fa-trash"></i></a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center py-4 text-muted">
+          <i class="fas fa-file-alt fa-3x mb-2 d-block"></i>
+          No exams yet.
+          <a href="{% url 'exams:exam_create' %}?course={{ course.pk }}" class="d-block mt-2">Create first exam</a>
+        </div>
+      {% endif %}
+    </div>
+
+
+  </div>
+  {# end teacher tab-content #}
+
+  {% endif %}
+  {# end can_edit section #}
+
+</div>
+
+{% endblock %}

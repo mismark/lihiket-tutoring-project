@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Chat Rooms{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Chat Rooms</h1>
+    <a href="{% url 'chat:create_chat_room' %}" class="btn btn-primary mb-3">Create New Chat Room</a>
+    <div class="row">
+        {% for chat_room in chat_rooms %}
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ chat_room.name|default:"Chat Room" }}</h5>
+                    <p class="card-text">Type: {{ chat_room.get_room_type_display }}</p>
+                    <p class="card-text">Participants: {{ chat_room.participants.count }}</p>
+                    <a href="{% url 'chat:chat_room_detail' chat_room.pk %}" class="btn btn-primary">Join Chat</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <p>No chat rooms found.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

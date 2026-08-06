@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lihiket Tutor — Online Tutoring Platform</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Poppins', sans-serif; overflow-x: hidden; }
+
+/* ── NAVBAR ── */
+.navbar { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+  box-shadow: 0 2px 20px rgba(0,0,0,0.08); padding: 1rem 2rem; position: sticky; top: 0; z-index: 1000; }
+.navbar-brand { font-weight: 800; font-size: 1.6rem;
+  background: linear-gradient(135deg,#667eea,#764ba2); -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; }
+
+/* ── HERO ── */
+.hero { min-height: 100vh; position: relative; overflow: hidden;
+  background: linear-gradient(135deg,#0f0c29,#302b63,#24243e); display: flex; align-items: center; }
+.hero-content { position: relative; z-index: 2; }
+.hero h1 { font-size: clamp(2.5rem,6vw,4.5rem); font-weight: 800; color: #fff;
+  line-height: 1.15; margin-bottom: 1.5rem; }
+.hero h1 span { background: linear-gradient(90deg,#f093fb,#f5576c,#fda085);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero p { font-size: 1.2rem; color: rgba(255,255,255,0.8); max-width: 540px; margin-bottom: 2.5rem; }
+.btn-hero-primary { background: linear-gradient(135deg,#667eea,#764ba2);
+  color: #fff; padding: .9rem 2.5rem; border-radius: 50px; font-weight: 700;
+  font-size: 1.05rem; border: none; text-decoration: none; display: inline-block;
+  transition: all .3s; box-shadow: 0 8px 30px rgba(102,126,234,.5); }
+.btn-hero-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(102,126,234,.7); color:#fff; }
+.btn-hero-secondary { background: transparent; color: #fff; padding: .85rem 2.2rem;
+  border-radius: 50px; font-weight: 600; font-size: 1.05rem;
+  border: 2px solid rgba(255,255,255,.5); text-decoration: none; display: inline-block;
+  transition: all .3s; margin-left: 1rem; }
+.btn-hero-secondary:hover { background: rgba(255,255,255,.15); border-color: #fff; color:#fff; transform: translateY(-3px); }
+
+/* floating shapes */
+.shape { position: absolute; border-radius: 50%; opacity: .15;
+  animation: float 6s ease-in-out infinite; }
+.shape-1 { width:400px; height:400px; background: linear-gradient(135deg,#f093fb,#f5576c);
+  top:-100px; right:-100px; animation-delay: 0s; }
+.shape-2 { width:300px; height:300px; background: linear-gradient(135deg,#4facfe,#00f2fe);
+  bottom:-80px; left:-80px; animation-delay: 2s; }
+.shape-3 { width:200px; height:200px; background: linear-gradient(135deg,#43e97b,#38f9d7);
+  top:40%; left:55%; animation-delay: 4s; }
+@keyframes float { 0%,100%{transform:translateY(0) rotate(0)} 50%{transform:translateY(-30px) rotate(10deg)} }
+
+/* stats in hero */
+.hero-stats { display: flex; gap: 3rem; margin-top: 3rem; }
+.hero-stat h3 { font-size: 2rem; font-weight: 800; color: #fff; margin: 0; }
+.hero-stat p { color: rgba(255,255,255,.6); font-size: .9rem; margin: 0; }
+</style>
+
+<style>
+/* ── FEATURES ── */
+.features { padding: 6rem 0; background: #f8f9ff; }
+.section-title { font-size: 2.5rem; font-weight: 800; text-align: center; margin-bottom: .75rem; }
+.section-subtitle { text-align: center; color: #666; font-size: 1.1rem; margin-bottom: 4rem; }
+.feature-card { background: #fff; border-radius: 20px; padding: 2.5rem 2rem; text-align: center;
+  box-shadow: 0 4px 25px rgba(0,0,0,.07); transition: all .4s; height: 100%; border: 1px solid #eee; }
+.feature-card:hover { transform: translateY(-10px); box-shadow: 0 20px 50px rgba(0,0,0,.12); }
+.feature-icon { width: 80px; height: 80px; border-radius: 20px; display: flex;
+  align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem; color: #fff; }
+.icon-blue  { background: linear-gradient(135deg,#667eea,#764ba2); }
+.icon-pink  { background: linear-gradient(135deg,#f093fb,#f5576c); }
+.icon-green { background: linear-gradient(135deg,#43e97b,#38f9d7); }
+.icon-orange{ background: linear-gradient(135deg,#f7971e,#ffd200); }
+.icon-cyan  { background: linear-gradient(135deg,#4facfe,#00f2fe); }
+.icon-red   { background: linear-gradient(135deg,#f5576c,#f093fb); }
+
+/* ── HOW IT WORKS ── */
+.how { padding: 6rem 0; }
+.step-number { width: 60px; height: 60px; border-radius: 50%; font-size: 1.5rem;
+  font-weight: 800; color: #fff; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+.step-connector { flex: 1; height: 2px; background: linear-gradient(90deg,#667eea,#764ba2); margin: 0 1rem; margin-top: -2rem; }
+
+/* ── ROLES ── */
+.roles { padding: 6rem 0; background: linear-gradient(135deg,#667eea,#764ba2); }
+.role-card { background: rgba(255,255,255,.12); border-radius: 20px; padding: 2.5rem 2rem;
+  text-align: center; color: #fff; transition: all .3s; border: 1px solid rgba(255,255,255,.2);
+  backdrop-filter: blur(10px); }
+.role-card:hover { background: rgba(255,255,255,.25); transform: translateY(-8px); }
+.role-card i { font-size: 3rem; margin-bottom: 1rem; }
+
+/* ── CTA ── */
+.cta { padding: 6rem 0; text-align: center;
+  background: linear-gradient(135deg,#0f0c29,#302b63,#24243e); color: #fff; position: relative; overflow: hidden; }
+.cta h2 { font-size: 3rem; font-weight: 800; margin-bottom: 1rem; }
+.cta p { font-size: 1.2rem; color: rgba(255,255,255,.7); margin-bottom: 2.5rem; }
+
+/* ── FOOTER ── */
+footer { background: #0d0d1a; color: rgba(255,255,255,.6); padding: 3rem 0 2rem; }
+footer h5 { color: #fff; font-weight: 700; margin-bottom: 1rem; }
+footer a { color: rgba(255,255,255,.6); text-decoration: none; display: block; margin-bottom: .5rem; transition: color .2s; }
+footer a:hover { color: #667eea; }
+.footer-brand { font-size: 1.8rem; font-weight: 800;
+  background: linear-gradient(135deg,#667eea,#f093fb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeInUp { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(102,126,234,.5)} 70%{box-shadow:0 0 0 15px rgba(102,126,234,0)} }
+.animate-on-scroll { opacity: 0; transform: translateY(40px); transition: all .7s ease; }
+.animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
+.typing::after { content: '|'; animation: blink 1s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+</style>
+
+</head>
+<body>
+
+<!-- ═══ NAVBAR ═══════════════════════════════════════════════════ -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="#">
+      <i class="fas fa-graduation-cap me-2"></i>Lihiket Tutor
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto me-4">
+        <li class="nav-item"><a class="nav-link fw-semibold" href="#features">Features</a></li>
+        <li class="nav-item"><a class="nav-link fw-semibold" href="#how">How It Works</a></li>
+        <li class="nav-item"><a class="nav-link fw-semibold" href="#teachers">Teachers</a></li>
+        <li class="nav-item"><a class="nav-link fw-semibold" href="#roles">For You</a></li>
+        <li class="nav-item"><a class="nav-link fw-semibold" href="#cta">Get Started</a></li>
+      </ul>
+      <a href="/accounts/login/" class="btn btn-outline-primary fw-semibold me-2 px-4 rounded-pill">Login</a>
+      <a href="/accounts/register/" class="btn btn-primary fw-semibold px-4 rounded-pill"
+         style="background:linear-gradient(135deg,#667eea,#764ba2);border:none;">
+        Sign Up Free
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ HERO ══════════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="shape shape-1"></div>
+  <div class="shape shape-2"></div>
+  <div class="shape shape-3"></div>
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-7 hero-content" style="animation:fadeInUp .9s ease">
+        <div class="d-inline-block px-3 py-1 rounded-pill mb-3"
+             style="background:rgba(102,126,234,.2);color:#a78bfa;font-size:.9rem;font-weight:600;">
+          <i class="fas fa-star me-1"></i> #1 Online Tutoring Platform
+        </div>
+        <h1>Learn Without <span id="heroTyping" class="typing">Limits</span></h1>
+        <p>Connect with expert teachers, attend live classes, complete assignments,
+           and earn certificates — all in one powerful platform.</p>
+        <div class="d-flex flex-wrap gap-3">
+          <a href="/accounts/register/" class="btn-hero-primary">
+            <i class="fas fa-rocket me-2"></i>Start Learning Free
+          </a>
+          <a href="/accounts/login/" class="btn-hero-secondary">
+            <i class="fas fa-sign-in-alt me-2"></i>Login
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><h3>10K+</h3><p>Students</p></div>
+          <div class="hero-stat"><h3>500+</h3><p>Courses</p></div>
+          <div class="hero-stat"><h3>100+</h3><p>Teachers</p></div>
+          <div class="hero-stat"><h3>50+</h3><p>Subjects</p></div>
+        </div>
+      </div>
+      <div class="col-lg-5 d-none d-lg-block text-center" style="animation:fadeInUp 1.2s ease">
+        <div style="background:rgba(255,255,255,.08);border-radius:30px;padding:3rem;
+             border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(10px);">
+          <div class="d-flex justify-content-center gap-4 mb-4">
+            <div class="text-center">
+              <div style="width:56px;height:56px;border-radius:15px;
+                   background:linear-gradient(135deg,#f093fb,#f5576c);
+                   display:flex;align-items:center;justify-content:center;
+                   color:#fff;font-size:1.4rem;margin:0 auto .5rem;">
+                <i class="fas fa-video"></i>
+              </div>
+              <small style="color:rgba(255,255,255,.7)">Live Classes</small>
+            </div>
+            <div class="text-center">
+              <div style="width:56px;height:56px;border-radius:15px;
+                   background:linear-gradient(135deg,#43e97b,#38f9d7);
+                   display:flex;align-items:center;justify-content:center;
+                   color:#fff;font-size:1.4rem;margin:0 auto .5rem;">
+                <i class="fas fa-tasks"></i>
+              </div>
+              <small style="color:rgba(255,255,255,.7)">Assignments</small>
+            </div>
+            <div class="text-center">
+              <div style="width:56px;height:56px;border-radius:15px;
+                   background:linear-gradient(135deg,#4facfe,#00f2fe);
+                   display:flex;align-items:center;justify-content:center;
+                   color:#fff;font-size:1.4rem;margin:0 auto .5rem;">
+                <i class="fas fa-certificate"></i>
+              </div>
+              <small style="color:rgba(255,255,255,.7)">Certificates</small>
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,.05);border-radius:15px;padding:1.5rem;
+               border:1px solid rgba(255,255,255,.1);">
+            <div class="d-flex align-items-center mb-3">
+              <div style="width:42px;height:42px;border-radius:50%;
+                   background:linear-gradient(135deg,#667eea,#764ba2);
+                   display:flex;align-items:center;justify-content:center;
+                   color:#fff;font-size:1rem;margin-right:1rem;">
+                <i class="fas fa-user-graduate"></i>
+              </div>
+              <div>
+                <div style="color:#fff;font-weight:600;font-size:.9rem">Mathematics — Grade 10</div>
+                <div style="color:rgba(255,255,255,.5);font-size:.8rem">Mr. Ahmed · 24 students</div>
+              </div>
+            </div>
+            <div style="background:rgba(255,255,255,.1);border-radius:8px;height:8px;margin-bottom:.5rem;">
+              <div style="background:linear-gradient(90deg,#43e97b,#38f9d7);
+                   height:100%;border-radius:8px;width:72%;"></div>
+            </div>
+            <small style="color:rgba(255,255,255,.5)">72% Progress</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FEATURES ══════════════════════════════════════════════════ -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="animate-on-scroll">
+      <h2 class="section-title">Everything You Need to <span style="background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Succeed</span></h2>
+      <p class="section-subtitle">A complete learning ecosystem built for students, teachers and admins.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-lg-4 col-md-6 animate-on-scroll">
+        <div class="feature-card">
+          <div class="feature-icon icon-blue"><i class="fas fa-video"></i></div>
+          <h4 class="fw-bold mb-2">Live Classes</h4>
+          <p class="text-muted">Join real-time sessions with countdown timers, meeting links, and auto status tracking.</p>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6 animate-on-scroll">
+        <div class="feature-card">
+          <div class="feature-icon icon-pink"><i class="fas fa-book-open"></i></div>
+          <h4 class="fw-bold mb-2">Rich Course Content</h4>
+          <p class="text-muted">Video lessons, downloadable documents, and structured learning paths per grade level.</p>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6 animate-on-scroll">
+        <div class="feature-card">
+          <div class="feature-icon icon-green"><i class="fas fa-tasks"></i></div>
+          <h4 class="fw-bold mb-2">Smart Assignments</h4>
+          <p class="text-muted">Submit work before deadlines, get graded with marks and feedback from teachers.</p>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6 animate-on-scroll">
+        <div class="feature-card">
+          <div class="feature-icon icon-orange"><i class="fas fa-question-circle"></i></div>
+          <h4 class="fw-bold mb-2">Quizzes & Exams</h4>
+          <p class="text-muted">Timed quizzes and scheduled exams with auto-submit, scoring, and instant results.</p>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6 animate-on-scroll">
+        <div class="feature-card">
+          <div class="feature-icon icon-cyan"><i class="fas fa-certificate"></i></div>
+          <h4 class="fw-bold mb-2">Digital Certificates</h4>
+          <p class="text-muted">Earn verifiable certificates with QR codes upon completing courses with 100% progress.</p>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6 animate-on-scroll">
+        <div class="feature-card">
+          <div class="feature-icon icon-red"><i class="fas fa-chart-line"></i></div>
+          <h4 class="fw-bold mb-2">Progress Tracking</h4>
+          <p class="text-muted">Monitor your learning progress, grades, submission history and achievements.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ HOW IT WORKS ══════════════════════════════════════════════ -->
+<section class="how" id="how">
+  <div class="container">
+    <div class="animate-on-scroll">
+      <h2 class="section-title">How It <span style="background:linear-gradient(135deg,#f093fb,#f5576c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Works</span></h2>
+      <p class="section-subtitle">Get started in minutes — no experience required.</p>
+    </div>
+    <div class="row text-center g-4 animate-on-scroll">
+      <div class="col-md-3">
+        <div class="step-number" style="background:linear-gradient(135deg,#667eea,#764ba2);">1</div>
+        <h5 class="fw-bold">Create Account</h5>
+        <p class="text-muted small">Sign up as a student, teacher, or parent in seconds.</p>
+      </div>
+      <div class="col-md-3">
+        <div class="step-number" style="background:linear-gradient(135deg,#f093fb,#f5576c);">2</div>
+        <h5 class="fw-bold">Browse Courses</h5>
+        <p class="text-muted small">Find courses matched to your grade level and subject.</p>
+      </div>
+      <div class="col-md-3">
+        <div class="step-number" style="background:linear-gradient(135deg,#43e97b,#38f9d7);">3</div>
+        <h5 class="fw-bold">Learn & Practice</h5>
+        <p class="text-muted small">Watch lessons, attend live classes, complete assignments.</p>
+      </div>
+      <div class="col-md-3">
+        <div class="step-number" style="background:linear-gradient(135deg,#f7971e,#ffd200);">4</div>
+        <h5 class="fw-bold">Earn Certificate</h5>
+        <p class="text-muted small">Complete the course and download your certificate.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ROLES ══════════════════════════════════════════════════════ -->
+<section class="roles" id="roles">
+  <div class="container">
+    <div class="animate-on-scroll">
+      <h2 class="section-title text-white">Built For <span style="background:linear-gradient(90deg,#fda085,#f5576c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Everyone</span></h2>
+      <p class="section-subtitle" style="color:rgba(255,255,255,.7);">Whether you're a learner, educator, or parent — we have you covered.</p>
+    </div>
+    <div class="row g-4 animate-on-scroll">
+      <div class="col-md-4">
+        <div class="role-card">
+          <i class="fas fa-user-graduate" style="color:#43e97b;"></i>
+          <h4 class="fw-bold mb-2">Students</h4>
+          <p style="color:rgba(255,255,255,.7);">Enroll in grade-matched courses, watch lessons, submit assignments, take quizzes and earn certificates.</p>
+          <a href="/accounts/register/" class="btn mt-3 px-4 rounded-pill fw-semibold"
+             style="background:rgba(67,233,123,.2);color:#43e97b;border:1px solid rgba(67,233,123,.4);">
+            Join as Student <i class="fas fa-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="role-card">
+          <i class="fas fa-chalkboard-teacher" style="color:#f093fb;"></i>
+          <h4 class="fw-bold mb-2">Teachers</h4>
+          <p style="color:rgba(255,255,255,.7);">Create courses, upload lessons and documents, schedule live classes, set exams and grade students.</p>
+          <a href="/accounts/register/" class="btn mt-3 px-4 rounded-pill fw-semibold"
+             style="background:rgba(240,147,251,.2);color:#f093fb;border:1px solid rgba(240,147,251,.4);">
+            Join as Teacher <i class="fas fa-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="role-card">
+          <i class="fas fa-user-shield" style="color:#fda085;"></i>
+          <h4 class="fw-bold mb-2">Parents</h4>
+          <p style="color:rgba(255,255,255,.7);">Monitor your child's learning progress, track assignments, grades and class attendance in real time.</p>
+          <a href="/accounts/register/" class="btn mt-3 px-4 rounded-pill fw-semibold"
+             style="background:rgba(253,160,133,.2);color:#fda085;border:1px solid rgba(253,160,133,.4);">
+            Join as Parent <i class="fas fa-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TEACHERS ══════════════════════════════════════════════════ -->
+<section style="padding:6rem 0;background:#fff;" id="teachers">
+  <div class="container">
+    <div class="animate-on-scroll">
+      <h2 class="section-title">Meet Our <span style="background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Expert Teachers</span></h2>
+      <p class="section-subtitle">Learn from passionate educators across all grade levels and subjects.</p>
+    </div>
+
+    <!-- Horizontal scroll wrapper -->
+    <div style="position:relative;" class="animate-on-scroll">
+
+      <!-- Left arrow -->
+      <button onclick="scrollTeachers(-1)" id="tLeft"
+              style="position:absolute;left:-20px;top:50%;transform:translateY(-50%);
+                     width:44px;height:44px;border-radius:50%;border:none;z-index:10;cursor:pointer;
+                     background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;
+                     box-shadow:0 4px 15px rgba(102,126,234,.4);font-size:1rem;
+                     display:flex;align-items:center;justify-content:center;">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+
+      <!-- Scrollable track -->
+      <div id="teacherTrack"
+           style="display:flex;gap:1.5rem;overflow-x:auto;padding:1.5rem .5rem;
+                  scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none;">
+
+        {% if teachers %}
+          {% for teacher in teachers %}
+          <!-- Teacher card -->
+          <div style="flex:0 0 220px;background:#fff;border-radius:20px;
+                      box-shadow:0 4px 25px rgba(0,0,0,.08);border:1px solid #eee;
+                      overflow:hidden;transition:all .3s;text-align:center;padding-bottom:1.5rem;"
+               onmouseenter="this.style.transform='translateY(-8px)';this.style.boxShadow='0 20px 50px rgba(102,126,234,.2)'"
+               onmouseleave="this.style.transform='';this.style.boxShadow='0 4px 25px rgba(0,0,0,.08)'">
+
+            <!-- Cover strip -->
+            <div style="height:70px;background:linear-gradient(135deg,#667eea,#764ba2);"></div>
+
+            <!-- Avatar -->
+            <div style="margin-top:-35px;margin-bottom:.75rem;">
+              {% if teacher.profile_picture %}
+                <img src="{{ teacher.profile_picture.url }}"
+                     style="width:70px;height:70px;border-radius:50%;
+                            object-fit:cover;border:3px solid #fff;
+                            box-shadow:0 4px 15px rgba(0,0,0,.15);">
+              {% else %}
+                <div style="width:70px;height:70px;border-radius:50%;
+                            background:linear-gradient(135deg,#f093fb,#f5576c);
+                            display:inline-flex;align-items:center;justify-content:center;
+                            color:#fff;font-size:1.6rem;font-weight:700;
+                            border:3px solid #fff;box-shadow:0 4px 15px rgba(0,0,0,.15);">
+                  {{ teacher.first_name|first|upper }}{{ teacher.last_name|first|upper }}
+                </div>
+              {% endif %}
+            </div>
+
+            <h6 style="font-weight:700;margin:0 1rem .25rem;font-size:.95rem;color:#1a1a2e;">
+              {{ teacher.get_full_name|default:teacher.username }}
+            </h6>
+
+            <p style="color:#888;font-size:.78rem;margin:0 1rem .5rem;">
+              <i class="fas fa-chalkboard-teacher" style="color:#667eea;"></i>
+              Teacher
+            </p>
+
+            {% if teacher.bio %}
+            <p style="color:#666;font-size:.78rem;margin:0 1rem .75rem;
+                      line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;
+                      -webkit-box-orient:vertical;overflow:hidden;">
+              {{ teacher.bio }}
+            </p>
+            {% endif %}
+
+            <!-- Subject tags from assigned subjects -->
+            <div style="padding:0 .75rem .75rem;display:flex;flex-wrap:wrap;gap:.3rem;justify-content:center;">
+              {% for subject in teacher.assigned_subjects.all|slice:":3" %}
+              <span style="background:#f0f2ff;color:#667eea;font-size:.7rem;
+                           padding:.2rem .6rem;border-radius:20px;font-weight:600;">
+                {{ subject.name }}
+              </span>
+              {% empty %}
+              <span style="background:#f0f2ff;color:#667eea;font-size:.7rem;
+                           padding:.2rem .6rem;border-radius:20px;font-weight:600;">
+                <i class="fas fa-book me-1"></i>Educator
+              </span>
+              {% endfor %}
+            </div>
+
+            <!-- Book Tutor button -->
+            <a href="/accounts/register/?next=/courses/"
+               style="display:inline-block;margin:0 1rem;padding:.5rem 1.5rem;
+                      background:linear-gradient(135deg,#667eea,#764ba2);
+                      color:#fff;border-radius:50px;font-size:.82rem;font-weight:700;
+                      text-decoration:none;transition:all .3s;
+                      box-shadow:0 4px 15px rgba(102,126,234,.35);"
+               onmouseenter="this.style.transform='scale(1.05)'"
+               onmouseleave="this.style.transform=''">
+              <i class="fas fa-calendar-check me-1"></i> Book Tutor
+            </a>
+
+          </div>
+          {% endfor %}
+        {% else %}
+          <!-- Placeholder cards when no teachers registered yet -->
+          {% for i in "12345678" %}
+          <div style="flex:0 0 220px;background:#fff;border-radius:20px;
+                      box-shadow:0 4px 25px rgba(0,0,0,.06);border:1px solid #eee;
+                      overflow:hidden;text-align:center;padding-bottom:1.5rem;">
+            <div style="height:70px;background:linear-gradient(135deg,#667eea,#764ba2);opacity:.3;"></div>
+            <div style="margin-top:-35px;margin-bottom:.75rem;">
+              <div style="width:70px;height:70px;border-radius:50%;
+                          background:#e0e0e0;display:inline-block;
+                          border:3px solid #fff;"></div>
+            </div>
+            <div style="height:12px;background:#eee;border-radius:6px;margin:.5rem 2rem;"></div>
+            <div style="height:10px;background:#f5f5f5;border-radius:6px;margin:.3rem 3rem;"></div>
+            <div style="height:32px;background:#f0f2ff;border-radius:50px;margin:1rem 1.5rem;"></div>
+          </div>
+          {% endfor %}
+        {% endif %}
+
+      </div>
+
+      <!-- Right arrow -->
+      <button onclick="scrollTeachers(1)" id="tRight"
+              style="position:absolute;right:-20px;top:50%;transform:translateY(-50%);
+                     width:44px;height:44px;border-radius:50%;border:none;z-index:10;cursor:pointer;
+                     background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;
+                     box-shadow:0 4px 15px rgba(102,126,234,.4);font-size:1rem;
+                     display:flex;align-items:center;justify-content:center;">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+
+    </div>
+
+    <!-- CTA below teachers -->
+    <div class="text-center mt-5 animate-on-scroll">
+      <p class="text-muted mb-3">Ready to learn with our teachers?</p>
+      <a href="/accounts/register/"
+         style="display:inline-block;padding:.85rem 2.5rem;
+                background:linear-gradient(135deg,#667eea,#764ba2);
+                color:#fff;border-radius:50px;font-weight:700;
+                text-decoration:none;font-size:1.05rem;
+                box-shadow:0 8px 30px rgba(102,126,234,.4);">
+        <i class="fas fa-user-plus me-2"></i>Sign Up & Enroll Now
+      </a>
+      <a href="/accounts/login/"
+         style="display:inline-block;margin-left:1rem;padding:.82rem 2.2rem;
+                border:2px solid #667eea;color:#667eea;border-radius:50px;
+                font-weight:600;text-decoration:none;font-size:1.05rem;">
+        <i class="fas fa-sign-in-alt me-2"></i>Already have an account?
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ CTA ════════════════════════════════════════════════════════ -->
+<section class="cta" id="cta">
+  <div class="shape shape-1" style="opacity:.08;right:-150px;top:-150px;"></div>
+  <div class="shape shape-2" style="opacity:.08;left:-100px;bottom:-100px;"></div>
+  <div class="container position-relative" style="z-index:2;">
+    <div class="animate-on-scroll">
+      <h2>Ready to Start <span style="background:linear-gradient(90deg,#f093fb,#fda085);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Learning?</span></h2>
+      <p>Join thousands of students already learning on Lihiket Tutor. It's free to get started.</p>
+      <a href="/accounts/register/" class="btn-hero-primary me-3"
+         style="animation:pulse 2s infinite;">
+        <i class="fas fa-rocket me-2"></i>Create Free Account
+      </a>
+      <a href="/accounts/login/" class="btn-hero-secondary">
+        <i class="fas fa-sign-in-alt me-2"></i>Already a member? Login
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ════════════════════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="row g-4 mb-4">
+      <div class="col-lg-4">
+        <div class="footer-brand mb-3"><i class="fas fa-graduation-cap me-2"></i>Lihiket Tutor</div>
+        <p style="font-size:.9rem;">A complete online tutoring platform for students, teachers and parents. Learn at your own pace, anywhere.</p>
+      </div>
+      <div class="col-lg-2 col-6">
+        <h5>Platform</h5>
+        <a href="#features">Features</a>
+        <a href="#how">How It Works</a>
+        <a href="#roles">For Students</a>
+        <a href="#roles">For Teachers</a>
+      </div>
+      <div class="col-lg-2 col-6">
+        <h5>Account</h5>
+        <a href="/accounts/register/">Sign Up</a>
+        <a href="/accounts/login/">Login</a>
+        <a href="/accounts/forgot-password/">Forgot Password</a>
+      </div>
+      <div class="col-lg-4">
+        <h5>Get Started Today</h5>
+        <p style="font-size:.9rem;">Sign up now and access hundreds of courses matched to your grade level.</p>
+        <a href="/accounts/register/" class="btn rounded-pill px-4 fw-semibold"
+           style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;">
+          <i class="fas fa-user-plus me-2"></i>Register Free
+        </a>
+      </div>
+    </div>
+    <hr style="border-color:rgba(255,255,255,.1);">
+    <div class="text-center" style="font-size:.85rem;">
+      © 2026 Lihiket Tutor Online Tutoring. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Typing animation
+const words = ['Limits', 'Boundaries', 'Borders', 'Barriers'];
+let wi = 0, ci = 0, deleting = false;
+const el = document.getElementById('heroTyping');
+function type() {
+  const word = words[wi];
+  el.textContent = deleting ? word.slice(0, ci--) : word.slice(0, ci++);
+  if (!deleting && ci > word.length) { deleting = true; setTimeout(type, 1500); return; }
+  if (deleting && ci < 0) { deleting = false; wi = (wi + 1) % words.length; ci = 0; }
+  setTimeout(type, deleting ? 60 : 110);
+}
+type();
+
+// Scroll animations
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.15 });
+document.querySelectorAll('.animate-on-scroll').forEach(el => obs.observe(el));
+
+// Teacher track scroll arrows
+function scrollTeachers(dir) {
+  var track = document.getElementById('teacherTrack');
+  track.scrollBy({ left: dir * 700, behavior: 'smooth' });
+}
+
+// Hide scrollbar CSS for teacher track
+var style = document.createElement('style');
+style.textContent = '#teacherTrack::-webkit-scrollbar{display:none}';
+document.head.appendChild(style);
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Invoice Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Invoice Details</h1>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ invoice.invoice_number }}</h5>
+            <p class="card-text"><strong>Amount:</strong> ${{ invoice.amount }}</p>
+            <p class="card-text"><strong>Due Date:</strong> {{ invoice.due_date }}</p>
+            <p class="card-text"><strong>Status:</strong> {% if invoice.is_paid %}Paid{% else %}Unpaid{% endif %}</p>
+            {% if invoice.paid_date %}
+            <p class="card-text"><strong>Paid Date:</strong> {{ invoice.paid_date }}</p>
+            {% endif %}
+            <a href="{% url 'payments:invoice_list' %}" class="btn btn-secondary">Back to Invoices</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

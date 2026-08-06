@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Quiz Results — {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold">Quiz Results</h2>
+      <p class="text-muted mb-0">
+        <strong>{{ quiz.title }}</strong> &nbsp;·&nbsp; {{ quiz.course.title }}
+      </p>
+    </div>
+    <a href="{% url 'quizzes:quiz_detail' quiz.pk %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+  </div>
+
+  <!-- Summary stats -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 text-center p-3">
+        <h3 class="text-primary mb-0">{{ attempts.count }}</h3>
+        <small class="text-muted">Total Attempts</small>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 text-center p-3">
+        <h3 class="text-success mb-0">{{ passed_count }}</h3>
+        <small class="text-muted">Passed</small>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 text-center p-3">
+        <h3 class="text-danger mb-0">{{ failed_count }}</h3>
+        <small class="text-muted">Failed</small>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 text-center p-3">
+        <h3 class="text-info mb-0">{{ avg_score }}%</h3>
+        <small class="text-muted">Average Score</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results table -->
+  {% if attempts %}
+  <div class="card shadow-sm border-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Student</th>
+            <th>Score</th>
+            <th>Percentage</th>
+            <th>Status</th>
+            <th>Completed</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for attempt in attempts %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>
+              <strong>{{ attempt.student.get_full_name|default:attempt.student.username }}</strong>
+              <br><small class="text-muted">{{ attempt.student.username }}</small>
+            </td>
+            <td>
+              <strong>{{ attempt.score }}</strong>
+              <span class="text-muted">/{{ attempt.total_marks }}</span>
+            </td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <div class="progress flex-grow-1" style="height:8px;min-width:80px;">
+                  <div class="progress-bar
+                    {% if attempt.passed %}bg-success{% else %}bg-danger{% endif %}"
+                    style="width:{{ attempt.percentage|floatformat:0 }}%;">
+                  </div>
+                </div>
+                <span class="fw-semibold">{{ attempt.percentage|floatformat:1 }}%</span>
+              </div>
+            </td>
+            <td>
+              {% if attempt.passed %}
+                <span class="badge bg-success"><i class="fas fa-check"></i> Passed</span>
+              {% else %}
+                <span class="badge bg-danger"><i class="fas fa-times"></i> Failed</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if attempt.completed_at %}
+                {{ attempt.completed_at|date:"M d, Y" }}
+              {% else %}
+                <span class="text-muted">In progress</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="alert alert-info text-center py-5">
+    <i class="fas fa-users fa-3x mb-3 d-block"></i>
+    No students have attempted this quiz yet.
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

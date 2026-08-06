@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="container mt-5">
+
+
+<h2>
+Certificate Verified
+</h2>
+
+
+<hr>
+
+
+<h4>
+{{ certificate.student.get_full_name }}
+</h4>
+
+
+<p>
+Course:
+{{ certificate.course.title }}
+</p>
+
+
+<p>
+Certificate Number:
+{{ certificate.certificate_number }}
+</p>
+
+
+<p>
+Issued:
+{{ certificate.issued_at }}
+</p>
+
+
+<div class="alert alert-success">
+
+This certificate is valid.
+
+</div>
+
+
+</div>
+
+
+{% endblock %}

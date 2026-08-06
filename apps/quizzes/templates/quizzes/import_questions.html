@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Import Questions — {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold">
+        <i class="fas fa-file-import text-primary"></i>
+        Import from Question Bank
+      </h2>
+      <p class="text-muted mb-0">
+        Quiz: <strong>{{ quiz.title }}</strong>
+        &nbsp;·&nbsp; {{ quiz.course.title }}
+        {% if quiz_subject %}
+          &nbsp;·&nbsp;
+          <span class="badge bg-info text-dark">
+            {{ quiz_subject.name }} — {{ quiz_subject.get_grade_level_display }}
+          </span>
+        {% endif %}
+      </p>
+    </div>
+    <a href="{% url 'quizzes:question_list' quiz.pk %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Filter bar -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+      <form method="GET" class="row g-2 align-items-end">
+
+        <div class="col-md-4">
+          <label class="form-label small fw-semibold">Search</label>
+          <input type="text" name="search" class="form-control"
+                 placeholder="Search question text..." value="{{ search }}">
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label small fw-semibold">Difficulty</label>
+          <select name="difficulty" class="form-select">
+            <option value="">All Levels</option>
+            {% for val, label in difficulty_levels %}
+              <option value="{{ val }}" {% if difficulty == val %}selected{% endif %}>
+                {{ label }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label small fw-semibold">Subject</label>
+          <select name="subject" class="form-select">
+            <option value="">All Subjects</option>
+            {% for s in subjects %}
+              <option value="{{ s.pk }}"
+                {% if subject_id == s.pk|stringformat:"s" %}selected{% endif %}>
+                {{ s.name }} — {{ s.get_grade_level_display }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-2 d-flex gap-2">
+          <button type="submit" class="btn btn-primary flex-grow-1">
+            <i class="fas fa-search"></i> Filter
+          </button>
+          <a href="{% url 'quizzes:import_questions' quiz.pk %}"
+             class="btn btn-outline-secondary">
+            <i class="fas fa-times"></i>
+          </a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Import form -->
+  <form method="POST">
+    {% csrf_token %}
+
+    {% if qb_questions %}
+
+      <!-- Toolbar -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="form-check mb-0">
+            <input class="form-check-input" type="checkbox" id="selectAll">
+            <label class="form-check-label fw-semibold" for="selectAll">
+              Select All
+            </label>
+          </div>
+          <small class="text-muted">
+            {{ qb_questions|length }} question{{ qb_questions|length|pluralize }} shown
+          </small>
+        </div>
+        <button type="submit" class="btn btn-success">
+          <i class="fas fa-file-import"></i> Import Selected
+        </button>
+      </div>
+
+      <!-- Question cards -->
+      <div class="list-group shadow-sm mb-4">
+        {% for q in qb_questions %}
+
+        <div class="list-group-item py-3
+          {% if q.question_text in existing_texts %}list-group-item-secondary{% endif %}">
+
+          <div class="row align-items-start g-2">
+
+            <!-- Checkbox col -->
+            <div class="col-auto pt-1">
+              {% if q.question_text in existing_texts %}
+                <input type="checkbox" class="form-check-input"
+                       disabled title="Already imported into this quiz">
+              {% else %}
+                <input type="checkbox" class="form-check-input question-checkbox"
+                       name="question_ids" value="{{ q.pk }}" id="q{{ q.pk }}">
+              {% endif %}
+            </div>
+
+            <!-- Question info col -->
+            <div class="col">
+              <label class="w-100 mb-0" for="q{{ q.pk }}"
+                     style="cursor:{% if q.question_text in existing_texts %}default{% else %}pointer{% endif %};">
+
+                <div class="fw-semibold mb-1">{{ q.question_text }}</div>
+
+                <!-- Choices preview -->
+                {% if q.choices.all %}
+                <div class="d-flex flex-wrap gap-1 mb-2">
+                  {% for choice in q.choices.all %}
+                  <span class="badge
+                    {% if choice.is_correct %}bg-success
+                    {% else %}bg-light text-dark border{% endif %}">
+                    {% if choice.is_correct %}
+                      <i class="fas fa-check me-1"></i>
+                    {% endif %}
+                    {{ choice.choice_text|truncatewords:6 }}
+                  </span>
+                  {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Meta -->
+                <div class="d-flex flex-wrap gap-2">
+                  <span class="badge bg-primary">
+                    {{ q.get_question_type_display }}
+                  </span>
+                  <span class="badge
+                    {% if q.difficulty == 'easy' %}bg-success
+                    {% elif q.difficulty == 'hard' %}bg-danger
+                    {% else %}bg-warning text-dark{% endif %}">
+                    {{ q.get_difficulty_display }}
+                  </span>
+                  <span class="badge bg-light text-dark border">
+                    <i class="fas fa-star text-warning"></i> {{ q.marks }} mark{{ q.marks|pluralize }}
+                  </span>
+                  {% if q.subject %}
+                  <span class="badge bg-info text-dark">
+                    <i class="fas fa-book"></i> {{ q.subject.name }}
+                  </span>
+                  {% endif %}
+                  {% if q.question_text in existing_texts %}
+                  <span class="badge bg-secondary">
+                    <i class="fas fa-check-circle"></i> Already in quiz
+                  </span>
+                  {% endif %}
+                </div>
+
+              </label>
+            </div>
+
+          </div>
+        </div>
+
+        {% endfor %}
+      </div>
+
+      <!-- Bottom import button -->
+      <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-success btn-lg">
+          <i class="fas fa-file-import"></i> Import Selected Questions
+        </button>
+      </div>
+
+    {% else %}
+      <div class="alert alert-info text-center py-5">
+        <i class="fas fa-question-circle fa-3x mb-3 d-block text-primary"></i>
+        <h5>No matching questions found in your question bank.</h5>
+        <p class="text-muted mb-3">
+          {% if subject_id %}
+            Try removing the subject filter, or create questions for this subject first.
+          {% else %}
+            Only Multiple Choice and True/False questions can be imported.
+          {% endif %}
+        </p>
+        <a href="{% url 'question_bank:create' %}" class="btn btn-primary">
+          <i class="fas fa-plus-circle"></i> Create Questions in Question Bank
+        </a>
+      </div>
+    {% endif %}
+
+  </form>
+
+</div>
+
+<script>
+document.getElementById('selectAll').addEventListener('change', function () {
+  document.querySelectorAll('.question-checkbox:not(:disabled)')
+    .forEach(cb => cb.checked = this.checked);
+});
+</script>
+
+{% endblock %}

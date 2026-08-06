@@ -1,0 +1,378 @@
+{% load static %}
+
+<!-- ── Overlay (mobile) ─────────────────────────────────────────── -->
+<div id="sidebarOverlay" onclick="closeSidebar()"
+     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;"></div>
+
+<!-- ── Toggle button ────────────────────────────────────────────── -->
+<button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+  <i class="fas fa-bars"></i>
+</button>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+
+  <!-- Brand -->
+  <div class="sidebar-logo-box">
+    <div style="width:38px;height:38px;border-radius:10px;
+                background:linear-gradient(135deg,#667eea,#764ba2);
+                display:flex;align-items:center;justify-content:center;
+                color:#fff;font-size:1.1rem;flex-shrink:0;">
+      <i class="fas fa-graduation-cap"></i>
+    </div>
+    <div>
+      <h3 style="font-size:.95rem;font-weight:800;margin:0;line-height:1.2;">Lihiket Tutor</h3>
+      <span style="font-size:.7rem;color:rgba(255,255,255,.4);">Lihiket Tutoring</span>
+    </div>
+    <button onclick="closeSidebar()"
+            style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,.4);
+                   cursor:pointer;font-size:1.1rem;display:none;" id="sidebarClose">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <!-- User mini profile -->
+  {% if user.is_authenticated %}
+  <div style="margin:.5rem .75rem 1rem;padding:.75rem 1rem;
+              background:rgba(255,255,255,.06);border-radius:12px;
+              border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:.75rem;">
+    {% if user.profile_picture %}
+      <img src="{{ user.profile_picture.url }}"
+           style="width:38px;height:38px;border-radius:50%;object-fit:cover;
+                  border:2px solid rgba(102,126,234,.6);flex-shrink:0;">
+    {% else %}
+      <div style="width:38px;height:38px;border-radius:50%;flex-shrink:0;
+                  background:linear-gradient(135deg,#f093fb,#f5576c);
+                  display:flex;align-items:center;justify-content:center;
+                  color:#fff;font-weight:700;font-size:.95rem;">
+        {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+      </div>
+    {% endif %}
+    <div style="overflow:hidden;">
+      <div style="color:#fff;font-size:.82rem;font-weight:600;white-space:nowrap;
+                  overflow:hidden;text-overflow:ellipsis;">
+        {{ user.get_full_name|default:user.username }}
+      </div>
+      <div style="font-size:.7rem;padding:.15rem .5rem;border-radius:20px;display:inline-block;margin-top:.15rem;
+                  {% if user.role == 'admin' %}background:rgba(245,87,108,.25);color:#f5576c;
+                  {% elif user.role == 'teacher' %}background:rgba(102,126,234,.25);color:#a78bfa;
+                  {% elif user.role == 'student' %}background:rgba(67,233,123,.2);color:#43e97b;
+                  {% else %}background:rgba(247,151,30,.2);color:#fda085;{% endif %}
+                  font-weight:600;">
+        <i class="fas fa-{% if user.role == 'admin' %}shield-alt{% elif user.role == 'teacher' %}chalkboard-teacher{% elif user.role == 'student' %}user-graduate{% else %}user{% endif %} me-1"></i>
+        {{ user.role|title }}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Navigation -->
+  <nav style="flex:1;overflow-y:auto;padding-bottom:1rem;">
+    <ul class="sidebar-menu">
+
+      <!-- ── MAIN ──────────────────────────────────────── -->
+      <li class="nav-section-label">Main</li>
+
+      <li>
+        <a href="{% url 'dashboard:home' %}" class="{% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}">
+          <i class="fas fa-th-large"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+
+      <!-- ── LEARNING ───────────────────────────────────── -->
+      <li class="nav-section-label">Learning</li>
+
+      <li class="has-submenu">
+        <a href="#" onclick="toggleSubmenu(this)">
+          <i class="fas fa-book-open" style="color:#667eea;"></i>
+          <span>Courses</span>
+          <i class="fas fa-chevron-right arrow-icon"></i>
+        </a>
+        <ul class="submenu">
+          <li><a href="{% url 'courses:course_list' %}"><i class="fas fa-list"></i>All Courses</a></li>
+          {% if user.role == "student" %}
+          <li><a href="{% url 'courses:my_courses' %}"><i class="fas fa-play-circle"></i>My Learning</a></li>
+          {% endif %}
+          {% if user.role == "teacher" or user.role == "admin" %}
+          <li><a href="{% url 'courses:course_create' %}"><i class="fas fa-plus"></i>Create Course</a></li>
+          {% endif %}
+          <li><a href="{% url 'certificates:certificate_list' %}"><i class="fas fa-certificate"></i>Certificates</a></li>
+        </ul>
+      </li>
+
+      <li class="has-submenu">
+        <a href="#" onclick="toggleSubmenu(this)">
+          <i class="fas fa-book" style="color:#43e97b;"></i>
+          <span>Subjects</span>
+          <i class="fas fa-chevron-right arrow-icon"></i>
+        </a>
+        <ul class="submenu">
+          <li><a href="{% url 'subjects:subject_list' %}"><i class="fas fa-list"></i>All Subjects</a></li>
+          {% if user.role == "admin" %}
+          <li><a href="{% url 'subjects:subject_create' %}"><i class="fas fa-plus"></i>Add Subject</a></li>
+          {% endif %}
+        </ul>
+      </li>
+
+      <li class="has-submenu">
+        <a href="#" onclick="toggleSubmenu(this)">
+          <i class="fas fa-play-circle" style="color:#4facfe;"></i>
+          <span>Lessons</span>
+          <i class="fas fa-chevron-right arrow-icon"></i>
+        </a>
+        <ul class="submenu">
+          <li><a href="{% url 'lessons:lesson_list' %}"><i class="fas fa-list"></i>All Lessons</a></li>
+          {% if user.role == "teacher" or user.role == "admin" %}
+          <li><a href="{% url 'lessons:lesson_create' %}"><i class="fas fa-plus"></i>Create Lesson</a></li>
+          <li><a href="{% url 'lessons:my_lessons' %}"><i class="fas fa-folder"></i>My Lessons</a></li>
+          {% endif %}
+        </ul>
+      </li>
+
+      <li class="has-submenu">
+        <a href="#" onclick="toggleSubmenu(this)">
+          <i class="fas fa-folder-open" style="color:#fda085;"></i>
+          <span>Documents</span>
+          <i class="fas fa-chevron-right arrow-icon"></i>
+        </a>
+        <ul class="submenu">
+          <li><a href="{% url 'documents:document_list' %}"><i class="fas fa-list"></i>All Documents</a></li>
+          {% if user.role == "teacher" or user.role == "admin" %}
+          <li><a href="{% url 'documents:document_create' %}"><i class="fas fa-upload"></i>Upload Document</a></li>
+          <li><a href="{% url 'documents:my_documents' %}"><i class="fas fa-folder"></i>My Documents</a></li>
+          {% endif %}
+        </ul>
+      </li>
+
+      <!-- ── ASSESSMENTS ────────────────────────────────── -->
+      <li class="nav-section-label">Assessments</li>
+
+      <li class="has-submenu">
+        <a href="#" onclick="toggleSubmenu(this)">
+          <i class="fas fa-tasks" style="color:#f7971e;"></i>
+          <span>Assignments</span>
+          <i class="fas fa-chevron-right arrow-icon"></i>
+        </a>
+        <ul class="submenu">
+          <li><a href="{% url 'assignments:assignment_list' %}"><i class="fas fa-list"></i>All Assignments</a></li>
+          {% if user.role == "student" %}
+          <li><a href="{% url 'assignments:my_assignments' %}"><i class="fas fa-user"></i>My Assignments</a></li>
+          {% endif %}
+          {% if user.role == "teacher" or user.role == "admin" %}
+          <li><a href="{% url 'assignments:assignment_create' %}"><i class="fas fa-plus"></i>Create Assignment</a></li>
+          {% endif %}
+        </ul>
+      </li>
+
+      <li class="has-submenu">
+        <a href="#" onclick="toggleSubmenu(this)">
+          <i class="fas fa-question-circle" style="color:#667eea;"></i>
+          <span>Quizzes</span>
+          <i class="fas fa-chevron-right arrow-icon"></i>
+        </a>
+        <ul class="submenu">
+          <li><a href="{% url 'quizzes:quiz_list' %}"><i class="fas fa-list"></i>All Quizzes</a></li>
+          {% if user.role == "student" %}
+          <li><a href="{% url 'quizzes:my_quizzes' %}"><i class="fas fa-user"></i>My Quizzes</a></li>
+          {% endif %}
+          {% if user.role == "teacher" or user.role == "admin" %}
+          <li><a href="{% url 'quizzes:quiz_create' %}"><i class="fas fa-plus"></i>Create Quiz</a></li>
+          {% endif %}
+        </ul>
+      </li>
+
+      <li class="has-submenu">
+        <a href="#" onclick="toggleSubmenu(this)">
+          <i class="fas fa-file-alt" style="color:#f5576c;"></i>
+          <span>Exams</span>
+          <i class="fas fa-chevron-right arrow-icon"></i>
+        </a>
+        <ul class="submenu">
+          <li><a href="{% url 'exams:exam_list' %}"><i class="fas fa-list"></i>All Exams</a></li>
+          {% if user.role == "student" %}
+          <li><a href="{% url 'exams:my_exams' %}"><i class="fas fa-user"></i>My Exams</a></li>
+          {% endif %}
+          {% if user.role == "teacher" or user.role == "admin" %}
+          <li><a href="{% url 'exams:exam_create' %}"><i class="fas fa-plus"></i>Create Exam</a></li>
+          {% endif %}
+        </ul>
+      </li>
+
+      <!-- ── LIVE CLASSES ───────────────────────────────── -->
+      <li class="nav-section-label">Live</li>
+
+      <li class="has-submenu">
+        <a href="#" onclick="toggleSubmenu(this)">
+          <i class="fas fa-video" style="color:#43e97b;"></i>
+          <span>Live Classes</span>
+          <i class="fas fa-chevron-right arrow-icon"></i>
+        </a>
+        <ul class="submenu">
+          <li><a href="{% url 'live_classes:live_class_list' %}"><i class="fas fa-list"></i>All Classes</a></li>
+          <li><a href="{% url 'live_classes:my_live_classes' %}"><i class="fas fa-user"></i>My Classes</a></li>
+          {% if user.role == "teacher" or user.role == "admin" %}
+          <li><a href="{% url 'live_classes:live_class_create' %}"><i class="fas fa-plus"></i>Schedule Class</a></li>
+          {% endif %}
+        </ul>
+      </li>
+
+      <!-- ── QUESTION BANK (teacher/admin) ─────────────── -->
+      {% if user.role == "teacher" or user.role == "admin" %}
+      <li class="nav-section-label">Tools</li>
+      <li>
+        <a href="{% url 'question_bank:list' %}">
+          <i class="fas fa-database" style="color:#a78bfa;"></i>
+          <span>Question Bank</span>
+        </a>
+      </li>
+      {% endif %}
+
+      <!-- ── ACCOUNT ────────────────────────────────────── -->
+      <li class="nav-section-label">Account</li>
+
+      <li>
+        <a href="{% url 'accounts:profile' %}">
+          <i class="fas fa-user-circle" style="color:#4facfe;"></i>
+          <span>My Profile</span>
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'accounts:edit_profile' %}">
+          <i class="fas fa-edit" style="color:#fda085;"></i>
+          <span>Edit Profile</span>
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'accounts:logout' %}"
+           style="color:rgba(245,87,108,.8)!important;"
+           onmouseenter="this.style.background='rgba(245,87,108,.15)'"
+           onmouseleave="this.style.background=''">
+          <i class="fas fa-sign-out-alt" style="color:#f5576c;"></i>
+          <span>Logout</span>
+        </a>
+      </li>
+
+    </ul>
+  </nav>
+
+  <!-- Footer -->
+  <div style="padding:.75rem 1.25rem;border-top:1px solid rgba(255,255,255,.07);
+              font-size:.7rem;color:rgba(255,255,255,.3);text-align:center;">
+    © 2026 Lihiket Tutor
+  </div>
+
+</aside>
+
+<style>
+.nav-section-label {
+  font-size: .65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: rgba(255,255,255,.25);
+  padding: .9rem 1.5rem .3rem;
+  list-style: none;
+}
+
+.sidebar-menu .has-submenu > a {
+  justify-content: flex-start;
+}
+
+.arrow-icon {
+  margin-left: auto;
+  font-size: .65rem;
+  opacity: .5;
+  transition: transform .3s;
+}
+
+.has-submenu.open > a .arrow-icon {
+  transform: rotate(90deg);
+  opacity: 1;
+  color: var(--primary);
+}
+
+.submenu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .35s ease;
+  list-style: none;
+  padding: 0;
+  background: rgba(255,255,255,.03);
+  border-left: 2px solid rgba(102,126,234,.3);
+  margin: 0 .75rem 0 2.25rem;
+  border-radius: 0 8px 8px 0;
+}
+
+.has-submenu.open .submenu {
+  max-height: 500px;
+}
+
+.submenu li a {
+  padding: .45rem 1rem !important;
+  font-size: .8rem !important;
+  margin: 0 !important;
+  border-radius: 6px !important;
+  color: rgba(255,255,255,.5) !important;
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+}
+
+.submenu li a i {
+  width: 14px;
+  font-size: .75rem;
+  color: rgba(255,255,255,.3) !important;
+}
+
+.submenu li a:hover {
+  color: #fff !important;
+  background: rgba(255,255,255,.07) !important;
+  transform: none !important;
+}
+
+@media (max-width: 992px) {
+  #sidebarClose { display: block !important; }
+}
+</style>
+
+<script>
+function toggleSidebar() {
+  var s = document.getElementById('sidebar');
+  var o = document.getElementById('sidebarOverlay');
+  s.classList.toggle('open');
+  o.style.display = s.classList.contains('open') ? 'block' : 'none';
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').style.display = 'none';
+}
+
+function toggleSubmenu(el) {
+  var li = el.closest('.has-submenu');
+  var isOpen = li.classList.contains('open');
+  // Close all open submenus
+  document.querySelectorAll('.has-submenu.open').forEach(function(item) {
+    item.classList.remove('open');
+  });
+  // Open clicked one if it was closed
+  if (!isOpen) li.classList.add('open');
+}
+
+// Auto-open submenu if current URL matches any child link
+document.addEventListener('DOMContentLoaded', function () {
+  var path = window.location.pathname;
+  document.querySelectorAll('.submenu li a').forEach(function (a) {
+    if (a.getAttribute('href') === path) {
+      a.classList.add('active');
+      a.closest('.has-submenu').classList.add('open');
+    }
+  });
+  document.querySelectorAll('.sidebar-menu > li > a').forEach(function (a) {
+    if (a.getAttribute('href') === path) a.classList.add('active');
+  });
+});
+</script>

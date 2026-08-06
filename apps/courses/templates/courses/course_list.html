@@ -1,0 +1,544 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block title %}
+Courses
+{% endblock %}
+
+
+
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'courses/courses.css' %}">
+
+{% endblock %}
+
+
+
+
+
+{% block content %}
+
+
+<div class="courses-page container-fluid">
+
+
+<h2 class="page-title">
+    All Courses
+</h2>
+
+{% if is_teacher_or_admin %}
+<div class="mb-3">
+  <a href="{% url 'courses:course_create' %}" class="btn btn-primary">
+    <i class="fas fa-plus-circle"></i> Add Course
+  </a>
+</div>
+{% endif %}
+
+{% if request.user.role == "student" and not request.user.grade_level %}
+<div class="alert alert-warning">
+  <i class="fas fa-exclamation-triangle"></i>
+  Your grade level is not set. Please
+  <a href="{% url 'accounts:edit_profile' %}">update your profile</a>
+  to see courses for your grade.
+</div>
+{% endif %}
+
+
+
+
+<!-- =====================
+     COURSE STATISTICS
+===================== -->
+
+
+<div class="course-stat-grid">
+
+
+<div class="stat-box blue">
+
+<h5>
+Total Courses
+</h5>
+
+<h2>
+{{ total_courses }}
+</h2>
+
+</div>
+
+
+
+<div class="stat-box green">
+
+<h5>
+Published
+</h5>
+
+<h2>
+{{ published_courses }}
+</h2>
+
+</div>
+
+
+
+<div class="stat-box orange">
+
+<h5>
+Draft
+</h5>
+
+<h2>
+{{ draft_courses }}
+</h2>
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="course-level-grid">
+
+
+<div class="level-card beginner">
+
+<h5>
+Beginner
+</h5>
+
+<h2>
+{{ beginner_courses }}
+</h2>
+
+</div>
+
+
+
+
+<div class="level-card intermediate">
+
+<h5>
+Intermediate
+</h5>
+
+<h2>
+{{ intermediate_courses }}
+</h2>
+
+</div>
+
+
+
+
+<div class="level-card advanced">
+
+<h5>
+Advanced
+</h5>
+
+<h2>
+{{ advanced_courses }}
+</h2>
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<!-- =====================
+     RECENT COURSES
+===================== -->
+
+
+<h3 class="section-title">
+Recently Added Courses
+</h3>
+
+
+
+<div class="recent-list">
+
+
+{% for course in recent_courses %}
+
+
+<a href="{% url 'courses:course_detail' course.pk %}"
+class="recent-item">
+
+
+<strong>
+{{ course.title }}
+</strong>
+
+
+<span>
+
+{{ course.created_at|date:"M d, Y" }}
+
+</span>
+
+
+</a>
+
+
+
+{% empty %}
+
+
+<div class="empty-box">
+
+No recent courses.
+
+</div>
+
+
+{% endfor %}
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- =====================
+     SEARCH
+===================== -->
+
+
+<form method="GET"
+class="course-search">
+
+
+
+<input 
+type="text"
+name="q"
+placeholder="Search courses..."
+value="{{query}}"
+class="search-input">
+
+
+
+
+
+<select name="level">
+
+<option value="">
+All Levels
+</option>
+
+
+<option value="beginner"
+{% if level == "beginner" %}selected{% endif %}>
+Beginner
+</option>
+
+
+
+<option value="intermediate"
+{% if level == "intermediate" %}selected{% endif %}>
+Intermediate
+</option>
+
+
+
+<option value="advanced"
+{% if level == "advanced" %}selected{% endif %}>
+Advanced
+</option>
+
+
+</select>
+
+
+
+
+
+
+<select name="status">
+
+
+<option value="">
+All Status
+</option>
+
+
+<option value="published"
+{% if status == "published" %}selected{% endif %}>
+Published
+</option>
+
+
+<option value="draft"
+{% if status == "draft" %}selected{% endif %}>
+Draft
+</option>
+
+
+</select>
+
+
+
+
+
+<select name="sort">
+
+
+<option value="">
+Newest First
+</option>
+
+
+<option value="oldest">
+Oldest First
+</option>
+
+
+<option value="title">
+Title A-Z
+</option>
+
+
+<option value="price_low">
+Price Low
+</option>
+
+
+<option value="price_high">
+Price High
+</option>
+
+
+</select>
+
+
+
+
+
+<button type="submit">
+
+Search
+
+</button>
+
+
+
+</form>
+
+
+
+
+
+
+
+
+
+<!-- =====================
+     COURSE CARDS
+===================== -->
+
+
+
+<div class="course-grid">
+
+
+
+{% for course in courses %}
+
+
+
+<div class="course-card">
+
+
+
+
+
+{% if course.thumbnail %}
+
+
+<img src="{{course.thumbnail.url}}"
+class="course-image"
+alt="{{course.title}}">
+
+
+{% else %}
+
+
+<img src="{% static 'images/default-course.png' %}"
+class="course-image"
+alt="default">
+
+
+{% endif %}
+
+
+
+
+
+
+<div class="course-body">
+
+
+
+<h3>
+{{course.title}}
+</h3>
+
+
+
+
+<p>
+
+{{course.description|truncatewords:20}}
+
+</p>
+
+
+
+
+<span class="course-date">
+
+{{course.created_at|date:"M d,Y"}}
+
+</span>
+
+
+
+
+
+<a href="{% url 'courses:course_detail' course.pk %}"
+class="course-button">
+
+
+View Course
+
+
+</a>
+
+
+
+</div>
+
+
+
+
+</div>
+
+
+
+
+
+{% empty %}
+
+
+<div class="empty-box">
+
+No courses found.
+
+</div>
+
+
+{% endfor %}
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- =====================
+     PAGINATION
+===================== -->
+
+
+{% if courses.paginator.num_pages > 1 %}
+
+
+<div class="pagination-box">
+
+
+{% if courses.has_previous %}
+
+
+<a href="?page={{courses.previous_page_number}}&q={{query}}&level={{level}}&status={{status}}&sort={{sort}}">
+
+Previous
+
+</a>
+
+
+{% endif %}
+
+
+
+
+<span>
+
+{{courses.number}}
+
+/
+
+{{courses.paginator.num_pages}}
+
+</span>
+
+
+
+
+
+{% if courses.has_next %}
+
+
+<a href="?page={{courses.next_page_number}}&q={{query}}&level={{level}}&status={{status}}&sort={{sort}}">
+
+Next
+
+</a>
+
+
+{% endif %}
+
+
+
+</div>
+
+
+{% endif %}
+
+
+
+
+
+
+</div>
+
+
+
+{% endblock %}

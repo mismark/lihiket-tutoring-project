@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Live Classes{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- Header -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold">
+
+                <i class="fas fa-video text-primary"></i>
+
+                My Live Classes
+
+            </h2>
+
+            <p class="text-muted">
+
+                Manage all your scheduled live classes.
+
+            </p>
+
+        </div>
+
+        {% if request.user.role == "teacher" or request.user.role == "admin" %}
+
+        <a href="{% url 'live_classes:live_class_create' %}"
+           class="btn btn-primary">
+
+            <i class="fas fa-plus-circle"></i>
+
+            Schedule Live Class
+
+        </a>
+
+        {% endif %}
+
+    </div>
+
+    <!-- Statistics -->
+
+    <div class="row mb-4">
+
+        <div class="col-md-3">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body text-center">
+
+                    <h2>{{ live_classes.count }}</h2>
+
+                    <p class="text-muted mb-0">
+
+                        Total Classes
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body text-center">
+
+                    <h2>
+
+                        {{ live_classes|length }}
+
+                    </h2>
+
+                    <p class="text-muted mb-0">
+
+                        Scheduled
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body text-center">
+
+                    <h2>
+
+                        {{ request.user.teaching_courses.count }}
+
+                    </h2>
+
+                    <p class="text-muted mb-0">
+
+                        Courses
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body text-center">
+
+                    <h2>
+
+                        {{ request.user.first_name }}
+
+                    </h2>
+
+                    <p class="text-muted mb-0">
+
+                        Instructor
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Live Classes Table -->
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-white">
+
+            <h5 class="mb-0">
+
+                Scheduled Live Classes
+
+            </h5>
+
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle">
+
+                <thead class="table-light">
+
+                    <tr>
+
+                        <th>Thumbnail</th>
+
+                        <th>Title</th>
+
+                        <th>Course</th>
+
+                        <th>Platform</th>
+
+                        <th>Start</th>
+
+                        <th>Status</th>
+
+                        <th>Students</th>
+
+                        <th>Actions</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for live_class in live_classes %}
+
+                    <tr>
+
+                        <td width="100">
+
+                            {% if live_class.thumbnail %}
+
+                                <img src="{{ live_class.thumbnail.url }}"
+                                     class="rounded"
+                                     width="80">
+
+                            {% else %}
+
+                                <img src="{% static 'images/default-course.jpg' %}"
+                                     class="rounded"
+                                     width="80">
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            <strong>
+
+                                {{ live_class.title }}
+
+                            </strong>
+
+                        </td>
+
+                        <td>
+
+                            {{ live_class.course.title }}
+
+                        </td>
+
+                        <td>
+
+                            {{ live_class.get_platform_display }}
+
+                        </td>
+
+                        <td>
+
+                            {{ live_class.start_datetime }}
+
+                        </td>
+
+                        <td>
+
+                            {% if live_class.status == "upcoming" %}
+
+                                <span class="badge bg-primary">
+
+                                    Upcoming
+
+                                </span>
+
+                            {% elif live_class.status == "live" %}
+
+                                <span class="badge bg-success">
+
+                                    Live
+
+                                </span>
+
+                            {% elif live_class.status == "completed" %}
+
+                                <span class="badge bg-secondary">
+
+                                    Completed
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-danger">
+
+                                    Cancelled
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            {{ live_class.maximum_students }}
+
+                        </td>
+
+                        <td>
+
+                            <a href="{% url 'live_classes:live_class_detail' live_class.pk %}"
+                               class="btn btn-sm btn-info">
+
+                                View
+
+                            </a>
+
+                            <a href="{% url 'live_classes:live_class_update' live_class.pk %}"
+                               class="btn btn-sm btn-warning">
+
+                                Edit
+
+                            </a>
+
+                            <a href="{% url 'live_classes:live_class_delete' live_class.pk %}"
+                               class="btn btn-sm btn-danger">
+
+                                Delete
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+
+                        <td colspan="8" class="text-center py-5">
+
+                            <h5>No Live Classes Found</h5>
+
+                            <p class="text-muted">
+
+                                Schedule your first live class.
+
+                            </p>
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

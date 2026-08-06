@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Parent Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4" id="dashRoot">
+
+<!-- Welcome Banner -->
+<div class="card border-0 shadow-lg mb-4" style="border-radius:24px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);overflow:hidden;position:relative;">
+  <div style="position:absolute;right:-80px;top:-80px;width:320px;height:320px;border-radius:50%;background:rgba(255,255,255,.06);"></div>
+  <div style="position:absolute;right:80px;bottom:-100px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.04);"></div>
+  <div class="card-body p-4 p-lg-5" style="position:relative;z-index:2;">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <span class="badge rounded-pill mb-3 px-3 py-2" style="background:rgba(255,255,255,.15);color:#fff;font-size:.8rem;">
+          <i class="fas fa-user-friends me-1"></i> Parent Portal
+        </span>
+        <h1 class="fw-800 text-white mb-2" style="font-size:2rem;">
+          Welcome back, {{ request.user.first_name|default:request.user.username }}! 
+        </h1>
+        <p style="color:rgba(255,255,255,.8);font-size:1rem;margin-bottom:1.75rem;">
+          Monitor your child's learning progress, assignments, and achievements — all in one place.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="{% url 'courses:course_list' %}" class="btn px-4 py-2 fw-semibold" style="background:#fff;color:#667eea;border-radius:50px;border:none;">
+            <i class="fas fa-book-open me-2"></i>Browse Courses
+          </a>
+          <a href="#" class="btn px-4 py-2 fw-semibold" style="background:rgba(255,255,255,.15);color:#fff;border:2px solid rgba(255,255,255,.4);border-radius:50px;">
+            <i class="fas fa-chart-line me-2"></i>View Progress
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-4 text-center d-none d-lg-block">
+        {% if request.user.profile_picture %}
+          <img src="{{ request.user.profile_picture.url }}"
+               style="width:130px;height:130px;border-radius:50%;object-fit:cover;border:4px solid rgba(255,255,255,.4);box-shadow:0 10px 40px rgba(0,0,0,.2);">
+        {% else %}
+          <div style="width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.2);display:inline-flex;align-items:center;justify-content:center;font-size:3rem;color:#fff;border:4px solid rgba(255,255,255,.4);">
+            <i class="fas fa-user-friends"></i>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-4 mb-4">
+  <div class="col-xl-3 col-md-6">
+    <div class="card border-0 shadow stat-card" style="border-radius:20px;overflow:hidden;cursor:default;">
+      <div class="card-body p-4" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;position:relative;">
+        <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.12;"><i class="fas fa-child"></i></div>
+        <p class="mb-1" style="opacity:.85;font-size:.82rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Children</p>
+        <h2 class="fw-bold mb-0 counter" data-target="{{ children_count|default:0 }}">0</h2>
+        <small style="opacity:.7;">Linked to your account</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card border-0 shadow stat-card" style="border-radius:20px;overflow:hidden;">
+      <div class="card-body p-4" style="background:linear-gradient(135deg,#43e97b,#38f9d7);color:#fff;position:relative;">
+        <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.12;"><i class="fas fa-book-open"></i></div>
+        <p class="mb-1" style="opacity:.85;font-size:.82rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Enrolled Courses</p>
+        <h2 class="fw-bold mb-0 counter" data-target="{{ total_courses|default:0 }}">0</h2>
+        <small style="opacity:.7;">Active courses across children</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card border-0 shadow stat-card" style="border-radius:20px;overflow:hidden;">
+      <div class="card-body p-4" style="background:linear-gradient(135deg,#f7971e,#ffd200);color:#fff;position:relative;">
+        <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.12;"><i class="fas fa-tasks"></i></div>
+        <p class="mb-1" style="opacity:.85;font-size:.82rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Pending Tasks</p>
+        <h2 class="fw-bold mb-0 counter" data-target="{{ pending_tasks|default:0 }}">0</h2>
+        <small style="opacity:.7;">Assignments to complete</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card border-0 shadow stat-card" style="border-radius:20px;overflow:hidden;">
+      <div class="card-body p-4" style="background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff;position:relative;">
+        <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.12;"><i class="fas fa-trophy"></i></div>
+        <p class="mb-1" style="opacity:.85;font-size:.82rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Achievements</p>
+        <h2 class="fw-bold mb-0 counter" data-target="{{ achievements|default:0 }}">0</h2>
+        <small style="opacity:.7;">Badges earned</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main content row -->
+<div class="row g-4 mb-4">
+
+  <!-- Children overview -->
+  <div class="col-lg-8">
+    <div class="card border-0 shadow h-100" style="border-radius:20px;">
+      <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+        <h6 class="fw-bold mb-0"><i class="fas fa-child text-primary me-2"></i>My Children</h6>
+        <a href="#" class="btn btn-primary btn-sm rounded-pill px-3">
+          <i class="fas fa-plus me-1"></i>Add Child
+        </a>
+      </div>
+      <div class="card-body px-4 pb-4">
+        {% if children %}
+        <div class="row g-3">
+          {% for child in children %}
+          <div class="col-md-6">
+            <div class="child-card p-3 rounded" style="background:#f8f9ff;border:1px solid #e8eaf6;transition:all .3s;cursor:pointer;"
+                 onmouseenter="this.style.background='#f0f2ff';this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 25px rgba(102,126,234,.15)'"
+                 onmouseleave="this.style.background='#f8f9ff';this.style.transform='';this.style.boxShadow=''">
+              <div class="d-flex align-items-start gap-3">
+                <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem;flex-shrink:0;">
+                  <i class="fas fa-user"></i>
+                </div>
+                <div style="min-width:0;">
+                  <div class="fw-semibold text-truncate" style="font-size:.875rem;">{{ child.get_full_name|default:child.username }}</div>
+                  <small class="text-muted">{{ child.grade_level|default:"Grade not set" }}</small>
+                  <div class="d-flex gap-2 mt-1">
+                    <span class="badge bg-success" style="font-size:.7rem;">
+                      {{ child.enrollments.count }} courses
+                    </span>
+                    <span class="badge" style="background:#f0f2ff;color:#667eea;font-size:.7rem;">
+                      {{ child.average_grade|default:"N/A" }} avg
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <a href="#" class="btn btn-sm w-100 mt-2 rounded-pill" style="background:#f0f2ff;color:#667eea;border:none;font-size:.78rem;font-weight:600;">
+                View Progress <i class="fas fa-arrow-right ms-1"></i>
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+          <i class="fas fa-child fa-3x mb-3 d-block" style="opacity:.2;"></i>
+          <p>No children linked to your account yet.</p>
+          <a href="#" class="btn btn-primary rounded-pill px-4">
+            <i class="fas fa-plus me-2"></i>Add First Child
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right column: recent activity -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow" style="border-radius:20px;">
+      <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+        <h6 class="fw-bold mb-0"><i class="fas fa-clock text-danger me-2"></i>Recent Activity</h6>
+      </div>
+      <div class="card-body px-4 pb-4">
+        {% if recent_activities %}
+          {% for activity in recent_activities %}
+          <div class="d-flex align-items-center gap-3 mb-3 p-2 rounded" style="background:#f8f9ff;border:1px solid #e8eaf6;">
+            <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#43e97b,#38f9d7);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;flex-shrink:0;">
+              <i class="fas fa-check"></i>
+            </div>
+            <div style="min-width:0;flex:1;">
+              <div class="fw-semibold text-truncate" style="font-size:.85rem;">{{ activity.title }}</div>
+              <small class="text-muted">
+                <i class="fas fa-user me-1"></i>{{ activity.child }}
+              </small>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-center py-3 text-muted">
+            <i class="fas fa-history fa-2x mb-2 d-block" style="opacity:.2;"></i>
+            <small>No recent activity</small>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Upcoming assignments + quick actions -->
+<div class="row g-4">
+
+  <!-- Upcoming assignments -->
+  <div class="col-lg-7">
+    <div class="card border-0 shadow" style="border-radius:20px;">
+      <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+        <h6 class="fw-bold mb-0">
+          <i class="fas fa-tasks text-warning me-2"></i>Upcoming Assignments
+        </h6>
+        <a href="#" class="btn btn-sm btn-outline-warning rounded-pill px-3">View All</a>
+      </div>
+      <div class="card-body p-0">
+        {% if upcoming_assignments %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0 align-middle" style="border-radius:0 0 20px 20px;overflow:hidden;">
+            <thead class="table-light">
+              <tr>
+                <th class="px-4">Child</th>
+                <th>Assignment</th>
+                <th>Due Date</th>
+                <th class="text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for assignment in upcoming_assignments %}
+              <tr>
+                <td class="px-4">
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#43e97b,#38f9d7);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.75rem;font-weight:700;flex-shrink:0;">
+                      {{ assignment.child.first_name|first|upper }}
+                    </div>
+                    <span style="font-size:.85rem;font-weight:600;">{{ assignment.child.get_full_name|default:assignment.child.username }}</span>
+                  </div>
+                </td>
+                <td style="font-size:.82rem;">{{ assignment.title|truncatewords:6 }}</td>
+                <td><small class="text-muted">{{ assignment.due_date|date:"M d" }}</small></td>
+                <td class="text-center">
+                  <span class="badge rounded-pill {% if assignment.status == 'pending' %}bg-warning{% elif assignment.status == 'submitted' %}bg-info{% else %}bg-success{% endif %}" style="font-size:.7rem;">
+                    {{ assignment.status|title }}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+          <i class="fas fa-calendar-check fa-3x mb-2 d-block" style="color:#43e97b;opacity:.5;"></i>
+          <p class="mb-0">No upcoming assignments.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick actions -->
+  <div class="col-lg-5">
+    <div class="card border-0 shadow" style="border-radius:20px;">
+      <div class="card-header bg-white border-0 pt-4 px-4">
+        <h6 class="fw-bold mb-0"><i class="fas fa-bolt text-warning me-2"></i>Quick Actions</h6>
+      </div>
+      <div class="card-body px-4 pb-4">
+        <div class="row g-2">
+          <div class="col-6">
+            <a href="{% url 'courses:course_list' %}" class="d-block text-center p-3 rounded text-decoration-none" style="background:#f0f2ff;transition:all .3s;"
+               onmouseenter="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 20px rgba(0,0,0,.1)'"
+               onmouseleave="this.style.transform='';this.style.boxShadow=''">
+              <i class="fas fa-book fa-lg mb-1 d-block" style="color:#667eea;"></i>
+              <small class="fw-semibold" style="color:#667eea;font-size:.75rem;">Browse Courses</small>
+            </a>
+          </div>
+          <div class="col-6">
+            <a href="#" class="d-block text-center p-3 rounded text-decoration-none" style="background:#fff8f0;transition:all .3s;"
+               onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform=''">
+              <i class="fas fa-chart-bar fa-lg mb-1 d-block" style="color:#f7971e;"></i>
+              <small class="fw-semibold" style="color:#f7971e;font-size:.75rem;">Progress Report</small>
+            </a>
+          </div>
+          <div class="col-6">
+            <a href="#" class="d-block text-center p-3 rounded text-decoration-none" style="background:#f0fff4;transition:all .3s;"
+               onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform=''">
+              <i class="fas fa-calendar-alt fa-lg mb-1 d-block" style="color:#43e97b;"></i>
+              <small class="fw-semibold" style="color:#43e97b;font-size:.75rem;">Schedule</small>
+            </a>
+          </div>
+          <div class="col-6">
+            <a href="#" class="d-block text-center p-3 rounded text-decoration-none" style="background:#fff1f2;transition:all .3s;"
+               onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform=''">
+              <i class="fas fa-comments fa-lg mb-1 d-block" style="color:#f5576c;"></i>
+              <small class="fw-semibold" style="color:#f5576c;font-size:.75rem;">Messages</small>
+            </a>
+          </div>
+          <div class="col-6">
+            <a href="#" class="d-block text-center p-3 rounded text-decoration-none" style="background:#f8f0ff;transition:all .3s;"
+               onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform=''">
+              <i class="fas fa-file-alt fa-lg mb-1 d-block" style="color:#a78bfa;"></i>
+              <small class="fw-semibold" style="color:#a78bfa;font-size:.75rem;">Reports</small>
+            </a>
+          </div>
+          <div class="col-6">
+            <a href="#" class="d-block text-center p-3 rounded text-decoration-none" style="background:#f0f9ff;transition:all .3s;"
+               onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform=''">
+              <i class="fas fa-cog fa-lg mb-1 d-block" style="color:#4facfe;"></i>
+              <small class="fw-semibold" style="color:#4facfe;font-size:.75rem;">Settings</small>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,248 @@
+/* ========================================
+   DOCUMENTS APP
+======================================== */
+
+body{
+    background:#f8f9fa;
+}
+
+/* ===========================
+   Cards
+=========================== */
+
+.card{
+    border:none;
+    border-radius:15px;
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 10px 25px rgba(0,0,0,.12);
+}
+
+.card-header{
+    font-weight:600;
+}
+
+/* ===========================
+   Buttons
+=========================== */
+
+.btn{
+    border-radius:8px;
+    transition:.3s;
+}
+
+.btn:hover{
+    transform:translateY(-2px);
+}
+
+/* ===========================
+   Tables
+=========================== */
+
+.table th{
+    font-weight:600;
+    background:#f8f9fa;
+}
+
+.table td{
+    vertical-align:middle;
+}
+
+.table-hover tbody tr:hover{
+    background:#f7fbff;
+}
+
+/* ===========================
+   File Icons
+=========================== */
+
+.fa-file,
+.fa-file-pdf,
+.fa-file-word,
+.fa-file-powerpoint,
+.fa-file-excel,
+.fa-file-archive{
+    transition:.3s;
+}
+
+.card:hover .fa-file,
+.card:hover .fa-file-pdf,
+.card:hover .fa-file-word,
+.card:hover .fa-file-powerpoint,
+.card:hover .fa-file-excel,
+.card:hover .fa-file-archive{
+    transform:scale(1.1);
+}
+
+/* ===========================
+   Forms
+=========================== */
+
+.form-control,
+.form-select{
+
+    border-radius:8px;
+
+}
+
+.form-control:focus,
+.form-select:focus{
+
+    border-color:#0d6efd;
+
+    box-shadow:0 0 0 .2rem rgba(13,110,253,.15);
+
+}
+
+/* ===========================
+   Search
+=========================== */
+
+#documentSearch{
+
+    max-width:350px;
+
+    margin-left:auto;
+
+}
+
+/* ===========================
+   Statistics Cards
+=========================== */
+
+.card h2{
+
+    font-weight:700;
+
+}
+
+/* ===========================
+   Badges
+=========================== */
+
+.badge{
+
+    padding:8px 12px;
+
+    font-size:.8rem;
+
+}
+
+/* ===========================
+   Alerts
+=========================== */
+
+.alert{
+
+    border-radius:10px;
+
+}
+
+/* ===========================
+   Tables Responsive
+=========================== */
+
+.table-responsive{
+
+    overflow-x:auto;
+
+}
+
+/* ===========================
+   Empty State
+=========================== */
+
+.empty-state{
+
+    text-align:center;
+
+    padding:60px 20px;
+
+}
+
+.empty-state i{
+
+    font-size:70px;
+
+    color:#adb5bd;
+
+}
+
+/* ===========================
+   File Information Box
+=========================== */
+
+.file-info{
+
+    background:#f8f9fa;
+
+    border-left:5px solid #0d6efd;
+
+    padding:15px;
+
+    border-radius:10px;
+
+}
+
+/* ===========================
+   Delete Page
+=========================== */
+
+.delete-form{
+
+    margin-top:20px;
+
+}
+
+/* ===========================
+   Footer Buttons
+=========================== */
+
+.btn-group .btn{
+
+    margin-right:3px;
+
+}
+
+/* ===========================
+   Mobile
+=========================== */
+
+@media (max-width:768px){
+
+    .btn-group{
+
+        display:flex;
+
+        flex-direction:column;
+
+        width:100%;
+
+    }
+
+    .btn-group .btn{
+
+        margin-bottom:5px;
+
+        width:100%;
+
+    }
+
+    #documentSearch{
+
+        max-width:100%;
+
+        margin-top:15px;
+
+    }
+
+    .card-body{
+
+        padding:1rem;
+
+    }
+
+}

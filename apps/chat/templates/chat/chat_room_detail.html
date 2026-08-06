@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}{{ chat_room.name|default:"Chat Room" }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ chat_room.name|default:"Chat Room" }}</h1>
+    <div class="card">
+        <div class="card-body">
+            <div class="chat-messages" style="height: 400px; overflow-y: scroll; border: 1px solid #ddd; padding: 10px; margin-bottom: 20px;">
+                {% for message in messages %}
+                <div class="message mb-2">
+                    <strong>{{ message.sender.username }}:</strong>
+                    <span>{{ message.content }}</span>
+                    <small class="text-muted">{{ message.created_at|date:"H:i" }}</small>
+                </div>
+                {% empty %}
+                <p>No messages yet.</p>
+                {% endfor %}
+            </div>
+            <form action="{% url 'chat:send_message' chat_room.pk %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ form.content }}
+                </div>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+            </form>
+        </div>
+    </div>
+    <a href="{% url 'chat:chat_room_list' %}" class="btn btn-secondary mt-3">Back to Chat Rooms</a>
+</div>
+{% endblock %}

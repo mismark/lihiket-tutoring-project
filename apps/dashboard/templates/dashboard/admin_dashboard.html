@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="container-fluid py-4" id="dashRoot" style="opacity:0;transform:translateY(20px);transition:all .6s ease;">
+
+  <!-- Welcome -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-0">Welcome back, {{ request.user.first_name|default:request.user.username }} </h2>
+      <p class="text-muted mb-0">Here's what's happening on your platform today.</p>
+    </div>
+    <a href="/admin/" class="btn btn-dark rounded-pill px-4">
+      <i class="fas fa-cog me-2"></i>Django Admin
+    </a>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="row g-4 mb-4">
+    {% for stat in stats %}
+    <div class="col-xl-3 col-md-6">
+      <div class="card border-0 shadow stat-card-anim" style="border-radius:20px;overflow:hidden;">
+        <div class="card-body p-4" style="background:{{ stat.bg }};color:#fff;position:relative;">
+          <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.12;">
+            <i class="{{ stat.icon }}"></i>
+          </div>
+          <p class="mb-1 fw-600" style="opacity:.85;font-size:.85rem;">{{ stat.label }}</p>
+          <h2 class="fw-800 mb-0 counter" data-target="{{ stat.value }}">0</h2>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    <!-- Fallback static cards if no context -->
+    <div class="col-xl-3 col-md-6">
+      <div class="card border-0 shadow stat-card-anim" style="border-radius:20px;overflow:hidden;">
+        <div class="card-body p-4" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;position:relative;">
+          <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.12;"><i class="fas fa-user-graduate"></i></div>
+          <p class="mb-1" style="opacity:.85;font-size:.85rem;">Total Students</p>
+          <h2 class="fw-bold mb-0 counter" data-target="{{ total_students }}">0</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="card border-0 shadow stat-card-anim" style="border-radius:20px;overflow:hidden;">
+        <div class="card-body p-4" style="background:linear-gradient(135deg,#43e97b,#38f9d7);color:#fff;position:relative;">
+          <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.12;"><i class="fas fa-chalkboard-teacher"></i></div>
+          <p class="mb-1" style="opacity:.85;font-size:.85rem;">Total Teachers</p>
+          <h2 class="fw-bold mb-0 counter" data-target="{{ total_teachers }}">0</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="card border-0 shadow stat-card-anim" style="border-radius:20px;overflow:hidden;">
+        <div class="card-body p-4" style="background:linear-gradient(135deg,#f7971e,#ffd200);color:#fff;position:relative;">
+          <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.12;"><i class="fas fa-book-open"></i></div>
+          <p class="mb-1" style="opacity:.85;font-size:.85rem;">Total Courses</p>
+          <h2 class="fw-bold mb-0 counter" data-target="{{ total_courses }}">0</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="card border-0 shadow stat-card-anim" style="border-radius:20px;overflow:hidden;">
+        <div class="card-body p-4" style="background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff;position:relative;">
+          <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.12;"><i class="fas fa-users"></i></div>
+          <p class="mb-1" style="opacity:.85;font-size:.85rem;">Total Enrollments</p>
+          <h2 class="fw-bold mb-0 counter" data-target="{{ total_enrollments }}">0</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Course stats + Quick actions -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-4">
+      <div class="card border-0 shadow h-100" style="border-radius:20px;">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+          <h6 class="fw-bold mb-0"><i class="fas fa-chart-pie text-primary me-2"></i>Course Status</h6>
+        </div>
+        <div class="card-body px-4 pb-4">
+          <canvas id="courseChart" height="200"></canvas>
+          <div class="row text-center mt-3">
+            <div class="col-6">
+              <div class="p-2 rounded" style="background:#f0f2ff;">
+                <div class="fw-bold text-primary">{{ published_courses }}</div>
+                <small class="text-muted">Published</small>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-2 rounded" style="background:#fff8f0;">
+                <div class="fw-bold text-warning">{{ draft_courses }}</div>
+                <small class="text-muted">Draft</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card border-0 shadow h-100" style="border-radius:20px;">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+          <h6 class="fw-bold mb-0"><i class="fas fa-bolt text-warning me-2"></i>Quick Actions</h6>
+        </div>
+        <div class="card-body px-4 pb-4">
+          <div class="d-grid gap-2">
+            <a href="{% url 'subjects:subject_create' %}" class="btn btn-primary rounded-pill"><i class="fas fa-plus me-2"></i>Add Subject</a>
+            <a href="{% url 'courses:course_create' %}" class="btn btn-success rounded-pill"><i class="fas fa-book me-2"></i>Create Course</a>
+            <a href="{% url 'lessons:lesson_create' %}" class="btn btn-warning rounded-pill"><i class="fas fa-play me-2"></i>Add Lesson</a>
+            <a href="{% url 'live_classes:live_class_create' %}" class="btn btn-danger rounded-pill"><i class="fas fa-video me-2"></i>Schedule Live Class</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card border-0 shadow h-100" style="border-radius:20px;">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+          <h6 class="fw-bold mb-0"><i class="fas fa-video text-danger me-2"></i>Live Now</h6>
+        </div>
+        <div class="card-body px-4 pb-4">
+          {% if live_now %}
+            {% for lc in live_now %}
+            <div class="d-flex align-items-center gap-3 p-2 rounded mb-2" style="background:#fff1f2;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#f5576c;animation:pulse 1.5s infinite;"></div>
+              <div>
+                <div class="fw-semibold" style="font-size:.85rem;">{{ lc.title }}</div>
+                <small class="text-muted">{{ lc.course.title }}</small>
+              </div>
+              <a href="{% url 'live_classes:join_live_class' lc.pk %}" class="btn btn-danger btn-sm ms-auto rounded-pill">Join</a>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="text-center py-4 text-muted">
+              <i class="fas fa-video fa-2x mb-2 d-block" style="opacity:.3;"></i>
+              No live classes right now
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent users + courses -->
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="card border-0 shadow" style="border-radius:20px;">
+        <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+          <h6 class="fw-bold mb-0"><i class="fas fa-users text-primary me-2"></i>Recent Users</h6>
+        </div>
+        <div class="card-body p-0">
+          <ul class="list-group list-group-flush" style="border-radius:0 0 20px 20px;">
+            {% for u in recent_users %}
+            <li class="list-group-item border-0 px-4 py-3 d-flex align-items-center gap-3">
+              <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem;flex-shrink:0;">
+                {{ u.first_name|first|upper }}{{ u.last_name|first|upper }}
+              </div>
+              <div>
+                <div class="fw-semibold" style="font-size:.875rem;">{{ u.get_full_name|default:u.username }}</div>
+                <small class="text-muted">{{ u.role|title }} · {{ u.date_joined|date:"M d" }}</small>
+              </div>
+              <span class="badge ms-auto
+                {% if u.role == 'student' %}bg-success
+                {% elif u.role == 'teacher' %}bg-primary
+                {% elif u.role == 'admin' %}bg-danger
+                {% else %}bg-warning text-dark{% endif %}">
+                {{ u.role|title }}
+              </span>
+            </li>
+            {% empty %}
+            <li class="list-group-item text-muted text-center py-4">No users yet.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card border-0 shadow" style="border-radius:20px;">
+        <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+          <h6 class="fw-bold mb-0"><i class="fas fa-book-open text-success me-2"></i>Recent Courses</h6>
+          <a href="{% url 'courses:course_list' %}" class="btn btn-sm btn-outline-primary rounded-pill">View All</a>
+        </div>
+        <div class="card-body p-0">
+          <ul class="list-group list-group-flush" style="border-radius:0 0 20px 20px;">
+            {% for c in recent_courses %}
+            <li class="list-group-item border-0 px-4 py-3 d-flex align-items-center gap-3">
+              <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#43e97b,#38f9d7);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;flex-shrink:0;">
+                <i class="fas fa-book"></i>
+              </div>
+              <div>
+                <div class="fw-semibold" style="font-size:.875rem;">{{ c.title }}</div>
+                <small class="text-muted">{{ c.teacher.get_full_name|default:c.teacher.username }}</small>
+              </div>
+              <span class="badge ms-auto {% if c.status == 'published' %}bg-success{% else %}bg-secondary{% endif %}">
+                {{ c.get_status_display }}
+              </span>
+            </li>
+            {% empty %}
+            <li class="list-group-item text-muted text-center py-4">No courses yet.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Animate in
+document.addEventListener('DOMContentLoaded', function () {
+  var root = document.getElementById('dashRoot');
+  setTimeout(function () {
+    root.style.opacity = '1';
+    root.style.transform = 'translateY(0)';
+  }, 100);
+
+  // Counter animation
+  document.querySelectorAll('.counter').forEach(function (el) {
+    var target = parseInt(el.dataset.target) || 0;
+    var duration = 1200;
+    var start = null;
+    function step(ts) {
+      if (!start) start = ts;
+      var progress = Math.min((ts - start) / duration, 1);
+      el.textContent = Math.floor(progress * target);
+      if (progress < 1) requestAnimationFrame(step);
+      else el.textContent = target;
+    }
+    requestAnimationFrame(step);
+  });
+
+  // Stagger stat cards
+  document.querySelectorAll('.stat-card-anim').forEach(function (el, i) {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(30px)';
+    el.style.transition = 'all .5s ease';
+    setTimeout(function () {
+      el.style.opacity = '1';
+      el.style.transform = 'translateY(0)';
+    }, 150 + i * 80);
+  });
+
+  // Donut chart
+  var ctx = document.getElementById('courseChart');
+  if (ctx) {
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Published', 'Draft', 'Subjects'],
+        datasets: [{
+          data: [{{ published_courses }}, {{ draft_courses }}, {{ total_subjects }}],
+          backgroundColor: ['#667eea', '#f7971e', '#43e97b'],
+          borderWidth: 0,
+          hoverOffset: 8
+        }]
+      },
+      options: {
+        cutout: '70%',
+        plugins: { legend: { position: 'bottom', labels: { padding: 15, font: { family: 'Poppins', size: 11 } } } }
+      }
+    });
+  }
+});
+
+// Pulse animation for live dot
+var style = document.createElement('style');
+style.textContent = '@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(245,87,108,.5)}70%{box-shadow:0 0 0 8px rgba(245,87,108,0)}}';
+document.head.appendChild(style);
+</script>
+{% endblock %}

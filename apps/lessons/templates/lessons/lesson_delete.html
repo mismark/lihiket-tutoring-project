@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'lessons/css/lessons.css' %}">
+
+
+{% block title %}Delete Lesson{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-lg">
+
+                <div class="card-header bg-danger text-white">
+
+                    <h3 class="mb-0">
+
+                        <i class="fas fa-trash-alt"></i>
+
+                        Delete Lesson
+
+                    </h3>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="text-center mb-4">
+
+                        {% if lesson.thumbnail %}
+
+                            <img src="{{ lesson.thumbnail.url }}"
+                                 class="img-fluid rounded shadow"
+                                 style="max-height:250px;">
+
+                        {% else %}
+
+                            <img src="{% static 'images/default-course.jpg' %}"
+                                 class="img-fluid rounded shadow"
+                                 style="max-height:250px;">
+
+                        {% endif %}
+
+                    </div>
+
+                    <div class="alert alert-danger">
+
+                        <h4>
+
+                            Are you sure?
+
+                        </h4>
+
+                        <p class="mb-0">
+
+                            You are about to permanently delete this lesson.
+
+                            <strong>This action cannot be undone.</strong>
+
+                        </p>
+
+                    </div>
+
+                    <table class="table table-bordered">
+
+                        <tbody>
+
+                            <tr>
+
+                                <th width="30%">Lesson</th>
+
+                                <td>{{ lesson.title }}</td>
+
+                            </tr>
+
+                            <tr>
+
+                                <th>Course</th>
+
+                                <td>{{ lesson.course.title }}</td>
+
+                            </tr>
+
+                            <tr>
+
+                                <th>Duration</th>
+
+                                <td>{{ lesson.duration }}</td>
+
+                            </tr>
+
+                            <tr>
+
+                                <th>Order</th>
+
+                                <td>{{ lesson.lesson_order }}</td>
+
+                            </tr>
+
+                            <tr>
+
+                                <th>Status</th>
+
+                                <td>
+
+                                    {% if lesson.status == "published" %}
+
+                                        <span class="badge bg-success">
+
+                                            Published
+
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-secondary">
+
+                                            Draft
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                            </tr>
+
+                            <tr>
+
+                                <th>Preview</th>
+
+                                <td>
+
+                                    {% if lesson.is_preview %}
+
+                                        <span class="badge bg-info">
+
+                                            Yes
+
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-dark">
+
+                                            No
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+
+                            <a href="{% url 'lessons:lesson_detail' lesson.slug %}"
+                               class="btn btn-secondary">
+
+                                <i class="fas fa-arrow-left"></i>
+
+                                Cancel
+
+                            </a>
+
+                            <button
+                                type="submit"
+                                class="btn btn-danger">
+
+                                <i class="fas fa-trash"></i>
+
+                                Delete Lesson
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="{% static 'lessons/js/lessons.js' %}" defer></script>
+
+{% endblock %}

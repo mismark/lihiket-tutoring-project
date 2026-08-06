@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Upcoming Live Classes{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- Header -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold">
+
+                <i class="fas fa-calendar-alt text-primary"></i>
+
+                Upcoming Live Classes
+
+            </h2>
+
+            <p class="text-muted">
+
+                Stay updated with your upcoming live sessions.
+
+            </p>
+
+        </div>
+
+        <a href="{% url 'live_classes:live_class_list' %}"
+           class="btn btn-outline-primary">
+
+            <i class="fas fa-video"></i>
+
+            All Live Classes
+
+        </a>
+
+    </div>
+
+    <!-- Statistics -->
+
+    <div class="row mb-4">
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body text-center">
+
+                    <h2 class="text-primary">
+
+                        {{ live_classes.count }}
+
+                    </h2>
+
+                    <p class="mb-0">
+
+                        Upcoming Classes
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body text-center">
+
+                    <h2 class="text-success">
+
+                        {{ request.user.first_name|default:request.user.username }}
+
+                    </h2>
+
+                    <p class="mb-0">
+
+                        Welcome Back
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body text-center">
+
+                    <h2 class="text-warning">
+
+                        {{ request.user.role|title }}
+
+                    </h2>
+
+                    <p class="mb-0">
+
+                        Account Type
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Live Classes -->
+
+    <div class="row">
+
+        {% for live_class in live_classes %}
+
+        <div class="col-lg-4 col-md-6 mb-4">
+
+            <div class="card h-100 shadow border-0">
+
+                {% if live_class.thumbnail %}
+
+                    <img src="{{ live_class.thumbnail.url }}"
+                         class="card-img-top"
+                         style="height:220px;object-fit:cover;">
+
+                {% else %}
+
+                    <img src="{% static 'images/default-course.jpg' %}"
+                         class="card-img-top"
+                         style="height:220px;object-fit:cover;">
+
+                {% endif %}
+
+                <div class="card-body">
+
+                    <h5 class="fw-bold">
+
+                        {{ live_class.title }}
+
+                    </h5>
+
+                    <hr>
+
+                    <p>
+
+                        <strong>Course</strong><br>
+
+                        {{ live_class.course.title }}
+
+                    </p>
+
+                    <p>
+
+                        <strong>Teacher</strong><br>
+
+                        {{ live_class.teacher.get_full_name|default:live_class.teacher.username }}
+
+                    </p>
+
+                    <p>
+
+                        <strong>Platform</strong><br>
+
+                        {{ live_class.get_platform_display }}
+
+                    </p>
+
+                    <p>
+
+                        <strong>Starts</strong><br>
+
+                        {{ live_class.start_datetime }}
+
+                    </p>
+
+                    <p>
+
+                        <strong>Duration</strong><br>
+
+                        {{ live_class.duration }} Minutes
+
+                    </p>
+
+                    <span class="badge bg-primary">
+
+                        Upcoming
+
+                    </span>
+
+                </div>
+
+                <div class="card-footer bg-white">
+
+                    <div class="d-grid gap-2">
+
+                        <a href="{% url 'live_classes:live_class_detail' live_class.pk %}"
+                           class="btn btn-outline-primary">
+
+                            <i class="fas fa-eye"></i>
+
+                            View Details
+
+                        </a>
+
+                        <a href="{% url 'live_classes:join_live_class' live_class.pk %}"
+                           class="btn btn-success">
+
+                            <i class="fas fa-video"></i>
+
+                            Join Class
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <div class="col-12">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body text-center py-5">
+
+                    <i class="fas fa-calendar-times fa-5x text-muted mb-3"></i>
+
+                    <h3>
+
+                        No Upcoming Live Classes
+
+                    </h3>
+
+                    <p class="text-muted">
+
+                        There are currently no scheduled live classes.
+
+                    </p>
+
+                    <a href="{% url 'live_classes:live_class_list' %}"
+                       class="btn btn-primary">
+
+                        Browse Live Classes
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

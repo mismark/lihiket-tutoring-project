@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ subject.name }}{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'subjects:subject_list' %}">Subjects</a></li>
+      <li class="breadcrumb-item active">{{ subject.name }}</li>
+    </ol>
+  </nav>
+
+  <!-- Subject Header Card -->
+  <div class="card shadow-lg border-0 mb-4">
+    <div class="row g-0">
+
+      <div class="col-lg-4">
+        {% if subject.image %}
+          <img src="{{ subject.image.url }}" class="img-fluid rounded-start w-100"
+               style="height:350px;object-fit:cover;">
+        {% else %}
+          <div class="d-flex align-items-center justify-content-center rounded-start w-100"
+               style="height:350px;background:{{ subject.color }}22;">
+            <i class="{{ subject.icon }} fa-6x" style="color:{{ subject.color }};"></i>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="col-lg-8">
+        <div class="card-body p-4">
+
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h2 class="fw-bold">
+              <i class="{{ subject.icon }}" style="color:{{ subject.color }};"></i>
+              {{ subject.name }}
+            </h2>
+            {% if subject.is_active %}
+              <span class="badge bg-success fs-6">Active</span>
+            {% else %}
+              <span class="badge bg-secondary fs-6">Inactive</span>
+            {% endif %}
+          </div>
+
+          <span class="badge fs-6 mb-3" style="background:{{ subject.color }};">
+            {{ subject.get_grade_level_display }}
+          </span>
+
+          <p class="text-muted">
+            {{ subject.description|default:"No description available." }}
+          </p>
+
+          <div class="row mt-3">
+            <div class="col-md-6">
+              <p><strong>Subject Code</strong><br>{{ subject.code }}</p>
+              <p>
+                <strong>Teachers</strong><br>
+                {% with teachers=subject.teachers.all %}
+                  {% if teachers %}
+                    {% for t in teachers %}
+                      <span class="badge bg-light text-dark border me-1">
+                        {{ t.get_full_name|default:t.username }}
+                      </span>
+                    {% endfor %}
+                  {% else %}
+                    <span class="text-muted">Not assigned</span>
+                  {% endif %}
+                {% endwith %}
+              </p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Created</strong><br>{{ subject.created_at|date:"F d, Y" }}</p>
+              <p><strong>Last Updated</strong><br>{{ subject.updated_at|date:"F d, Y" }}</p>
+            </div>
+          </div>
+
+          <hr>
+
+          <div class="d-flex flex-wrap gap-2">
+            {% if user_is_admin %}
+              <a href="{% url 'subjects:subject_update' subject.slug %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Edit
+              </a>
+              <a href="{% url 'subjects:subject_delete' subject.slug %}" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Delete
+              </a>
+            {% endif %}
+            <a href="{% url 'subjects:subject_list' %}" class="btn btn-secondary">
+              <i class="fas fa-arrow-left"></i> Back
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 text-center p-3">
+        <i class="fas fa-book fa-3x text-primary mb-2"></i>
+        <h3>{{ courses.count }}</h3>
+        <p class="mb-0">Courses</p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 text-center p-3">
+        <i class="fas fa-chalkboard-teacher fa-3x text-success mb-2"></i>
+        <h3>{{ subject.teachers.count }}</h3>
+        <p class="mb-0">Teachers</p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 text-center p-3">
+        <i class="fas fa-user-graduate fa-3x text-info mb-2"></i>
+        <h3>0</h3>
+        <p class="mb-0">Students</p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 text-center p-3">
+        <i class="fas fa-file-alt fa-3x text-warning mb-2"></i>
+        <h3>0</h3>
+        <p class="mb-0">Assignments</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Courses under this subject -->
+  <div class="card shadow-sm border-0 mt-2">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">
+        <i class="fas fa-book-open text-primary"></i>
+        Courses Under This Subject
+      </h5>
+      {% if is_teacher or user_is_admin %}
+        <a href="{% url 'courses:course_create' %}" class="btn btn-primary btn-sm">
+          <i class="fas fa-plus-circle"></i> Add Course
+        </a>
+      {% endif %}
+    </div>
+
+    <div class="card-body">
+
+      {% if courses %}
+      <div class="row">
+        {% for course in courses %}
+        <div class="col-md-6 col-xl-4 mb-4">
+          <div class="card h-100 border-0 shadow-sm">
+
+            {% if course.thumbnail %}
+              <img src="{{ course.thumbnail.url }}"
+                   class="card-img-top"
+                   style="height:160px;object-fit:cover;">
+            {% else %}
+              <div class="card-img-top d-flex align-items-center justify-content-center"
+                   style="height:160px;background:#f0f4ff;">
+                <i class="fas fa-book fa-3x text-primary"></i>
+              </div>
+            {% endif %}
+
+            <div class="card-body">
+
+              <div class="d-flex justify-content-between align-items-start mb-1">
+                <h6 class="fw-bold mb-0">{{ course.title }}</h6>
+                {% if course.status == "published" %}
+                  <span class="badge bg-success">Published</span>
+                {% else %}
+                  <span class="badge bg-secondary">Draft</span>
+                {% endif %}
+              </div>
+
+              <p class="text-muted small mb-2">
+                {{ course.description|truncatewords:15 }}
+              </p>
+
+              <div class="d-flex gap-2 flex-wrap mb-2">
+                <span class="badge bg-light text-dark border">
+                  <i class="fas fa-signal"></i> {{ course.get_level_display }}
+                </span>
+                {% if course.price == 0 %}
+                  <span class="badge bg-success">Free</span>
+                {% else %}
+                  <span class="badge bg-info text-dark">${{ course.price }}</span>
+                {% endif %}
+              </div>
+
+              <p class="small text-muted mb-0">
+                <i class="fas fa-chalkboard-teacher"></i>
+                {{ course.teacher.get_full_name|default:course.teacher.username }}
+              </p>
+
+              {% with doc_count=course.documents.count %}
+              {% if doc_count %}
+              <p class="small mb-0 mt-1">
+                <i class="fas fa-folder-open text-warning"></i>
+                <span class="text-muted">{{ doc_count }} document{{ doc_count|pluralize }}</span>
+              </p>
+              {% endif %}
+              {% endwith %}
+
+            </div>
+
+            <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+
+              <a href="{% url 'courses:course_detail' course.pk %}"
+                 class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-eye"></i> View
+              </a>
+
+              {% if is_teacher or user_is_admin %}
+                <div class="btn-group btn-group-sm">
+                  <a href="{% url 'courses:course_update' course.pk %}"
+                     class="btn btn-outline-warning">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <a href="{% url 'courses:course_delete' course.pk %}"
+                     class="btn btn-outline-danger">
+                    <i class="fas fa-trash"></i>
+                  </a>
+                </div>
+              {% endif %}
+
+              {% if request.user.role == "student" %}
+                {% if course.pk in enrolled_course_ids %}
+                  <span class="badge bg-success">
+                    <i class="fas fa-check"></i> Enrolled
+                  </span>
+                {% else %}
+                  <a href="{% url 'courses:enroll_course' course.pk %}"
+                     class="btn btn-success btn-sm">
+                    <i class="fas fa-user-plus"></i> Enroll
+                  </a>
+                {% endif %}
+              {% endif %}
+
+            </div>
+
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      {% else %}
+      <div class="text-center py-4 text-muted">
+        <i class="fas fa-book-open fa-3x mb-3 d-block"></i>
+        <p class="mb-0">No courses yet for this subject.</p>
+        {% if is_teacher or user_is_admin %}
+          <a href="{% url 'courses:course_create' %}" class="btn btn-primary mt-3">
+            <i class="fas fa-plus-circle"></i> Create First Course
+          </a>
+        {% endif %}
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

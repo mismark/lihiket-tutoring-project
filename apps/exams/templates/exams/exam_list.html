@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Exams{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold"><i class="fas fa-file-alt text-danger"></i> Exams</h2>
+      <p class="text-muted mb-0">Scheduled exams for your courses.</p>
+    </div>
+    {% if request.user.role == "teacher" or request.user.role == "admin" or request.user.is_superuser %}
+    <a href="{% url 'exams:exam_create' %}" class="btn btn-danger">
+      <i class="fas fa-plus-circle"></i> Create Exam
+    </a>
+    {% endif %}
+  </div>
+
+  {% if messages %}
+    {% for m in messages %}<div class="alert alert-{{ m.tags }}">{{ m }}</div>{% endfor %}
+  {% endif %}
+
+  {% if exams %}
+  <div class="row">
+    {% for exam in exams %}
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-header d-flex justify-content-between align-items-center
+          {% if exam.is_active %}bg-white{% else %}bg-light{% endif %}">
+          <h6 class="fw-bold mb-0">{{ exam.title }}</h6>
+          {% if request.user.role == "student" %}
+            {% if exam.my_attempt and exam.my_attempt.submitted_at %}
+              <span class="badge {% if exam.my_attempt.passed %}bg-success{% else %}bg-danger{% endif %}">
+                {{ exam.my_attempt.percentage|floatformat:1 }}%
+                {% if exam.my_attempt.passed %}Passed{% else %}Failed{% endif %}
+              </span>
+            {% elif exam.is_open %}
+              <span class="badge bg-success">Open Now</span>
+            {% elif exam.is_upcoming %}
+              <span class="badge bg-warning text-dark">Upcoming</span>
+            {% else %}
+              <span class="badge bg-secondary">Ended</span>
+            {% endif %}
+          {% else %}
+            {% if exam.is_active %}<span class="badge bg-success">Active</span>
+            {% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}
+          {% endif %}
+        </div>
+        <div class="card-body">
+          <p class="text-muted small mb-2">
+            <i class="fas fa-book"></i> {{ exam.course.title }}
+          </p>
+          {% if exam.description %}
+            <p class="text-muted small">{{ exam.description|truncatewords:15 }}</p>
+          {% endif %}
+          <div class="d-flex flex-wrap gap-2 mb-2">
+            <span class="badge bg-light text-dark border">
+              <i class="fas fa-clock text-muted"></i> {{ exam.duration }} min
+            </span>
+            <span class="badge bg-light text-dark border">
+              <i class="fas fa-check-circle text-muted"></i> Pass: {{ exam.passing_score }}%
+            </span>
+            <span class="badge bg-light text-dark border">
+              <i class="fas fa-question-circle text-muted"></i> {{ exam.questions.count }} questions
+            </span>
+          </div>
+          <p class="small mb-0 text-muted">
+            <i class="fas fa-calendar-alt"></i>
+            {{ exam.start_time|date:"M d, Y H:i" }} → {{ exam.end_time|date:"M d, Y H:i" }}
+          </p>
+        </div>
+        <div class="card-footer bg-white d-flex gap-2">
+          <a href="{% url 'exams:exam_detail' exam.pk %}" class="btn btn-outline-primary btn-sm">
+            <i class="fas fa-eye"></i> View
+          </a>
+          {% if request.user.role == "student" %}
+            {% if exam.my_attempt and exam.my_attempt.submitted_at %}
+              <a href="{% url 'exams:exam_result' exam.my_attempt.pk %}" class="btn btn-success btn-sm">
+                <i class="fas fa-chart-bar"></i> Result
+              </a>
+            {% elif exam.is_open %}
+              <a href="{% url 'exams:take_exam' exam.pk %}" class="btn btn-danger btn-sm">
+                <i class="fas fa-play"></i> Start Exam
+              </a>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="alert alert-info text-center py-5">
+    <i class="fas fa-file-alt fa-3x mb-3 d-block"></i>
+    <h5>No exams found.</h5>
+    {% if request.user.role in "teacher admin" %}
+      <a href="{% url 'exams:exam_create' %}" class="btn btn-danger mt-2">Create First Exam</a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

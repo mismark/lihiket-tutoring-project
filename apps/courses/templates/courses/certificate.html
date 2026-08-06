@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Certificate
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet"
+href="{% static 'css/certificate.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5 mb-5">
+
+<div class="certificate">
+
+<div class="text-center">
+
+<img
+src="{% static 'images/logo.png' %}"
+class="logo">
+
+<h5 class="mt-3">
+ONLINE TUTORING ACADEMY
+</h5>
+
+<h1 class="title">
+Certificate of Completion
+</h1>
+
+<p class="subtitle">
+This certifies that
+</p>
+
+<h1 class="student">
+{{ request.user.get_full_name|default:request.user.username }}
+</h1>
+
+<p class="subtitle">
+has successfully completed
+</p>
+
+<h2 class="course">
+{{ course.title }}
+</h2>
+
+<hr>
+
+<p>
+
+<strong>Certificate Number</strong>
+
+<br>
+
+{{ certificate.certificate_number }}
+
+</p>
+
+<p>
+
+<strong>Completion Date</strong>
+
+<br>
+
+{{ certificate.issued_at|date:"F d, Y" }}
+
+</p>
+
+<img
+src="{{ qr_code }}"
+class="qrcode">
+
+<p>
+
+Scan to verify this certificate
+
+</p>
+
+</div>
+
+<div class="row footer-line">
+
+<div class="col text-center">
+
+<img
+src="{% static 'images/signature.png' %}"
+class="signature">
+
+<hr>
+
+Instructor
+
+</div>
+
+<div class="col text-center">
+
+<img
+src="{% static 'images/seal.png' %}"
+class="seal">
+
+<hr>
+
+Official Seal
+
+</div>
+
+</div>
+
+<div class="text-center mt-5">
+
+<a
+href="{% url 'courses:download_certificate' course.pk %}"
+class="btn btn-success">
+
+Download PDF
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

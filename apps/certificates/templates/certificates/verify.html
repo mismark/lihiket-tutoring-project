@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+
+<div class="container mt-5">
+
+
+<div class="card shadow p-5">
+
+
+<h2 class="text-success">
+
+Certificate Verified
+
+</h2>
+
+
+<hr>
+
+
+<h4>
+
+Student:
+
+{{certificate.student.username}}
+
+</h4>
+
+
+
+<h4>
+
+Course:
+
+{{certificate.course.title}}
+
+</h4>
+
+
+
+<p>
+
+Certificate ID:
+
+{{certificate.id}}
+
+</p>
+
+
+
+<p>
+
+Issued Date:
+
+{{certificate.issue_date}}
+
+</p>
+
+
+
+</div>
+
+
+</div>
+
+
+{% endblock %}
