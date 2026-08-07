@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'dashboard/css/student_list.css' %} ">
+{% endblock  %}
+
+{% block content %}
+
+<div class = "table-card">
+
+    <h1>Parent lists  </h1>
+
+
+    <form method = "GET" >
+        <input type="text" name="search" placeholder="search by name or email " value="{{ request.GET.search}} ">
+        <button type = "submit"> search </button>
+    </form>
+
+
+   <div class = "table-wrapper">
+   <table border = "1" colspan = "10" class = "student-table" >
+    
+    <thead>
+    <tr>
+        <th>id</th>
+        <th>first name</th>
+        <th>last name</th>
+        <th>email</th>
+        <th>phone No</th>
+        <th>date of birth </th>
+        <th>address</th>
+        <th> created at </th>
+        {% comment %} <th>bio</th> {% endcomment %}
+        <th>grade level </th>
+        <th>cv document </th>
+        <th>profile picture </th>
+        <th>quick actions</th>
+    </tr>
+    </thead>
+     
+    <tbody>
+    {% for parent in parent_list %}
+    <tr>
+        <td>{{ parent.id }}</td>
+        <td>{{parent.first_name }} </td>
+        <td>{{ parent.last_name}} </td>
+        <td>{{parent.email }} </td>
+        <td>{{ parent.phone}} </td>
+        <td>{{ parent.date_of_birth }} </td>
+        <td>{{ parent.address }} </td>
+
+
+        <td> {{ parent.date_joined }} </td>
+        {% comment %} <td{{ parent.bio}}></td> {% endcomment %}
+        <td>{{ parent.grade_level}} </td>
+
+        <td>{{parent.cv_document}} </td>
+
+        {% comment %} <td> <img src="{{ parent.profile_picture.url }}" alt="no image found" class = "profile-img"> </td> {% endcomment %}
+
+        <td>{{parent.profile_picture }} </td>
+
+        <td><a href=" # " class = "view-btn">👁️</a>
+        </td>
+
+    </tr>
+
+    {% empty %}
+      <tr style="
+       color:green;
+      " colspan = "12" > 
+      <td>no super user</td> </tr>
+
+    {% endfor %}
+    </tbody>
+
+   </table>
+</div>
+   
+
+{% endblock content %}

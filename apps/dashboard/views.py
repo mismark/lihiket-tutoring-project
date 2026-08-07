@@ -1,3 +1,5 @@
+from re import search
+
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -6,6 +8,8 @@ from django.utils import timezone
 from apps.accounts.models import User
 from apps.subjects.models import Subject
 from apps.courses.models import Course, Enrollment, CourseProgress
+
+from django.db.models import Q
 
 
 @login_required
@@ -139,6 +143,7 @@ def home(request):
             "recent_courses":    Course.objects.select_related("teacher").order_by("-created_at")[:5],
             "live_now":          live_now,
             "upcoming_classes":  upcoming,
+            
         })
 
     # ── TEACHER ───────────────────────────────────────────────────
@@ -216,3 +221,76 @@ def home(request):
     # ── PARENT / OTHER ────────────────────────────────────────────
     else:
         return render(request, "dashboard/parent_dashboard.html", {})
+# for student crud for admin 
+def student_list(request):
+    search = request.GET.get("search", "").strip()
+    student_lists= User.objects.filter(role = "student").all()
+    
+    
+    if search:
+        student_lists = student_lists.filter(
+            Q(first_name__icontains = search)|
+            Q(last_name__icontains = search)|
+            Q(email__icontains = search)|
+            Q(id__icontains =search)
+            
+        )
+    context = {
+        "student_list":student_lists,
+        
+    }
+    return render(request, "dashboard/admin/student_list.html", context )
+
+def student_detail(request, id):
+    student = User.objects.filter(role = "student").get(id = id)
+    context = {
+        "student":student,
+    }
+    return render(request,"dashboard/admin/student_detail.html", context)
+
+
+def teacher_list(request):
+     teacher_lists = User.objects.filter(role = "teacher").all()
+     
+     search = request.GET.get("search", "").strip()    
+    
+     if search:
+        teacher_lists = teacher_lists.filter(
+            Q(first_name__icontains = search)|
+            Q(last_name__icontains = search)|
+            Q(email__icontains = search)|
+            Q(id__icontains = search)
+            
+        )
+     
+     context={
+         "teacher_list" : teacher_lists,
+     }
+     return render(request,"dashboard/admin/teacher_list.html", context)
+ 
+def parent_list(request):
+     parents = User.objects.filter(role="parent").all()
+     
+     search = request.GET.get("search", "").strip()    
+         
+     if search:
+        parents = parents.filter(
+            Q(first_name__icontains = search)|
+            Q(last_name__icontains = search)|
+            Q(email__icontains = search)|
+            Q(id__icontains = search)
+            
+        )
+     
+     context = {
+         "parent_list": parents,
+     }
+     return render(request, "dashboard/admin/parent_list.html", context)
+
+def super_user(request):
+     superuser_list = User.objects.filter(is_superuser = True).all()
+     context = {
+         "superuser-list": superuser_list
+     }
+     return render(request, "dashboard/admin/superuser.html", context)
+ 

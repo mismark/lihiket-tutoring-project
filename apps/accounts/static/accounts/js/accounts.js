@@ -28,3 +28,37 @@ function togglePassword(inputId, btn) {
     });
   }
 })();
+
+
+  (function () {
+    const roleSelect      = document.getElementById('id_role');
+    const gradeLevelField = document.getElementById('grade_level_field');
+    const gradeLevelSelect = document.getElementById('id_grade_level');
+    const cvDocumentField = document.getElementById('cv_document_field');
+    const cvDocumentInput = document.getElementById('id_cv_document');
+
+    function toggleRoleFields() {
+      const role = roleSelect.value;
+
+      // Grade level — students only
+      if (role === 'student') {
+        gradeLevelField.style.display = 'block';
+      } else {
+        gradeLevelField.style.display = 'none';
+        gradeLevelSelect.value = '';
+      }
+
+      // CV document — teachers only
+      if (role === 'teacher') {
+        cvDocumentField.style.display = 'block';
+      } else {
+        cvDocumentField.style.display = 'none';
+        cvDocumentInput.value = '';
+      }
+    }
+
+    // Run on page load to handle POST re-renders after validation errors
+    toggleRoleFields();
+
+    roleSelect.addEventListener('change', toggleRoleFields);
+  })();

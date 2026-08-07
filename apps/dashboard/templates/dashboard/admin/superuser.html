@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'dashboard/css/student_list.css' %} ">
+{% endblock  %}
+
+{% block content %}
+
+<div class = "table-card">
+
+    <h1>students lists  </h1>
+    <div class="search-input" style = "
+    padding:10px;
+    margin:10px; " >
+    <input type="search" placeholder="search for students " class = "search-box"> <input type="submit" value = "search" >
+    </div>
+   <div class = "table-wrapper">
+   <table border = "1" colspan = "10" class = "student-table" >
+    
+    <thead>
+    <tr>
+        <th>id</th>
+        <th>first name</th>
+        <th>last name</th>
+        <th>email</th>
+        <th>phone No</th>
+        <th>date of birth </th>
+        <th>address</th>
+        <th> created at </th>
+        {% comment %} <th>bio</th> {% endcomment %}
+        <th>grade level </th>
+        <th>cv document </th>
+        <th>profile picture </th>
+        <th>quick actions</th>
+    </tr>
+    </thead>
+     
+    <tbody>
+    {% for superuser in superuser_list %}
+    <tr>
+        <td>{{ superuser.id }}</td>
+        <td>{{superuser.first_name }} </td>
+        <td>{{ superuser.last_name}} </td>
+        <td>{{superuser.email }} </td>
+        <td>{{ superuser.phone}} </td>
+        <td>{{ superuser.date_of_birth }} </td>
+        <td>{{ superuser.address }} </td>
+
+
+        <td> {{ superuser.date_joined }} </td>
+        {% comment %} <td{{ superuser.bio}}></td> {% endcomment %}
+        <td>{{ superuser.grade_level}} </td>
+
+        <td>{{superuser.cv_document}} </td>
+
+        {% comment %} <td> <img src="{{ superuser.profile_picture.url }}" alt="no image found" class = "profile-img"> </td> {% endcomment %}
+
+        <td>{{superuser.profile_picture }} </td>
+
+        <td><a href=" # " class = "view-btn">👁️</a>
+        </td>
+
+    </tr>
+      {% empty %}
+      <tr style="color:green;"> 
+        <td colspan= "12">no super user </td>
+    {% endfor %}
+    
+    </tbody>
+
+   </table>
+</div>
+   
+
+{% endblock content %}

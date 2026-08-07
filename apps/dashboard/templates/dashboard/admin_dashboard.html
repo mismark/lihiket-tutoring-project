@@ -7,13 +7,14 @@
   <!-- Welcome -->
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h2 class="fw-bold mb-0">Welcome back, {{ request.user.first_name|default:request.user.username }} </h2>
+      <h2 class="fw-bold mb-0">Welcome back, {{ request.user.first_name|default:request.user.username }} {{ request.user.last_name}} </h2>
       <p class="text-muted mb-0">Here's what's happening on your platform today.</p>
     </div>
     <a href="/admin/" class="btn btn-dark rounded-pill px-4">
       <i class="fas fa-cog me-2"></i>Django Admin
     </a>
   </div>
+
 
   <!-- Stat cards -->
   <div class="row g-4 mb-4">
@@ -37,6 +38,23 @@
           <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.12;"><i class="fas fa-user-graduate"></i></div>
           <p class="mb-1" style="opacity:.85;font-size:.85rem;">Total Students</p>
           <h2 class="fw-bold mb-0 counter" data-target="{{ total_students }}">0</h2>
+
+          <a href=" {% url 'dashboard:student_list' %} "  style="color:white;
+          position:absolute;
+          bottom: 20px;
+          right: 20px;
+
+          backgroung:white;
+          color:#2563eb;
+          padding:10px 18px;
+          border-radius: 25px;
+          text-decoration:none;
+          font-weight:bold;
+
+          transition:.3s;
+
+          
+          "> <h2>view</h2></a>
         </div>
       </div>
     </div>
@@ -46,6 +64,23 @@
           <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.12;"><i class="fas fa-chalkboard-teacher"></i></div>
           <p class="mb-1" style="opacity:.85;font-size:.85rem;">Total Teachers</p>
           <h2 class="fw-bold mb-0 counter" data-target="{{ total_teachers }}">0</h2>
+
+          <a href=" {% url 'dashboard:teacher_list' %} "  style="color:white;
+          position:absolute;
+          bottom: 20px;
+          right: 20px;
+
+          backgroung:white;
+          color:#2563eb;
+          padding:10px 18px;
+          border-radius: 25px;
+          text-decoration:none;
+          font-weight:bold;
+
+          transition:.3s;
+          
+          
+          "> <h2>view</h2></a>
         </div>
       </div>
     </div>
@@ -55,6 +90,9 @@
           <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.12;"><i class="fas fa-book-open"></i></div>
           <p class="mb-1" style="opacity:.85;font-size:.85rem;">Total Courses</p>
           <h2 class="fw-bold mb-0 counter" data-target="{{ total_courses }}">0</h2>
+
+          <a href=" {% url 'dashboard:student_list' %} "  style="color:white;"> <h2>view</h2></a>
+
         </div>
       </div>
     </div>
@@ -64,6 +102,9 @@
           <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.12;"><i class="fas fa-users"></i></div>
           <p class="mb-1" style="opacity:.85;font-size:.85rem;">Total Enrollments</p>
           <h2 class="fw-bold mb-0 counter" data-target="{{ total_enrollments }}">0</h2>
+
+          <a href=" {% url 'dashboard:student_list' %} "  style="color:white;"> <h2>view</h2></a>
+
         </div>
       </div>
     </div>

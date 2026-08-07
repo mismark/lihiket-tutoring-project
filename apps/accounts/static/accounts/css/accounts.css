@@ -1,5 +1,5 @@
 .register-page{
-
+ 
     min-height:100vh;
 
     display:flex;
@@ -16,9 +16,9 @@
 
 .register-card{
 
-    width:900px;
+    width:100%;
 
-    background:#fff;
+    background:#f0dddd;
 
     padding:40px;
 
@@ -49,6 +49,16 @@
 .register-card label{
 
     font-weight:600;
+
+}
+
+.register-card input,
+.register-card select,
+.register-card textarea:hover{
+
+    border-color:#0d6efd;
+
+    box-shadow:0 0 5px rgba(13,110,253,.5);
 
 }
 
@@ -362,3 +372,5 @@ table th{
 .pw-toggle:hover  { color: #0d6efd; }
 .pw-toggle:focus  { outline: none; }
 .pw-toggle svg    { display: block; pointer-events: none; }
+
+

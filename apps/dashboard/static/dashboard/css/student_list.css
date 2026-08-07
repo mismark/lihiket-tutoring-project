@@ -1,0 +1,126 @@
+.table-card{
+    width: 100%;
+    background: #fff;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .1);
+    
+}
+
+.student-table{
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 15px;
+
+}
+
+.table-wrapper{
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    border-radius: 15px;
+}
+
+.student-table th{
+    background: #4830c3;
+    color: white;
+    padding: 10px;
+    
+}
+
+.student-table td{
+    padding: 5px;
+    border-bottom: 1px solid #dddddd;
+}
+.student-table tr:hover{
+    background: #f0fff3;
+}
+
+.profile-img{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.edit-btn{
+    background: #357ae9;
+    color: white;
+    padding: 8px 15px;
+    margin: auto;
+    border-radius: 8px;
+}
+
+.delete-btn{
+    background: #ef4444;
+    color: white;
+    padding: 8px 15px;
+    margin: auto;
+    border-radius: 8px;
+}
+
+.view-btn{
+    background: #10b981;
+    color: white;
+    padding: 8px 15px;
+    margin: auto;
+    border-radius: 8px;
+}
+
+.table-card{
+    animation: fadeUp.6s ease;
+}
+
+@keyframes fadeUp{
+    from{
+        opacity: 0;
+        transform: translateY(0);
+    }
+    to{
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.edit-dtn, .delete-btn, .view-btn {
+    transition: 3s;
+}
+
+.edit-dtn, .delete-btn, .view-btn:hover{
+    transform: scale(1.08);
+
+}
+.search-box{
+    padding: 10px;
+    margin: 15px;
+}
+
+form{
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+    justify-content: center;
+}
+
+input[type=
+"text"]{
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    width: 300px;
+    outline: none;
+}
+
+button{
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: none;
+    background: #357ae9;
+    color: white;
+    cursor: pointer;
+}
+button:hover{
+    background: #055f32;
+}

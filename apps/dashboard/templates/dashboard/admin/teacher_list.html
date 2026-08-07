@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'dashboard/css/student_list.css' %} ">
+{% endblock  %}
+
+{% block content %}
+
+<div class = "table-card">
+
+    <h1>teacher lists  </h1>
+
+    <form method = "GET" >
+        <input type="text" name="search" placeholder="search by name or email " value="{{ request.GET.search}} ">
+        <button type = "submit"> search </button>
+    </form>
+
+   <div class = "table-wrapper">
+   <table border = "1" colspan = "10" class = "student-table" >
+    
+    <thead>
+    <tr>
+        <th>id</th>
+        <th>first name</th>
+        <th>last name</th>
+        <th>email</th>
+        <th>phone No</th>
+        <th>date of birth </th>
+        <th>address</th>
+        <th> created at </th>
+        {% comment %} <th>bio</th> {% endcomment %}
+        <th>grade level </th>
+        <th>cv document </th>
+        <th>profile picture </th>
+        <th>quick actions</th>
+    </tr>
+    </thead>
+     
+    <tbody>
+    {% for teacher in teacher_list %}
+    <tr>
+        <td>{{ teacher.id }}</td>
+        <td>{{teacher.first_name }} </td>
+        <td>{{ teacher.last_name}} </td>
+        <td>{{teacher.email }} </td>
+        <td>{{ teacher.phone}} </td>
+        <td>{{ teacher.date_of_birth }} </td>
+        <td>{{ teacher.address }} </td>
+
+
+        <td> {{ teacher.date_joined }} </td>
+        {% comment %} <td{{ teacher.bio}}></td> {% endcomment %}
+        <td>{{ teacher.grade_level}} </td>
+
+        <td>{{teacher.cv_document}} </td>
+
+        {% comment %} <td> <img src="{{ teacher.profile_picture.url }}" alt="no image found" class = "profile-img"> </td> {% endcomment %}
+
+        <td>{{teacher.profile_picture }} </td>
+
+        <td><a href=" # " class = "view-btn">👁️</a>
+        </td>
+
+    </tr>
+
+    {% empty %}
+      <tr style="
+       color:green;
+      " > no super user </tr>
+
+    {% endfor %}
+    </tbody>
+
+   </table>
+</div>
+   
+
+{% endblock content %}
