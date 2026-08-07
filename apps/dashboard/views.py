@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from apps.accounts.forms import RegisterForm
 from apps.accounts.models import User
-from apps.dashboard.forms import StudentForm
+from apps.dashboard.forms import StudentForm, TeacherForm
 from apps.subjects.models import Subject
 from apps.courses.models import Course, Enrollment, CourseProgress
 
@@ -289,6 +289,7 @@ def student_delete(request, pk):
     return render(request, "dashboard/admin/student_delete.html", context)
 
 
+#  for teacher crud for admin
 @login_required
 @user_passes_test(admin_required)
 def teacher_list(request):
@@ -316,6 +317,38 @@ def teacher_detail(request, pk):
         "teacher":teacher,
     }
     return render(request,"dashboard/admin/teacher_detail.html", context) 
+
+@login_required
+@user_passes_test(admin_required)
+def teacher_edit(request, pk):
+    teacher = get_object_or_404(User, pk=pk, role="teacher")
+
+    if request.method == "POST":
+        form = TeacherForm(request.POST, request.FILES, instance=teacher)
+
+        if form.is_valid():
+            form.save()
+            return redirect("dashboard:teacher_list")
+    else:
+        form = TeacherForm(instance=teacher)
+    context = {
+        "form": form,
+        "teacher": teacher,
+    }
+
+    return render(request, "dashboard/admin/teacher_edit.html", context)
+
+def teacher_delete(request, pk):
+    teacher = get_object_or_404(User, pk=pk, role="teacher")
+
+    if request.method == "POST":
+        teacher.delete()
+        return redirect("dashboard:teacher_list")
+
+    context = {
+        "teacher": teacher,
+    }
+    return render(request, "dashboard/admin/teacher_delete.html", context)
  
 @login_required
 @user_passes_test(admin_required)

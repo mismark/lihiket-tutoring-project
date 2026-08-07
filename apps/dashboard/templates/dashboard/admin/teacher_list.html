@@ -61,7 +61,14 @@
         {% if teacher.profile_picture %}
         <td> <img src=" {{teacher.profile_picture.url }} " alt="no image found" class = "profile-img"> </td>
         {% endif %}
-        <td><a href=" {% url 'dashboard:teacher_detail' teacher.pk %} " class = "view-btn">👁️</a>
+        <td><a href=" {% url 'dashboard:teacher_detail' teacher.pk %} " class = "view-btn">
+            <i class="fa-solid fa-eye"></i>
+        </a>
+
+        <a href=" {% url 'dashboard:teacher_edit' teacher.pk %} " class = "edit-btn"><i class="fa-solid fa-pen-to-square"></i></a>
+
+        <a href="{% url 'dashboard:teacher_delete' teacher.pk %}" class = "delete-btn"><i class="fa-solid fa-trash"></i></a>
+
         </td>
 
     </tr>

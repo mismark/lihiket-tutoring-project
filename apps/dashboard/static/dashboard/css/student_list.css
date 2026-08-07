@@ -187,8 +187,15 @@ button[type="submit"]:hover{
 }
 
 
+
+
+
+
+
+
+
 /* ==========================
-   Page
+   Page  for Edit student 
 ========================== */
 
 .page-container{
@@ -272,11 +279,14 @@ button[type="submit"]:hover{
    Buttons
 ========================== */
 
+
+
 .button-group{
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 15px;
-    margin-top: 35px;
+    margin-top: 30px;
 }
 
 .btn{
@@ -338,6 +348,108 @@ input[type="file"]{
 
     .page-title{
         font-size: 24px;
+    }
+
+    .button-group{
+        flex-direction: column;
+    }
+
+    .btn{
+        width: 100%;
+        text-align: center;
+    }
+}
+
+
+
+
+/* for delete page  */
+
+/* ==========================
+   Delete Page
+========================== */
+
+.delete-container{
+    max-width: 600px;
+    margin: 70px auto;
+    padding: 20px;
+}
+
+.delete-card{
+    background: #fff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 5px 18px rgba(0,0,0,.1);
+    text-align: center;
+}
+
+.delete-icon{
+    font-size: 70px;
+    margin-bottom: 20px;
+}
+
+.delete-card h2{
+    color: #dc3545;
+    margin-bottom: 15px;
+}
+
+.delete-card p{
+    color: #555;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.warning{
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.button-group{
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn{
+    display: inline-block;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-danger{
+    background: #dc3545;
+    color: #fff;
+}
+
+.btn-danger:hover{
+    background: #bb2d3b;
+}
+
+.btn-secondary{
+    background: #6c757d;
+    color: #fff;
+}
+
+.btn-secondary:hover{
+    background: #5a6268;
+}
+
+/* ==========================
+   Responsive
+========================== */
+
+@media (max-width: 768px){
+
+    .delete-card{
+        padding: 25px;
     }
 
     .button-group{

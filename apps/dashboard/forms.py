@@ -15,3 +15,16 @@ class StudentForm(forms.ModelForm):
             "grade_level",
             "profile_picture",
         ]
+
+class TeacherForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            "first_name",
+            "last_name",
+            "email",
+            "phone",
+            "date_of_birth",
+            "address",
+            "profile_picture",
+        ]

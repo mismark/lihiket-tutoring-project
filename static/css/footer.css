@@ -1,0 +1,136 @@
+/* ===========================
+   Footer Layout
+=========================== */
+
+.footer-content{
+    align-items: center;
+    row-gap: 25px;
+}
+
+/* ===========================
+   Brand
+=========================== */
+
+.footer-brand{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.footer-logo{
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color: #fff;
+    font-size: .9rem;
+}
+
+.footer-brand-name{
+    font-size: 1.1rem;
+    font-weight: 800;
+    background: linear-gradient(135deg,#667eea,#f093fb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.footer-description{
+    font-size: .82rem;
+    color: rgba(156, 4, 151, 0.45);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ===========================
+   Quick Links
+=========================== */
+
+.footer-links{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 18px;
+}
+
+.footer-link{
+    color: rgba(255,255,255,.55);
+    text-decoration: none;
+    font-size: .82rem;
+    transition: .3s;
+}
+
+.footer-link:hover{
+    color: #667eea;
+}
+
+/* ===========================
+   Social Icons
+=========================== */
+
+.footer-social{
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.social-btn{
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    background: rgba(255,255,255,.08);
+    color: rgba(255,255,255,.65);
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,.1);
+    transition: all .3s ease;
+}
+
+.social-btn i{
+    font-size: .9rem;
+}
+
+.social-btn.github:hover{
+    background: #667eea;
+    color: #fff;
+}
+
+.social-btn.telegram:hover{
+    background: #0088cc;
+    color: #fff;
+}
+
+.social-btn.youtube:hover{
+    background: #ff0000;
+    color: #fff;
+}
+
+/* ===========================
+   Responsive
+=========================== */
+
+@media (max-width:768px){
+
+    .footer-brand{
+        justify-content: center;
+    }
+
+    .footer-description{
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .footer-links{
+        margin-bottom: 20px;
+    }
+
+    .footer-social{
+        justify-content: center;
+    }
+
+}
