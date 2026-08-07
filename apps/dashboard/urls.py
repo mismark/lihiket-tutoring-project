@@ -11,6 +11,11 @@ urlpatterns = [
     path("teacher-list/", views.teacher_list, name= "teacher_list"),
     path("superuser/", views.super_user, name = "superuser_list"),
     path("parents/", views.parent_list, name = "parent_list"),
-    path("student/<int:id>/", views.student_detail, name = "student_detail" ),
+    path("student/<int:pk>/", views.student_detail, name = "student_detail" ),
+    path("teacher/<int:pk>/", views.teacher_detail, name = "teacher_detail" ),
     
+    path("student/<int:pk>/edit/", views.student_edit, name = "student_edit" ),
+    
+    path("student/<int:pk>/delete/", views.student_delete, name = "student_delete" ),
+
 ]

@@ -53,10 +53,17 @@
         <td>{{ student.grade_level}} </td>
 
         {% comment %} <td> <img src="{{ student.profile_picture.url }}" alt="no image found" class = "profile-img"> </td> {% endcomment %}
+         {% if student.profile_picture %}
+        <td> <img src=" {{student.profile_picture.url }} " alt="no image found" class = "profile-img"> </td>
+        {% endif %}
+        <td><a href=" {% url 'dashboard:student_detail' student.pk %} " class = "view-btn">
+            <i class="fa-solid fa-eye"></i>
+        </a>
 
-        <td>{{student.profile_picture }} </td>
+        <a href=" {% url 'dashboard:student_edit' student.pk %} " class = "edit-btn"><i class="fa-solid fa-pen-to-square"></i></a>
 
-        <td><a href=" # " class = "view-btn">👁️</a>
+        <a href="{% url 'dashboard:student_delete' student.pk %}" class = "delete-btn"><i class="fa-solid fa-trash"></i></a>
+
         </td>
 
     </tr>

@@ -58,9 +58,10 @@
 
         {% comment %} <td> <img src="{{ teacher.profile_picture.url }}" alt="no image found" class = "profile-img"> </td> {% endcomment %}
 
-        <td>{{teacher.profile_picture }} </td>
-
-        <td><a href=" # " class = "view-btn">👁️</a>
+        {% if teacher.profile_picture %}
+        <td> <img src=" {{teacher.profile_picture.url }} " alt="no image found" class = "profile-img"> </td>
+        {% endif %}
+        <td><a href=" {% url 'dashboard:teacher_detail' teacher.pk %} " class = "view-btn">👁️</a>
         </td>
 
     </tr>

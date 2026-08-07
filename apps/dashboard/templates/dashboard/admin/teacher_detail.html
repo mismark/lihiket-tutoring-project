@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'dashboard/css/student_list.css' %} ">
+{% endblock  %}
+
+{% block content %}
+
+<div class="detail-card">
+    <h1>Teacher Details</h1>
+    <p><strong>ID:</strong> {{ teacher.id }}</p>
+    <p><strong>First Name:</strong> {{ teacher.first_name }}</p>
+    <p><strong>UserName:</strong> {{ teacher.username }}</p>
+    <p><strong>Last Name:</strong> {{ teacher.last_name }}</p>
+    <p><strong>Email:</strong> {{ teacher.email }}</p>
+    <p><strong>Phone:</strong> {{ teacher.phone }}</p>
+    <p><strong>Date of Birth:</strong> {{ teacher.date_of_birth }}</p>
+    <p><strong>Address:</strong> {{ teacher.address }}</p>
+    <p><strong>Date Joined:</strong> {{ teacher.date_joined }}</p>
+    <p><strong>Grade Level:</strong> {{ teacher.grade_level }}</p>
+
+    <a href="{% url 'dashboard:teacher_list' %}" style="color: white; background: #357ae9; padding: 10px 15px; text-decoration: none;">Back to List</a>
+
+{% endblock %}

@@ -1,1 +1,94 @@
-<h1> student details </h1>
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'dashboard/css/student_list.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="page-container">
+
+    <div class="detail-card">
+
+        <h2 class="page-title">Student Details</h2>
+
+        <div class="detail-grid">
+
+            <div class="detail-header">
+
+                {% if student.profile_picture %}
+                    <img src="{{ student.profile_picture.url }}" alt="Profile Picture" class="profile-image">
+                {% else %}
+                    <img src="{% static 'images/default-user.png' %}" alt="Default Profile" class="profile-image">
+                {% endif %}
+
+                <h2 class="page-title">
+                    {{ student.first_name }} {{ student.last_name }}
+                </h2>
+
+            </div>
+
+            <div class="detail-item">
+                <h5>First Name</h5>
+                <p>{{ student.first_name }}</p>
+            </div>
+
+            <div class="detail-item">
+                <h5>Last Name</h5>
+                <p>{{ student.last_name }}</p>
+            </div>
+
+            <div class="detail-item">
+                <h5>Email</h5>
+                <p>{{ student.email }}</p>
+            </div>
+
+            <div class="detail-item">
+                <h5>Phone</h5>
+                <p>{{ student.phone }}</p>
+            </div>
+
+            <div class="detail-item">
+                <h5>Date of Birth</h5>
+                <p>{{ student.date_of_birth }}</p>
+            </div>
+
+            <div class="detail-item">
+                <h5>Address</h5>
+                <p>{{ student.address }}</p>
+            </div>
+
+            <div class="detail-item">
+                <h5>Grade Level</h5>
+                <p>{{ student.grade_level }}</p>
+            </div>
+
+            <div class="detail-item">
+                <h5>Date Joined</h5>
+                <p>{{ student.date_joined }}</p>
+            </div>
+
+        </div>
+
+        <div class="action-buttons">
+
+            <a href="{% url 'dashboard:student_edit' student.pk %}" class="btn btn-warning">
+                ✏️ Edit
+            </a>
+
+            <a href="{% url 'dashboard:student_delete' student.pk %}" class="btn btn-danger">
+                🗑 Delete
+            </a>
+
+            <a href="{% url 'dashboard:student_list' %}" class="btn btn-primary">
+                ← Back to List
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

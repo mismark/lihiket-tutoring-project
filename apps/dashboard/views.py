@@ -1,16 +1,20 @@
 from re import search
 
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import JsonResponse
 from django.utils import timezone
 
+from apps.accounts.forms import RegisterForm
 from apps.accounts.models import User
+from apps.dashboard.forms import StudentForm
 from apps.subjects.models import Subject
 from apps.courses.models import Course, Enrollment, CourseProgress
 
 from django.db.models import Q
 
+def admin_required(user):
+    return user.is_authenticated and (user.role == "admin" or user.is_superuser)
 
 @login_required
 def global_search(request):
@@ -222,6 +226,8 @@ def home(request):
     else:
         return render(request, "dashboard/parent_dashboard.html", {})
 # for student crud for admin 
+@login_required
+@user_passes_test(admin_required)
 def student_list(request):
     search = request.GET.get("search", "").strip()
     student_lists= User.objects.filter(role = "student").all()
@@ -241,14 +247,50 @@ def student_list(request):
     }
     return render(request, "dashboard/admin/student_list.html", context )
 
-def student_detail(request, id):
-    student = User.objects.filter(role = "student").get(id = id)
+@login_required
+@user_passes_test(admin_required)
+def student_detail(request, pk):
+    student = User.objects.filter(role = "student").get(id = pk)
     context = {
         "student":student,
     }
     return render(request,"dashboard/admin/student_detail.html", context)
 
+@login_required
+@user_passes_test(admin_required)
+def student_edit(request, pk):
+    student = get_object_or_404(User, pk=pk, role="student")
 
+    if request.method == "POST":
+        form = StudentForm(request.POST, request.FILES, instance=student)
+
+        if form.is_valid():
+            form.save()
+            return redirect("dashboard:student_list")
+    else:
+        form = StudentForm(instance=student)
+    context = {
+        "form": form,
+        "student": student,
+    }
+
+    return render(request, "dashboard/admin/student_edit.html", context)
+
+def student_delete(request, pk):
+    student = get_object_or_404(User, pk=pk, role="student")
+
+    if request.method == "POST":
+        student.delete()
+        return redirect("dashboard:student_list")
+
+    context = {
+        "student": student,
+    }
+    return render(request, "dashboard/admin/student_delete.html", context)
+
+
+@login_required
+@user_passes_test(admin_required)
 def teacher_list(request):
      teacher_lists = User.objects.filter(role = "teacher").all()
      
@@ -268,6 +310,15 @@ def teacher_list(request):
      }
      return render(request,"dashboard/admin/teacher_list.html", context)
  
+def teacher_detail(request, pk):
+    teacher = User.objects.filter(role = "teacher").get(id = pk)
+    context = {
+        "teacher":teacher,
+    }
+    return render(request,"dashboard/admin/teacher_detail.html", context) 
+ 
+@login_required
+@user_passes_test(admin_required)
 def parent_list(request):
      parents = User.objects.filter(role="parent").all()
      
@@ -286,11 +337,12 @@ def parent_list(request):
          "parent_list": parents,
      }
      return render(request, "dashboard/admin/parent_list.html", context)
-
+@login_required
+@user_passes_test(admin_required)
 def super_user(request):
      superuser_list = User.objects.filter(is_superuser = True).all()
      context = {
-         "superuser-list": superuser_list
+         "superuser_list": superuser_list
      }
      return render(request, "dashboard/admin/superuser.html", context)
  

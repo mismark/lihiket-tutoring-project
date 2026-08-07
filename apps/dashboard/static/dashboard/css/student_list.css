@@ -44,6 +44,22 @@
     object-fit: cover;
 }
 
+.view-btn,
+.edit-btn,
+.delete-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 20px;
+    margin: 0 3px;
+    border-radius: 6px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
 .edit-btn{
     background: #357ae9;
     color: white;
@@ -113,7 +129,7 @@ input[type=
     outline: none;
 }
 
-button{
+button[type="submit"]{
     padding: 10px 15px;
     border-radius: 8px;
     border: none;
@@ -121,6 +137,215 @@ button{
     color: white;
     cursor: pointer;
 }
-button:hover{
+button[type="submit"]:hover{
     background: #055f32;
+}
+
+.detail-card{
+    width: 100%;
+    background: #b10d0d;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .1);
+    
+}
+
+.page-container{
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.detail-card{
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.1);
+}
+
+.page-title{
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 25px;
+}
+
+.back-btn{
+    display: inline-block;
+    margin-top: 25px;
+    padding: 12px 24px;
+    background: #357ae8;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: .3s;
+}
+
+.back-btn:hover{
+    background: #1f5fc9;
+    transform: translateY(-2px);
+}
+
+
+/* ==========================
+   Page
+========================== */
+
+.page-container{
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.form-card{
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 35px;
+    box-shadow: 0 5px 18px rgba(0,0,0,.1);
+}
+
+.page-title{
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+/* ==========================
+   Form
+========================== */
+
+.edit-form{
+    width: 100%;
+}
+
+.form-grid{
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 20px;
+}
+
+.form-group{
+    display: flex;
+    flex-direction: column;
+}
+
+.full-width{
+    grid-column: 1 / -1;
+}
+
+.form-group label{
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #444;
+}
+
+/* Django Form Inputs */
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    transition: .3s;
+    box-sizing: border-box;
+}
+
+.form-group textarea{
+    min-height: 120px;
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{
+    border-color: #357ae8;
+    box-shadow: 0 0 8px rgba(53,122,232,.25);
+}
+
+/* ==========================
+   Buttons
+========================== */
+
+.button-group{
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 35px;
+}
+
+.btn{
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: .3s;
+}
+
+.btn-success{
+    background: #198754;
+    color: white;
+}
+
+.btn-success:hover{
+    background: #157347;
+}
+
+.btn-secondary{
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover{
+    background: #ee8208;
+}
+
+/* ==========================
+   File Input
+========================== */
+
+input[type="file"]{
+    padding: 8px;
+    background: #f8f9fa;
+}
+
+/* ==========================
+   Responsive
+========================== */
+
+@media (max-width:768px){
+
+    .form-grid{
+        grid-template-columns: 1fr;
+    }
+
+    .page-container{
+        margin: 20px auto;
+        padding: 10px;
+    }
+
+    .form-card{
+        padding: 20px;
+    }
+
+    .page-title{
+        font-size: 24px;
+    }
+
+    .button-group{
+        flex-direction: column;
+    }
+
+    .btn{
+        width: 100%;
+        text-align: center;
+    }
 }
