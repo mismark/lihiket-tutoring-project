@@ -1,0 +1,565 @@
+/* =========================================
+   TEACHER DASHBOARD
+   ========================================= */
+
+#dashRoot {
+    max-width: 1600px;
+    margin: auto;
+}
+
+
+/* =========================================
+   WELCOME BANNER
+   ========================================= */
+
+.teacher-welcome {
+    border-radius: 24px;
+    background: linear-gradient(
+        135deg,
+        #667eea 0%,
+        #764ba2 100%
+    );
+    overflow: hidden;
+    position: relative;
+}
+
+.teacher-welcome-body {
+    position: relative;
+    z-index: 2;
+}
+
+.teacher-welcome-circle {
+    position: absolute;
+    border-radius: 50%;
+}
+
+.teacher-welcome-circle-one {
+    right: -80px;
+    top: -80px;
+    width: 320px;
+    height: 320px;
+    background: rgba(255,255,255,.06);
+}
+
+.teacher-welcome-circle-two {
+    right: 80px;
+    bottom: -100px;
+    width: 220px;
+    height: 220px;
+    background: rgba(255,255,255,.04);
+}
+
+
+/* =========================================
+   PORTAL BADGE
+   ========================================= */
+
+.teacher-portal-badge {
+    background: rgba(255,255,255,.15);
+    color: #fff;
+    font-size: .8rem;
+}
+
+
+/* =========================================
+   WELCOME TEXT
+   ========================================= */
+
+.teacher-welcome-title {
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+.teacher-welcome-text {
+    color: rgba(255,255,255,.8);
+    font-size: 1rem;
+    margin-bottom: 1.75rem;
+}
+
+
+/* =========================================
+   ACTION BUTTONS
+   ========================================= */
+
+.teacher-action-btn {
+    border-radius: 50px;
+    transition: all .3s ease;
+}
+
+.teacher-action-btn:hover {
+    transform: translateY(-3px);
+}
+
+.teacher-action-primary {
+    background: #fff;
+    color: #667eea;
+    border: none;
+}
+
+.teacher-action-primary:hover {
+    background: #fff;
+    color: #667eea;
+    box-shadow: 0 8px 20px rgba(0,0,0,.15);
+}
+
+.teacher-action-secondary {
+    background: rgba(255,255,255,.15);
+    color: #fff;
+    border: 2px solid rgba(255,255,255,.4);
+}
+
+.teacher-action-secondary:hover {
+    background: rgba(255,255,255,.25);
+    color: #fff;
+}
+
+
+/* =========================================
+   PROFILE
+   ========================================= */
+
+.teacher-profile-image,
+.teacher-profile-placeholder {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+}
+
+.teacher-profile-image {
+    object-fit: cover;
+    border: 4px solid rgba(255,255,255,.4);
+    box-shadow: 0 10px 40px rgba(0,0,0,.2);
+}
+
+.teacher-profile-placeholder {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,.2);
+    color: #fff;
+    font-size: 3rem;
+    border: 4px solid rgba(255,255,255,.4);
+}
+
+
+/* =========================================
+   STAT CARDS
+   ========================================= */
+
+.stat-card {
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: default;
+    transition: all .3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 35px rgba(0,0,0,.15) !important;
+}
+
+.stat-card-body {
+    color: #fff;
+    position: relative;
+}
+
+.stat-purple {
+    background: linear-gradient(135deg,#667eea,#764ba2);
+}
+
+.stat-green {
+    background: linear-gradient(135deg,#43e97b,#38f9d7);
+}
+
+.stat-orange {
+    background: linear-gradient(135deg,#f7971e,#ffd200);
+}
+
+.stat-pink {
+    background: linear-gradient(135deg,#f093fb,#f5576c);
+}
+
+.stat-title {
+    opacity: .85;
+    font-size: .82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+
+.stat-description {
+    opacity: .7;
+}
+
+.stat-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 3.5rem;
+    opacity: .12;
+}
+
+
+/* =========================================
+   LIVE NOW
+   ========================================= */
+
+.live-now-card {
+    border-radius: 20px;
+    background: linear-gradient(135deg,#f5576c,#f093fb);
+    color: #fff;
+}
+
+.live-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #fff;
+    animation: livePulse 1.5s infinite;
+}
+
+.live-class-item {
+    background: rgba(255,255,255,.15);
+}
+
+.live-course-name {
+    opacity: .8;
+}
+
+.live-join-btn {
+    background: #fff;
+    color: #f5576c;
+    border-radius: 50px;
+    border: none;
+}
+
+.live-join-btn:hover {
+    background: #fff;
+    color: #f5576c;
+    transform: translateY(-2px);
+}
+
+
+/* =========================================
+   UPCOMING CLASSES
+   ========================================= */
+
+.upcoming-card,
+.dashboard-card {
+    border-radius: 20px;
+}
+
+.dashboard-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.upcoming-class {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 8px;
+    border-radius: 8px;
+    background: #f8f9ff;
+    border: 1px solid #e8eaf6;
+    transition: all .25s ease;
+}
+
+.upcoming-class:hover {
+    transform: translateX(4px);
+    border-color: #d8dcff;
+}
+
+.upcoming-class-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg,#f5576c,#f093fb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.upcoming-class-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.upcoming-class-title {
+    font-size: .85rem;
+}
+
+.empty-icon {
+    opacity: .2;
+}
+
+
+/* =========================================
+   LOWER SECTION
+   ========================================= */
+
+.dashboard-lower-section {
+    margin-top: 24px;
+}
+
+
+/* =========================================
+   SUBMISSIONS
+   ========================================= */
+
+.pending-badge {
+    background: #f7971e;
+    color: #fff;
+}
+
+.submissions-table {
+    border-radius: 0 0 20px 20px;
+    overflow: hidden;
+}
+
+.student-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg,#43e97b,#38f9d7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: .75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.student-name {
+    font-size: .85rem;
+    font-weight: 600;
+}
+
+.assignment-title {
+    font-size: .82rem;
+}
+
+.all-caught-icon {
+    color: #43e97b;
+    opacity: .5;
+}
+
+
+/* =========================================
+   QUICK ACTIONS
+   ========================================= */
+
+.quick-action {
+    display: block;
+    text-align: center;
+    padding: 16px 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all .3s ease;
+}
+
+.quick-action:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,.1);
+}
+
+.quick-course {
+    background: #f0f2ff;
+    color: #667eea;
+}
+
+.quick-assignment {
+    background: #fff8f0;
+    color: #f7971e;
+}
+
+.quick-quiz {
+    background: #f0fff4;
+    color: #43e97b;
+}
+
+.quick-exam {
+    background: #fff1f2;
+    color: #f5576c;
+}
+
+.quick-document {
+    background: #f8f0ff;
+    color: #a78bfa;
+}
+
+.quick-question {
+    background: #f0f9ff;
+    color: #4facfe;
+}
+
+
+/* =========================================
+   RECENT LESSONS
+   ========================================= */
+
+.recent-lesson {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.lesson-status-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .9rem;
+    flex-shrink: 0;
+}
+
+.lesson-published {
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color: #fff;
+}
+
+.lesson-draft {
+    background: #e8eaf6;
+    color: #9ca3af;
+}
+
+.recent-lesson-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.recent-lesson-title {
+    font-size: .85rem;
+    color: #1a1a2e;
+    font-weight: 600;
+    text-decoration: none;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recent-lesson-title:hover {
+    color: #667eea;
+}
+
+.lesson-status {
+    font-size: .7rem;
+    flex-shrink: 0;
+}
+
+
+/* =========================================
+   ANIMATIONS
+   ========================================= */
+
+@keyframes livePulse {
+
+    0% {
+        transform: scale(1);
+        opacity: 1;
+        box-shadow: 0 0 0 0 rgba(255,255,255,.7);
+    }
+
+    50% {
+        transform: scale(1.15);
+        opacity: .8;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+        box-shadow: 0 0 0 8px rgba(255,255,255,0);
+    }
+
+}
+
+
+@keyframes dashboardFade {
+
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+
+.stat-card {
+    animation: dashboardFade .6s ease both;
+}
+
+.stat-card:nth-child(2) {
+    animation-delay: .1s;
+}
+
+.stat-card:nth-child(3) {
+    animation-delay: .2s;
+}
+
+.stat-card:nth-child(4) {
+    animation-delay: .3s;
+}
+
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 767px) {
+
+    #dashRoot {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .teacher-welcome {
+        border-radius: 18px;
+    }
+
+    .teacher-welcome-title {
+        font-size: 1.5rem;
+    }
+
+    .teacher-welcome-text {
+        font-size: .9rem;
+    }
+
+    .teacher-action-btn {
+        width: 100%;
+    }
+
+    .stat-card {
+        border-radius: 16px;
+    }
+
+    .dashboard-card,
+    .upcoming-card {
+        border-radius: 16px;
+    }
+
+    .dashboard-card-header {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .submissions-table {
+        font-size: .8rem;
+    }
+
+}
