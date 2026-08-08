@@ -520,8 +520,43 @@
   ════════════════════════════════════════════════════════════════════ -->
   {% if can_edit %}
 
-  <!-- Stats row -->
-  <div class="row mb-4">
+<!-- Stats row -->
+<div class="row mb-4"
+     style="
+        --bs-gutter-x: 0.75rem;
+     ">
+
+  <style>
+    @media (max-width: 767.98px) {
+      .teacher-stats-grid .col-md-2 {
+        width: 31%;
+        flex: 0 0 31%;
+        max-width: 31%;
+        margin:2px;
+      }
+
+      .teacher-stats-grid .card {
+        padding: 12px 5px !important;
+      }
+
+      .teacher-stats-grid .card h3 {
+        font-size: 20px;
+      }
+
+      .teacher-stats-grid .card small {
+        font-size: 11px;
+      }
+
+      .teacher-stats-grid .card i {
+        font-size: 20px !important;
+      }
+    }
+
+    
+  </style>
+
+  <div class="teacher-stats-grid" style="display: contents; ">
+
     <div class="col-md-2">
       <div class="card shadow-sm border-0 text-center p-3">
         <i class="fas fa-user-graduate fa-2x text-info mb-1"></i>
@@ -529,6 +564,7 @@
         <small class="text-muted">Students</small>
       </div>
     </div>
+
     <div class="col-md-2">
       <div class="card shadow-sm border-0 text-center p-3">
         <i class="fas fa-play-circle fa-2x text-primary mb-1"></i>
@@ -536,6 +572,7 @@
         <small class="text-muted">Lessons</small>
       </div>
     </div>
+
     <div class="col-md-2">
       <div class="card shadow-sm border-0 text-center p-3">
         <i class="fas fa-folder-open fa-2x text-warning mb-1"></i>
@@ -543,6 +580,7 @@
         <small class="text-muted">Documents</small>
       </div>
     </div>
+
     <div class="col-md-2">
       <div class="card shadow-sm border-0 text-center p-3">
         <i class="fas fa-tasks fa-2x text-success mb-1"></i>
@@ -550,6 +588,7 @@
         <small class="text-muted">Assignments</small>
       </div>
     </div>
+
     <div class="col-md-2">
       <div class="card shadow-sm border-0 text-center p-3">
         <i class="fas fa-question-circle fa-2x text-info mb-1"></i>
@@ -557,6 +596,7 @@
         <small class="text-muted">Quizzes</small>
       </div>
     </div>
+
     <div class="col-md-2">
       <div class="card shadow-sm border-0 text-center p-3">
         <i class="fas fa-file-alt fa-2x text-danger mb-1"></i>
@@ -564,41 +604,9 @@
         <small class="text-muted">Exams</small>
       </div>
     </div>
-  </div>
 
-  <!-- Teacher tabs -->
-  <ul class="nav nav-tabs mb-0" id="teacherTabs" role="tablist">
-    <li class="nav-item">
-      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tt-lessons" type="button">
-        <i class="fas fa-play-circle text-primary"></i> Lessons
-        <span class="badge bg-primary ms-1">{{ t_lessons_count }}</span>
-      </button>
-    </li>
-    <li class="nav-item">
-      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tt-documents" type="button">
-        <i class="fas fa-folder-open text-warning"></i> Documents
-        <span class="badge bg-warning text-dark ms-1">{{ t_documents_count }}</span>
-      </button>
-    </li>
-    <li class="nav-item">
-      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tt-assignments" type="button">
-        <i class="fas fa-tasks text-success"></i> Assignments
-        <span class="badge bg-success ms-1">{{ t_assignments_count }}</span>
-      </button>
-    </li>
-    <li class="nav-item">
-      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tt-quizzes" type="button">
-        <i class="fas fa-question-circle text-info"></i> Quizzes
-        <span class="badge bg-info text-dark ms-1">{{ t_quizzes_count }}</span>
-      </button>
-    </li>
-    <li class="nav-item">
-      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tt-exams" type="button">
-        <i class="fas fa-file-alt text-danger"></i> Exams
-        <span class="badge bg-danger ms-1">{{ t_exams_count }}</span>
-      </button>
-    </li>
-  </ul>
+  </div>
+</div>
 
   <div class="tab-content border border-top-0 rounded-bottom shadow-sm bg-white p-4 mb-4">
 
