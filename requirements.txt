@@ -24,6 +24,7 @@ django-extensions==4.1
 django-filter==26.1
 executing==2.2.1
 filelock==3.29.0
+git-filter-repo==2.47.0
 gunicorn==26.0.0
 hyperlink==21.0.0
 idna==3.18
