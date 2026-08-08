@@ -111,30 +111,24 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
 
-        'NAME': os.getenv(
-            "DB_NAME",
-            "online_tutoring_db"
-        ),
-
-        'USER': os.getenv(
-            "DB_USER",
-            "root"
-        ),
-
-        'PASSWORD': os.getenv(
-            "DB_PASSWORD",
-            ""
-        ),
-
+        'NAME': os.getenv('DB_NAME', 'defaultdb'),
+        'USER': os.getenv('DB_USER', 'avnadmin'),
+        'PASSWORD': os.getenv('DB_PASSWORD', ''),
         'HOST': os.getenv(
-            "DB_HOST",
-            "localhost"
+            'DB_HOST',
+            'online-tutoring-db-mismarkol2129-2c06.e.aivencloud.com'
         ),
+        'PORT': os.getenv('DB_PORT', '17612'),
 
-        'PORT': os.getenv(
-            "DB_PORT",
-            "3306"
-        ),
+        'OPTIONS': {
+            'ssl': {
+                'ca': os.path.join(
+                    BASE_DIR,
+                    'certs',
+                    'ca.pem'
+                ),
+            },
+        },
     }
 }
 
