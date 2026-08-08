@@ -36,9 +36,10 @@ DEBUG = True
 ALLOWED_HOSTS = [
     # ".onrender.com",
     # "192.168.37.1",
-    # "localhost",
-    # "127.0.0.1",
-    "*"
+     "localhost",
+     "127.0.0.1",
+
+    "10.252.230.127",
 ]
 
 
