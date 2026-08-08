@@ -1,0 +1,538 @@
+css
+/* =========================================================
+   REGISTER PAGE
+   ========================================================= */
+
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #3730a3;
+    --primary-light: #eef2ff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: #d1d5db;
+    --danger: #dc2626;
+    --white: #ffffff;
+    --background: #f5f7fb;
+}
+
+/* Page background */
+body {
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(79, 70, 229, 0.12),
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at bottom right,
+            rgba(59, 130, 246, 0.10),
+            transparent 35%
+        ),
+        var(--background);
+
+    color: var(--text);
+}
+
+
+/* =========================================================
+   MAIN CONTAINER
+   ========================================================= */
+
+.container {
+    width: 80%;
+    position: relative;
+    z-index: 1;
+    
+}
+
+
+/* =========================================================
+   REGISTER CARD
+   ========================================================= */
+
+.register-card {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 38px 42px;
+
+    background: rgba(255, 255, 255, 0.96);
+
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 22px;
+
+    box-shadow:
+        0 20px 50px rgba(141, 14, 170, 0.785),
+        0 5px 15px rgba(10, 240, 25, 0.865);
+
+    animation: cardAppear 1s ease;
+    
+}
+
+
+/* Card animation */
+@keyframes cardAppear {
+    from {
+        opacity: 0;
+        transform: translateY(25px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* =========================================================
+   TITLE
+   ========================================================= */
+
+.register-card h2 {
+    color: #111827;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 30px !important;
+}
+
+
+/* =========================================================
+   LABELS
+   ========================================================= */
+
+.register-card label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #033810cc;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   INPUTS / SELECT / TEXTAREA
+   ========================================================= */
+
+.register-card .form-control,
+.register-card .form-select {
+    width: 100%;
+
+    min-height: 48px;
+
+    padding: 11px 14px;
+
+    background: #ffffff;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    color: #111827;
+
+    font-size: 15px;
+
+    transition:
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.2s ease,
+        background 0.25s ease;
+}
+
+
+/* Textareas */
+.register-card textarea.form-control {
+    min-height: 110px;
+    resize: vertical;
+}
+
+
+/* File inputs */
+.register-card input[type="file"] {
+    padding: 10px;
+    cursor: pointer;
+}
+
+
+/* Hover */
+.register-card .form-control:hover,
+.register-card .form-select:hover {
+    border-color: #9ca3af;
+}
+
+
+/* Focus */
+.register-card .form-control:focus,
+.register-card .form-select:focus {
+    border-color: var(--primary);
+
+    background: #ffffff;
+
+    box-shadow:
+        0 0 0 4px rgba(79, 70, 229, 0.10);
+
+    outline: none;
+
+    transform: translateY(-1px);
+}
+
+
+/* Placeholder */
+.register-card .form-control::placeholder {
+    color: #242423;
+}
+
+
+/* =========================================================
+   PASSWORD WRAPPER
+   ========================================================= */
+
+.pw-wrap {
+    position: relative;
+    width: 100%;
+}
+
+
+/* Password input */
+.pw-wrap .form-control {
+    padding-right: 48px;
+}
+
+
+/* =========================================================
+   PASSWORD TOGGLE
+   ========================================================= */
+
+.pw-toggle {
+    position: absolute;
+
+    right: 7px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: #6b7280;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.pw-toggle:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+
+.pw-toggle:active {
+    transform: translateY(-50%) scale(0.92);
+}
+
+
+.pw-toggle svg {
+    width: 17px;
+    height: 17px;
+}
+
+
+/* =========================================================
+   ROLE / CONDITIONAL FIELDS
+   ========================================================= */
+
+#grade_level_field,
+#cv_document_field {
+    animation: fieldAppear 0.3s ease;
+}
+
+
+@keyframes fieldAppear {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* =========================================================
+   HELP TEXT
+   ========================================================= */
+
+.register-card small.text-muted {
+    display: block;
+
+    margin-top: 6px;
+
+    color: var(--muted) !important;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   FORM ERRORS
+   ========================================================= */
+
+.register-card .text-danger {
+    margin-top: 5px;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+
+.register-card .alert-danger {
+    margin-bottom: 25px;
+
+    padding: 13px 16px;
+
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+
+    background: #fef2f2;
+
+    color: var(--danger);
+
+    font-size: 14px;
+
+    animation: errorAppear 0.3s ease;
+}
+
+
+@keyframes errorAppear {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* =========================================================
+   CREATE ACCOUNT BUTTON
+   ========================================================= */
+
+.register-card .btn-primary {
+    min-height: 52px;
+
+    border: none;
+    border-radius: 11px;
+
+    background: linear-gradient(
+        135deg,
+        #4f46e5,
+        #6366f1
+    );
+
+    color: white;
+
+    font-size: 16px;
+    font-weight: 700;
+
+    box-shadow:
+        0 8px 20px rgba(79, 70, 229, 0.22);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+
+.register-card .btn-primary:hover {
+    background: linear-gradient(
+        135deg,
+        #4338ca,
+        #4f46e5
+    );
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 12px 25px rgba(79, 70, 229, 0.30);
+}
+
+
+.register-card .btn-primary:active {
+    transform: translateY(0);
+
+    box-shadow:
+        0 5px 12px rgba(79, 70, 229, 0.20);
+}
+
+
+/* =========================================================
+   LOGIN LINK
+   ========================================================= */
+
+.register-card p.text-center {
+    color: var(--muted);
+
+    font-size: 14px;
+}
+
+
+.register-card p.text-center a {
+    color: var(--primary);
+
+    font-weight: 700;
+
+    text-decoration: none;
+
+    transition: color 0.2s ease;
+}
+
+
+.register-card p.text-center a:hover {
+    color: var(--primary-dark);
+
+    text-decoration: underline;
+}
+
+
+/* =========================================================
+   FILE INPUT
+   ========================================================= */
+
+.register-card input[type="file"]::file-selector-button {
+    margin-right: 10px;
+
+    padding: 7px 12px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: var(--primary-light);
+
+    color: var(--primary);
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: background 0.2s ease;
+}
+
+
+.register-card input[type="file"]::file-selector-button:hover {
+    background: #d7d9de;
+}
+
+
+/* =========================================================
+   CHECKBOX
+   ========================================================= */
+
+.register-card input[type="checkbox"] {
+    accent-color: var(--primary);
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .register-card {
+        margin: 10px auto;
+        padding: 30px 25px;
+
+        border-radius: 18px;
+    }
+
+    .register-card h2 {
+        font-size: 26px;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE — PHONE
+   ========================================================= */
+
+@media (max-width: 576px) {
+
+    .container {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    .register-card {
+        margin: 5px auto;
+
+        padding: 25px 18px;
+
+        border-radius: 16px;
+
+        box-shadow:
+            0 12px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .register-card h2 {
+        font-size: 23px;
+
+        margin-bottom: 23px !important;
+    }
+
+    .register-card .form-control,
+    .register-card .form-select {
+        min-height: 46px;
+
+        font-size: 14px;
+    }
+
+    .register-card .btn-primary {
+        min-height: 49px;
+
+        font-size: 15px;
+    }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .register-card,
+    #grade_level_field,
+    #cv_document_field,
+    .register-card .alert-danger {
+        animation: none;
+    }
+
+    .register-card .form-control,
+    .register-card .form-select,
+    .register-card .btn-primary,
+    .pw-toggle {
+        transition: none;
+    }
+}
+

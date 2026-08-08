@@ -20,6 +20,18 @@ class User(AbstractUser):
         choices=ROLE_CHOICES,
         default='student'
     )
+    
+    APPROVAL_STATUS_CHOICES = (
+        ("pending", "Pending"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
+    )
+
+    approval_status = models.CharField(
+        max_length=20,
+        choices=APPROVAL_STATUS_CHOICES,
+        default="pending",
+    )
 
     phone = models.CharField(
         max_length=15,

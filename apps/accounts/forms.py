@@ -50,6 +50,8 @@ class RegisterForm(UserCreationForm):
             "id": "id_role"
         })
     )
+    
+    
 
     grade_level = forms.ChoiceField(
         required=False,

@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import  authenticate, login, logout
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -24,23 +24,43 @@ def home(request):
 
     return render(request, "home.html", {"teachers": teachers})
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+
+from .forms import RegisterForm
+
+
 def register_view(request):
+
     if request.method == "POST":
-        form = RegisterForm(request.POST, request.FILES)
+
+        form = RegisterForm(
+            request.POST,
+            request.FILES
+        )
 
         if form.is_valid():
-            user = form.save()
 
-            login(request, user)
+            user = form.save(commit=False)
+
+            # New registration must wait for admin approval
+            user.approval_status = "pending"
+
+            user.save()
 
             messages.success(
                 request,
-                "Registration successful. Welcome!"
+                "Registration submitted successfully. "
+                "Please wait for administrator approval "
+                "before logging in."
             )
 
-            return redirect("dashboard:home")
+            return redirect(
+                "accounts:registration_pending"
+            )
 
     else:
+
         form = RegisterForm()
 
     return render(
@@ -50,6 +70,17 @@ def register_view(request):
             "form": form
         }
     )
+    
+
+def registration_pending(request):
+
+    return render(
+        request,
+        "accounts/pending.html"
+    )
+    
+
+    
 
 def login_view(request):
 
@@ -69,14 +100,44 @@ def login_view(request):
 
         if user is not None:
 
-            login(request, user)
+            # -------------------------------
+            # CHECK REGISTRATION APPROVAL
+            # -------------------------------
 
-            messages.success(
-                request,
-                f"Welcome back {user.first_name}!"
-            )
+            if user.approval_status == "pending":
 
-            return redirect("dashboard:home")
+                messages.warning(
+                    request,
+                    "Your registration is waiting "
+                    "for administrator approval."
+                )
+
+                return redirect("accounts:login")
+
+            if user.approval_status == "rejected":
+
+                messages.error(
+                    request,
+                    "Your registration request has "
+                    "been rejected by the administrator."
+                )
+
+                return redirect("accounts:login")
+
+            # -------------------------------
+            # USER IS APPROVED
+            # -------------------------------
+
+            if user.approval_status == "approved":
+
+                login(request, user)
+
+                messages.success(
+                    request,
+                    f"Welcome back {user.first_name}!"
+                )
+
+                return redirect("dashboard:home")
 
         else:
 

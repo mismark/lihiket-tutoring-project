@@ -1,0 +1,62 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Registration Pending</title>
+
+<link rel="stylesheet"
+      href="{% static 'accounts/css/auth-pending.css' %}">
+
+</head>
+
+<body>
+
+<div class="auth-container">
+
+    <div class="auth-card pending-card">
+
+        <div class="pending-icon">
+            ⏳
+        </div>
+
+        <h1>Registration Submitted</h1>
+
+        <p class="pending-title">
+            Your registration request has been received.
+        </p>
+
+        <p class="pending-text">
+            Your account is currently waiting for administrator
+            approval. You will be able to login with in 24-48 hours after your
+            registration has been approved.
+        </p>
+
+        <div class="pending-status">
+            <span class="status-dot"></span>
+            Waiting for approval
+        </div>
+
+        <a href="{% url 'accounts:login' %}"
+        class="auth-button">
+            Go to Login
+        </a>
+
+        <a href="{% url 'accounts:register' %}"
+        class="back-link">
+            Register another account
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

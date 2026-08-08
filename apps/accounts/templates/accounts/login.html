@@ -1,77 +1,200 @@
-{% extends "base_auth.html" %}
 {% load static %}
 
-{% block title %}Login{% endblock %}
+<!DOCTYPE html>
 
-{% block content %}
+<html lang="en">
 
-<link rel="stylesheet" href="{% static 'accounts/css/accounts.css' %}">
+<head>
 
-<div class="login-page">
+<meta charset="UTF-8">
 
-  <div class="login-card">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Login</title>
+
+<link rel="stylesheet"
+      href="{% static 'accounts/css/login.css' %}">
+
+
+
+
+</head>
+
+<body>
+
+<div class="login-container">
+
+<div class="login-card">
+
+    <!-- Login Icon -->
+
+    <div class="login-icon">
+        🔐
+    </div>
+
+
+    <!-- Header -->
 
     <h2>Welcome Back</h2>
-    <p>Login to continue learning.</p>
+
+    <p class="login-subtitle">
+        Login to continue learning.
+    </p>
+
+
+    <!-- Django Messages -->
 
     {% if messages %}
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-      {% endfor %}
+
+        {% for message in messages %}
+
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
     {% endif %}
+
+
+    <!-- Login Form -->
 
     <form method="POST">
 
-      {% csrf_token %}
+        {% csrf_token %}
 
-      <div class="mb-3">
-        <label>Username</label>
-        <input
-          type="text"
-          name="username"
-          class="form-control"
-          placeholder="Username"
-          required>
-      </div>
 
-      <div class="mb-3">
-        <label>Password</label>
-        <div class="pw-wrap">
-          <input
-            type="password"
-            name="password"
-            id="login_password"
-            class="form-control"
-            placeholder="Password"
-            required>
-          <button type="button" class="pw-toggle" onclick="togglePassword('login_password', this)" aria-label="Show password">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/><path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/></svg>
-          </button>
+        <!-- Username -->
+
+        <div class="mb-3">
+
+            <label for="username">
+                Username
+            </label>
+
+            <input
+                type="text"
+                name="username"
+                id="username"
+                class="form-control"
+                placeholder="Username"
+                autocomplete="username"
+                required>
+
         </div>
-      </div>
 
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <label class="mb-0">
-          <input type="checkbox"> Remember Me
-        </label>
-        <a href="{% url 'accounts:forgot_password' %}">Forgot Password?</a>
-      </div>
 
-      <button class="btn btn-primary w-100">Login</button>
+        <!-- Password -->
+
+        <div class="mb-3">
+
+            <label for="login_password">
+                Password
+            </label>
+
+            <div class="pw-wrap">
+
+                <input
+                    type="password"
+                    name="password"
+                    id="login_password"
+                    class="form-control"
+                    placeholder="Password"
+                    autocomplete="current-password"
+                    required>
+
+
+                <button
+                    type="button"
+                    class="pw-toggle"
+                    onclick="togglePassword('login_password', this)"
+                    aria-label="Show password">
+
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        viewBox="0 0 16 16">
+
+                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
+
+                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
+
+                    </svg>
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- Remember / Forgot -->
+
+        <div class="d-flex justify-content-between align-items-center remember-forgot">
+
+            <label class="remember-label">
+
+                <input
+                    type="checkbox"
+                    name="remember_me">
+
+                Remember Me
+
+            </label>
+
+
+            <a
+                href="{% url 'accounts:forgot_password' %}"
+                class="forgot-link">
+
+                Forgot Password?
+
+            </a>
+
+        </div>
+
+
+        <!-- Login -->
+
+        <button
+            type="submit"
+            class="login-button">
+
+            Login
+
+        </button>
 
     </form>
 
+
+    <!-- Divider -->
+
     <hr>
 
-    <p class="text-center">
-      Don't have an account?
-      <a href="{% url 'accounts:register' %}">Register</a>
-    </p>
 
-  </div>
+    <!-- Register -->
+
+    <p class="register-text">
+
+        Don't have an account?
+
+        <a href="{% url 'accounts:register' %}">
+            Register
+        </a>
+
+    </p>
 
 </div>
 
-<script src="{% static 'accounts/js/accounts.js' %}"></script>
+</div>
 
-{% endblock %}
+<!-- Password Toggle -->
+
+<script> function togglePassword(inputId, button) { const input = document.getElementById(inputId); if (input.type === "password") { input.type = "text"; button.setAttribute( "aria-label", "Hide password" ); } else { input.type = "password"; button.setAttribute( "aria-label", "Show password" ); } } </script>
+
+</body>
+
+</html>
