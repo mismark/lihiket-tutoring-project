@@ -60,7 +60,7 @@
       <div class="card-body p-4" style=" border-radius:15px; background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;position:relative;">
         <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.12;"><i class="fas fa-book-open"></i></div>
         <p class="mb-1" style="opacity:.85;font-size:.82rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">My Courses</p>
-        <h2 class="fw-bold mb-0 counter" data-target="{{ total_courses }}">0 </h2>
+        <h2 class="fw-bold mb-0 counter" data-target="{{ total_courses }}">{{ total_courses }} </h2>
         <small style="opacity:.7;">Active teaching courses</small>
       </div>
     </div>
@@ -70,7 +70,7 @@
       <div class="card-body p-4" style=" border-radius:15px; background:linear-gradient(135deg,#43e97b,#38f9d7);color:#fff;position:relative;">
         <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.12;"><i class="fas fa-user-graduate"></i></div>
         <p class="mb-1" style="opacity:.85;font-size:.82rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Students</p>
-        <h2 class="fw-bold mb-0 counter" data-target="{{ enrolled_count }}">0</h2>
+        <h2 class="fw-bold mb-0 counter" data-target="{{ enrolled_count }}">{{ enrolled_count }}</h2>
         <small style="opacity:.7;">Enrolled in your courses</small>
       </div>
     </div>
@@ -80,7 +80,7 @@
       <div class="card-body p-4" style=" border-radius:15px; background:linear-gradient(135deg,#f7971e,#ffd200);color:#fff;position:relative;">
         <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.12;"><i class="fas fa-tasks"></i></div>
         <p class="mb-1" style="opacity:.85;font-size:.82rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Pending Grades</p>
-        <h2 class="fw-bold mb-0 counter" data-target="{{ pending_count }}">0</h2>
+        <h2 class="fw-bold mb-0 counter" data-target="{{ pending_count }}">{{ pending_count }}</h2>
         <small style="opacity:.7;">Submissions to review</small>
       </div>
     </div>
@@ -90,7 +90,7 @@
       <div class="card-body p-4" style=" border-radius:15px; background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff;position:relative;">
         <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.12;"><i class="fas fa-video"></i></div>
         <p class="mb-1" style="opacity:.85;font-size:.82rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Live Classes</p>
-        <h2 class="fw-bold mb-0 counter" data-target="{{ upcoming|length }}">0</h2>
+        <h2 class="fw-bold mb-0 counter" data-target="{{ upcoming|length }}">{{ upcoming|length }}</h2>
         <small style="opacity:.7;">Upcoming sessions</small>
       </div>
     </div>
