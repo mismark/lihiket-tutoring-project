@@ -120,14 +120,18 @@ DATABASES = {
         ),
         'PORT': os.getenv('DB_PORT', '17612'),
 
+        # 'OPTIONS': {
+        #     'ssl': {
+        #         'ca': os.path.join(
+        #             BASE_DIR,
+        #             'certs',
+        #             'ca.pem'
+        #         ),
+        #     },
+        # },
+        
         'OPTIONS': {
-            'ssl': {
-                'ca': os.path.join(
-                    BASE_DIR,
-                    'certs',
-                    'ca.pem'
-                ),
-            },
+            'ssl_mode': 'REQUIRED',
         },
     }
 }
